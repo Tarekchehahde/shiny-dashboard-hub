@@ -21,7 +21,7 @@ shiny::runApp("apps/thesis_battery_lithium/01_batteries_deutschland")
 ## Data
 
 - **MaStR-powered apps** use `R/mastr_data.R` (remote Parquet / DuckDB via GitHub Releases). No ETL in this folder.
-- **Lithium / mining context** is not in MaStR. App `03_lithium_rohstoff_kontext` reads optional curated rows from **`data/thesis_static/lithium_projects_de.csv`** (relative to `thesis_energy_mastr_shiny/`, not this `apps/` subfolder).
+- **Lithium / mining context** is not in MaStR. App `03_lithium_rohstoff_kontext` reads optional curated rows from **`data/thesis_static/lithium_projects_de.csv`** (relative to `thesis_energy_mastr_shiny/`, not this `apps/` subfolder) and shows **Plotly bar charts** (counts by `status` and `bundesland`) plus a searchable **reactable** table with clickable `source_url` links.
 
 ## If you see “Could not resolve latest release”
 
