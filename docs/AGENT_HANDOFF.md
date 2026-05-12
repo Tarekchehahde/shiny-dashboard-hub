@@ -87,7 +87,7 @@ Any **other** Shiny (or R) project that reuses **`shiny/R/mastr_data.R`** or the
 
 ## 7. THESIS track (separate repo, same MaStR release idea)
 
-Battery / thesis Shiny lives in **`Tarekchehahde/mastr`** under **`thesis_energy_mastr_shiny/`** — not in this repo. It uses its own `mastr_data.R` and typically **`MASTR_REPO=Tarekchehahde/transtek`** for Parquet releases (see that repo’s `AGENT_CONTEXT_THESIS_MASTR_SHINY.md`). **No second ETL** is required in the thesis tree if it keeps consuming published release assets.
+Battery / thesis Shiny **source** lives **on GitHub** in **`Tarekchehahde/mastr`** under **`thesis_energy_mastr_shiny/`** — not in this repo (and not “only” under a local `MaStR/` stub; that stub just points at the remote). It uses its own `mastr_data.R` and typically **`MASTR_REPO=Tarekchehahde/transtek`** for Parquet releases (see that repo’s `AGENT_CONTEXT_THESIS_MASTR_SHINY.md`). **No second ETL** is required in the thesis tree if it keeps consuming published release assets.
 
 If your **local** workspace groups both efforts, keep a **sibling** folder **`MaStR/`** (README + `METADATA.json` only — **not** pushed as the thesis repo) and clone this GitHub project as e.g. **`mastr-thesis/`** so the path on disk does not fight with the remote name **`mastr`**.
 
