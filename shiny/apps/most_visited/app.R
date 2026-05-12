@@ -52,7 +52,7 @@ ui <- mastr_page(
     MONTHS_DE[MONTH_NOW]),
   fluid = TRUE,
 
-  tableau_parity_banner("Aktuelle Zubauleistung pro Segment (Candida)"),
+  tableau_parity_banner("Aktuelle Zubauleistung pro Segment (Tableau-Referenz)"),
 
   layout_sidebar(
     sidebar = sidebar(

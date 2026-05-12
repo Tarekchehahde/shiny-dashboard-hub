@@ -51,7 +51,7 @@ Swap `01_overview` for any of:
 | 13 | `13_capacity_trends` | time-series build-out |
 | 14 | `14_state_comparison` | Bundesland league tables |
 | 15 | `15_ee_quote` | renewable share by state |
-| ★ | `most_visited` | **Flagship** — R-Shiny clone of Candida's monthly Tableau panel (4 segment small-multiples + YTD diff table) |
+| ★ | `most_visited` | **Flagship** — monthly solar Zubau by segment + YTD diff table (Tableau-parity; internal name *Candida dashboard*: see [`AGENT_HANDOFF.md`](AGENT_HANDOFF.md)) |
 | 16 | `16_ibn_stacked_area` | Tableau *Inbetriebnahmen (2)* — stacked area by size bucket |
 | 17 | `17_anlagen_leistung` | Tableau *Überblick – Anlagen & Leistung* — summary row, 3 maps, Q-time series |
 | 18 | `18_ibn_tabelle` | Tableau *Inbetriebnahmen MaStR – Tabelle* — Jahr/Quartal/Monat + Δ |

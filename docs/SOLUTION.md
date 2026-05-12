@@ -8,7 +8,8 @@ from RStudio without downloading a single XML file.
 > **Audience:** engineers, data team reviewers, forkers, and anyone writing
 > academic / policy work who needs to cite exactly what the pipeline does.
 > For a two-minute "how do I see a chart in RStudio right now?", read
-> [`RUN.md`](RUN.md) instead.
+> [`RUN.md`](RUN.md) instead. Contributors and **coding agents** should also read
+> [`AGENT_HANDOFF.md`](AGENT_HANDOFF.md) (operations, release quirks, internal naming such as *Candida dashboard*).
 
 ---
 
@@ -390,6 +391,7 @@ mastr-shiny/
 ├── docs/
 │   ├── SOLUTION.md            # this file
 │   ├── RUN.md                 # public-facing quickstart
+│   ├── AGENT_HANDOFF.md       # ops + agent vocabulary (e.g. Candida dashboard)
 │   ├── ARCHITECTURE.md        # short index into SOLUTION
 │   ├── AUTONOMY.md            # CI autonomy state machine
 │   ├── DATA_SCHEMA.md         # column-level reference

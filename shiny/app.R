@@ -22,7 +22,7 @@ suppressPackageStartupMessages({
 APPS <- list(
   list(id = "most_visited",      title = "Most Visited",
        group = "flagship",
-       desc = "R Shiny-Nachbau des Tableau-Panels, das Candida monatlich ins Dashboard postet. Zubau nach Segment + YTD-Vergleichstabelle.",
+       desc = "Monatlicher Solar-Zubau (MW) nach Segment + YTD-Vergleichstabelle \u2014 Nachbau des internen Tableau-Referenzpanels.",
        highlight = TRUE),
 
   list(id = "01_overview",       title = "MaStR — Überblick",
@@ -124,9 +124,9 @@ ui <- page_fluid(
       p(class = "text-muted",
         "Daten werden live aus dem neuesten GitHub-Release gelesen (kein XML nötig)."),
 
-      h4(class = "mt-4", "Flagship — Vergleich mit Candida"),
+      h4(class = "mt-4", "Flagship \u2014 Tableau-Referenz (Solar-Zubau)"),
       p(class = "text-muted small",
-        "Direktes R-Shiny-Pendant des Tableau-Panels, das Candida monatlich postet."),
+        "R-Shiny-Nachbau des internen Tableau-Blatts: Zubauleistung pro Segment und Vorjahresvergleich."),
       layout_column_wrap(width = 1, gap = "1rem",
         !!!lapply(.apps_in("flagship"), .app_card)),
 
