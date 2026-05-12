@@ -102,7 +102,11 @@ mastr-shiny/
         ├── R/mastr_data.R
         ├── R/ui_helpers.R
         ├── apps/thesis_battery_lithium/
-        └── data/thesis_static/lithium_projects_de.csv
+        └── data/
+            ├── README.md
+            ├── thesis_static/   # curated CSVs (git), incl. lithium_projects_de.csv
+            ├── raw/             # bulk downloads (git-ignored except README)
+            └── processed/       # cleaned outputs
 ```
 
 *Last updated: monorepo — thesis tree under `THESIS/` in `Tarekchehahde/mastr-shiny` alongside `WORK/` (ETL + production Shiny).*

@@ -1,0 +1,4 @@
+# Ignore bulk downloads by default; track only README + this file.
+*
+!.gitignore
+!README.md
