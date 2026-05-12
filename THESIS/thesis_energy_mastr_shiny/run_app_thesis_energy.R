@@ -14,7 +14,13 @@ source("thesis_menu_app.R", local = TRUE)
 
 launched <- shinyApp(ui, server)
 if (interactive()) {
-  picked <- runApp(launched)
+  picked <- tryCatch(
+    {
+      options(thesis.menu.return_path = TRUE)
+      runApp(launched)
+    },
+    finally = options(thesis.menu.return_path = NULL)
+  )
   if (is.character(picked) && nzchar(picked)) {
     app_full <- file.path(getwd(), picked)
     if (!dir.exists(app_full)) {

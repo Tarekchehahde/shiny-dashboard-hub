@@ -46,7 +46,22 @@ server <- function(input, output, session) {
     path <- a$id
     observeEvent(input[[paste0("go_", slug)]], {
       message(">> thesis track: launching ", path)
-      stopApp(returnValue = path)
+      # run_app_thesis_energy.R sets options(thesis.menu.return_path = TRUE) so the
+      # outer script can runApp(menu) then runApp(child). shiny::runGitHub only runs
+      # one outer runApp — without this branch the session ends and the child never starts.
+      if (isTRUE(getOption("thesis.menu.return_path", FALSE))) {
+        stopApp(returnValue = path)
+      } else {
+        apath <- normalizePath(file.path(getwd(), path), mustWork = FALSE)
+        session$onSessionEnded(function() {
+          if (!dir.exists(apath)) {
+            warning("Thesis app folder not found: ", apath)
+            return()
+          }
+          shiny::runApp(apath, launch.browser = TRUE)
+        })
+        stopApp()
+      }
     })
   })
 }
