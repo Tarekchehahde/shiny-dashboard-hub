@@ -25,7 +25,7 @@ shiny::runApp("apps/thesis_battery_lithium/01_batteries_deutschland")
 
 ## If you see “Could not resolve latest release”
 
-The app calls GitHub’s **`/releases/latest`** API for `MASTR_REPO` (default `Tarekchehahde/transtek`). That fails when the repo is **private**, has **no releases**, or you’re **rate-limited**. Pick one fix **before** `runApp()`:
+The app calls GitHub’s **`/releases/latest`** API for `MASTR_REPO` (default **`Tarekchehahde/mastr-shiny`**). That fails when the repo is **private**, has **no releases**, or you’re **rate-limited**. Pick one fix **before** `runApp()`:
 
 **A — Pin a known data release tag** (no “latest” API call):
 

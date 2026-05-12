@@ -15,7 +15,7 @@ shiny::runGitHub("mastr-shiny", "Tarekchehahde",
                  subdir = "THESIS/thesis_energy_mastr_shiny", ref = "main")
 ```
 
-**Data:** `thesis_energy_mastr_shiny/R/mastr_data.R` — GitHub Releases / DuckDB `httpfs`; default `MASTR_REPO` is often `Tarekchehahde/transtek` unless you override (see app README + agent context).
+**Data:** `thesis_energy_mastr_shiny/R/mastr_data.R` — GitHub Releases / DuckDB `httpfs`; default **`MASTR_REPO`** is **`Tarekchehahde/mastr-shiny`** (same assets as `WORK/shiny`). Override if needed (see app README + agent context).
 
 **Agent handoff:** [`thesis_energy_mastr_shiny/AGENT_CONTEXT_THESIS_MASTR_SHINY.md`](thesis_energy_mastr_shiny/AGENT_CONTEXT_THESIS_MASTR_SHINY.md).
 

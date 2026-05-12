@@ -27,7 +27,7 @@ Please read:
 
 Constraints:
 - This folder is self-contained: run_app_thesis_energy.R, R/, apps/thesis_battery_lithium/, data/.
-- MaStR data: R/mastr_data.R — GitHub Releases / DuckDB httpfs; default MASTR_REPO is Tarekchehahde/transtek unless overridden.
+- MaStR data: R/mastr_data.R — GitHub Releases / DuckDB httpfs; default MASTR_REPO is Tarekchehahde/mastr-shiny (same as WORK track) unless overridden.
 - Lithium app (03_*) uses data/thesis_static/lithium_projects_de.csv — not MaStR.
 
 Working directory for R (from clone root): THESIS/thesis_energy_mastr_shiny/
