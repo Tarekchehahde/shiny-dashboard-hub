@@ -1,8 +1,8 @@
-# mastr-shiny :: convenience targets
+# MaStR monorepo :: ETL / WORK Shiny convenience targets (run from repo root)
 # Most users never run these. CI (.github/workflows/nightly-etl.yml) runs them.
 
 PY  ?= python3
-VENV := etl/.venv
+VENV := WORK/etl/.venv
 BIN  := $(VENV)/bin
 
 DATA_DIR ?= data
@@ -15,8 +15,8 @@ RELEASE_TAG ?= data-$(shell date -u +%Y-%m-%d)
         schema-check publish test lint shiny-lint shinylive
 
 help:
-	@echo "mastr-shiny targets:"
-	@echo "  make venv          - create Python virtualenv in etl/.venv"
+	@echo "MaStR monorepo targets (WORK/etl):"
+	@echo "  make venv          - create Python virtualenv in WORK/etl/.venv"
 	@echo "  make install       - install Python deps"
 	@echo "  make download      - fetch MaStR ZIP into $(WORK_DIR)"
 	@echo "  make parse         - XML -> Parquet in $(OUT_DIR)"
@@ -34,7 +34,7 @@ venv:
 	$(BIN)/pip install -U pip wheel
 
 install: venv
-	$(BIN)/pip install -e etl
+	$(BIN)/pip install -e WORK/etl
 
 download:
 	$(BIN)/python -m mastr_etl.download --out $(WORK_DIR)
@@ -51,19 +51,19 @@ aggregates:
 all: download parse duckdb aggregates
 
 schema-check:
-	$(BIN)/python -m mastr_etl.schema_diff --work $(WORK_DIR) --snapshot etl/schema_snapshot.json
+	$(BIN)/python -m mastr_etl.schema_diff --work $(WORK_DIR) --snapshot WORK/etl/schema_snapshot.json
 
 publish:
 	$(BIN)/python -m mastr_etl.publish --tag $(RELEASE_TAG) --parquet $(OUT_DIR) --duckdb $(DUCKDB)
 
 test:
-	$(BIN)/pytest etl/tests -v
+	$(BIN)/pytest WORK/etl/tests -v
 
 lint:
-	$(BIN)/ruff check etl
+	$(BIN)/ruff check WORK/etl
 
 shinylive:
-	Rscript -e 'shinylive::export("shiny", "shinylive-site", subdir = "apps")'
+	Rscript -e 'shinylive::export("WORK/shiny", "shinylive-site", subdir = "apps")'
 
 clean:
 	rm -rf $(DATA_DIR)

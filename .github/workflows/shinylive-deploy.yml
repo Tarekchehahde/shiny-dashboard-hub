@@ -30,11 +30,11 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          working-directory: shiny
+          working-directory: WORK/shiny
           extra-packages: any::shinylive, any::shiny, any::bslib
 
       - name: Build shinylive site
-        run: Rscript -e 'shinylive::export("shiny", "_site", subdir = "apps")'
+        run: Rscript -e 'shinylive::export("WORK/shiny", "_site", subdir = "apps")'
 
       - uses: actions/upload-pages-artifact@v3
         with:

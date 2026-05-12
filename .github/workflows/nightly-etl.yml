@@ -54,7 +54,7 @@ jobs:
       - name: Install ETL
         run: |
           python -m pip install -U pip wheel
-          pip install -e etl
+          pip install -e WORK/etl
 
       - name: Compute tag
         id: meta
@@ -210,7 +210,7 @@ jobs:
       - name: Schema-drift check
         id: drift
         continue-on-error: true
-        run: python -m mastr_etl.schema_diff --parquet data/parquet --snapshot etl/schema_snapshot.json
+        run: python -m mastr_etl.schema_diff --parquet data/parquet --snapshot WORK/etl/schema_snapshot.json
 
       - name: Open issue if schema changed
         if: steps.drift.outcome == 'failure'

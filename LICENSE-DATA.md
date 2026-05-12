@@ -19,7 +19,7 @@ display the following notice:
 > bereitgestellt unter Datenlizenz Deutschland — Namensnennung — Version 2.0
 > (https://www.govdata.de/dl-de/by-2-0).
 
-Each Shiny app in `shiny/apps/` renders this notice in its footer.
+Each Shiny app in `WORK/shiny/apps/` renders this notice in its footer.
 
 ## What this project adds
 
@@ -32,5 +32,5 @@ attribution.
 
 ## Code licence
 
-All code in this repository (`etl/`, `shiny/`, `.github/workflows/`, `docs/`)
+All code in this repository (`WORK/etl/`, `WORK/shiny/`, `.github/workflows/`, `WORK/docs/`, `THESIS/`)
 is released under the MIT licence — see [`LICENSE`](LICENSE).

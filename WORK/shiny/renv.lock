@@ -1,0 +1,23 @@
+{
+  "__comment": "Placeholder renv.lock. Regenerate with renv::snapshot() once the first environment is installed. Pins are left minimal so new users can restore on current CRAN quickly.",
+  "R": {
+    "Version": "4.4.0",
+    "Repositories": [
+      { "Name": "CRAN", "URL": "https://cloud.r-project.org" }
+    ]
+  },
+  "Packages": {
+    "shiny":       { "Source": "Repository", "Repository": "CRAN" },
+    "bslib":       { "Source": "Repository", "Repository": "CRAN" },
+    "DBI":         { "Source": "Repository", "Repository": "CRAN" },
+    "duckdb":      { "Source": "Repository", "Repository": "CRAN" },
+    "httr2":       { "Source": "Repository", "Repository": "CRAN" },
+    "memoise":     { "Source": "Repository", "Repository": "CRAN" },
+    "rlang":       { "Source": "Repository", "Repository": "CRAN" },
+    "plotly":      { "Source": "Repository", "Repository": "CRAN" },
+    "leaflet":     { "Source": "Repository", "Repository": "CRAN" },
+    "reactable":   { "Source": "Repository", "Repository": "CRAN" },
+    "viridisLite": { "Source": "Repository", "Repository": "CRAN" },
+    "dplyr":       { "Source": "Repository", "Repository": "CRAN" }
+  }
+}

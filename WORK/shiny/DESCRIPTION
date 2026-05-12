@@ -1,0 +1,30 @@
+Package: mastrShiny
+Title: Click-and-Run Shiny Dashboards for the German Marktstammdatenregister
+Version: 0.1.0
+Authors@R: person("mastr-shiny", "contributors", role = c("aut", "cre"),
+                  email = "noreply@example.com")
+Description: A collection of bslib-styled Shiny dashboards that visualize the
+    Bundesnetzagentur Marktstammdatenregister (MaStR) by reading
+    pre-processed Parquet files from GitHub Releases through DuckDB's httpfs
+    extension. End users never need to download the ~2.8 GB XML dump.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Depends: R (>= 4.3)
+Imports:
+    shiny (>= 1.8),
+    bslib (>= 0.7),
+    DBI,
+    duckdb (>= 0.10),
+    httr2,
+    memoise,
+    rlang,
+    plotly,
+    leaflet,
+    reactable,
+    viridisLite,
+    dplyr
+Suggests:
+    shinylive,
+    renv,
+    testthat (>= 3.0)
+RoxygenNote: 7.3.1

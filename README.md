@@ -1,126 +1,74 @@
-# MaStR-Shiny — Click-and-Run Dashboards for the German Marktstammdatenregister
+# MaStR monorepo — `WORK` + `THESIS`
 
-Interactive R/Shiny dashboards for the Bundesnetzagentur **Marktstammdatenregister (MaStR)** —
-Germany's official register of all electricity- and gas-market units.
+One GitHub repository for **two top-level product lines** that both use **BundesnetzAgen­tur MaStR** data (via the same nightly release assets where applicable). Use **one clone on any laptop**; open the folder that matches what you are doing that day.
 
-> **You never download the XML.** A nightly GitHub Actions pipeline parses the
-> ~2.8 GB MaStR XML dump, writes compact Parquet + DuckDB files, and publishes
-> them as GitHub Release assets. The Shiny apps query those files **remotely
-> over HTTPS** through DuckDB's `httpfs` extension. Locally, you only ever
-> download a few MB of R code.
+| Folder | Use on | Contents |
+|--------|--------|----------|
+| **[`WORK/`](WORK/)** | This machine / Candida-style flagship dashboards and the rest of the production Shiny suite | Python **ETL**, **GitHub Actions** (root `.github/`), launcher + apps under `WORK/shiny/`, docs under `WORK/docs/` |
+| **[`THESIS/`](THESIS/)** | Other laptop / battery & thesis dashboards | Self-contained **`THESIS/thesis_energy_mastr_shiny/`** — thesis launcher, three battery-related apps, `R/mastr_data.R` |
 
----
-
-## What's in the box
-
-| Folder | Purpose |
-|---|---|
-| [`etl/`](etl/) | Python pipeline: download → parse XML → write Parquet → build DuckDB → publish Release |
-| [`.github/workflows/`](.github/workflows/) | Nightly ETL, schema-drift detection, release automation |
-| [`shiny/apps/`](shiny/apps/) | 15+ standalone Shiny dashboards (one folder = one app) |
-| [`shiny/R/`](shiny/R/) | Shared loader (`mastr_data.R`) — reads remote Parquet via DuckDB |
-| [`docs/`](docs/) | Documentation, data schema, autonomy model |
-
-**Key docs:**
-- **[`docs/RUN.md`](docs/RUN.md)** — copy-paste launch commands for end users (start here).
-- **[`docs/RSTUDIO_CONTEXTS.md`](docs/RSTUDIO_CONTEXTS.md)** — **RStudio copy-paste**: work vs. thesis (`MASTR_TAG`), full `runGitHub` list per dashboard.
-- **[`docs/SOLUTION.md`](docs/SOLUTION.md)** — full architecture, pipeline, data layer, and design decisions.
-- [`docs/DATA_SCHEMA.md`](docs/DATA_SCHEMA.md) — column-level reference.
-- [`docs/AUTONOMY.md`](docs/AUTONOMY.md) — CI state machine.
+**Default branch:** `main` (there is no requirement to use a branch named `master`; agents and `runGitHub` should use `ref = "main"` unless you add `master` yourself.)
 
 ---
 
-## Quickstart (end user, RStudio)
+## Quick links
 
-### One-liner from GitHub (no clone)
+- **WORK runbook:** [`WORK/docs/RUN.md`](WORK/docs/RUN.md) — `runGitHub` and `runApp` paths start with `WORK/shiny/…`.
+- **WORK agent handoff:** [`WORK/docs/AGENT_HANDOFF.md`](WORK/docs/AGENT_HANDOFF.md) — Candida / flagship context, ETL, release resolution.
+- **RStudio matrix (both tracks):** [`WORK/docs/RSTUDIO_CONTEXTS.md`](WORK/docs/RSTUDIO_CONTEXTS.md) — includes THESIS `runGitHub` after the monorepo move.
+- **THESIS run + env:** [`THESIS/thesis_energy_mastr_shiny/README.md`](THESIS/thesis_energy_mastr_shiny/README.md) and [`THESIS/thesis_energy_mastr_shiny/AGENT_CONTEXT_THESIS_MASTR_SHINY.md`](THESIS/thesis_energy_mastr_shiny/AGENT_CONTEXT_THESIS_MASTR_SHINY.md).
+
+---
+
+## `runGitHub` (single repo, two `subdir` roots)
+
+**WORK launcher (production dashboards, incl. flagship / “most visited”):**
 
 ```r
-install.packages(c("shiny", "bslib", "DBI", "duckdb", "memoise", "httr2",
-                   "rlang", "dplyr", "tidyr", "ggplot2", "plotly", "leaflet",
-                   "reactable", "scales", "stringr", "lubridate"))
-
-# Launcher menu (15 dashboards):
-shiny::runGitHub("mastr-shiny", "Tarekchehahde", subdir = "shiny", ref = "main")
-
-# Or jump straight into one dashboard:
-shiny::runGitHub("mastr-shiny", "Tarekchehahde",
-                 subdir = "shiny/apps/02_solar_pv", ref = "main")
+shiny::runGitHub("mastr-shiny", "Tarekchehahde", subdir = "WORK/shiny", ref = "main")
 ```
 
-### Clone-and-run (preferred for repeated use)
+**WORK single app (example):**
+
+```r
+shiny::runGitHub("mastr-shiny", "Tarekchehahde",
+                 subdir = "WORK/shiny/apps/most_visited", ref = "main")
+```
+
+**THESIS launcher:**
+
+```r
+shiny::runGitHub("mastr-shiny", "Tarekchehahde",
+                 subdir = "THESIS/thesis_energy_mastr_shiny", ref = "main")
+```
+
+---
+
+## Clone layout (any PC)
 
 ```bash
-git clone --depth 1 https://github.com/Tarekchehahde/mastr-shiny.git
+git clone https://github.com/Tarekchehahde/mastr-shiny.git
 ```
 
 ```r
-shiny::runApp("mastr-shiny/shiny")                  # launcher menu
-shiny::runApp("mastr-shiny/shiny/apps/12_geo_map")  # any single app
+# WORK
+shiny::runApp("mastr-shiny/WORK/shiny")
+
+# THESIS
+setwd("mastr-shiny/THESIS/thesis_energy_mastr_shiny")
+shiny::runApp("run_app_thesis_energy.R")
 ```
 
-The first query downloads ~5 MB of column statistics; subsequent queries are
-sub-second because DuckDB only fetches the Parquet row groups it needs.
+---
 
-### Zero-install (browser) build
+## Data & ETL
 
-The `gh-pages` branch hosts a [shinylive](https://shinylive.io/) build —
-no R, no install, just a URL. See [`docs/SHINYLIVE.md`](docs/SHINYLIVE.md).
+- **BNetzA** publishes the official MaStR export.
+- **Nightly ETL** still lives under **`WORK/etl/`**; workflows remain in **`.github/workflows/`** at the repository root.
+- **GitHub Releases** on this repo (`data-YYYY-MM-DD`) are produced by that pipeline — same consumer URLs as before, with **code paths** under `WORK/` for contributors.
 
 ---
 
-## The dashboards
+## Licence
 
-| # | App | What it shows |
-|--:|---|---|
-| 01 | **overview** | KPIs: total installed capacity, units, EE-quote, last refresh |
-| 02 | **solar_pv** | PV fleet by Bundesland, size class, year of commissioning |
-| 03 | **wind_onshore** | Onshore wind: turbines, hub height, rotor diameter, capacity factor proxy |
-| 04 | **wind_offshore** | Offshore wind parks, water depth, distance to coast |
-| 05 | **biomass** | Biomass / biogas / waste-to-energy plants |
-| 06 | **hydro** | Run-of-river, storage, pumped hydro |
-| 07 | **geothermal** | Deep geothermal heat & power |
-| 08 | **storage** | Battery + pumped storage capacity, C-rate distribution |
-| 09 | **chp** | Combined heat and power (KWK) plants |
-| 10 | **grid_operators** | Netzbetreiber: connections, balancing zones |
-| 11 | **market_actors** | Marktakteure: organisation type, registration timeline |
-| 12 | **geo_map** | Leaflet map, units clustered by PLZ / Gemeinde |
-| 13 | **capacity_trends** | Time-series build-out vs. EEG targets |
-| 14 | **state_comparison** | Bundesland-level league tables and per-capita rankings |
-| 15 | **ee_quote** | Renewable share by region & technology, with target trajectories |
-
-Each app is a self-contained `app.R` with its own README. Add your own by
-copying any folder and renaming.
-
----
-
-## Autonomy model
-
-| Stage | Autonomous? | Frequency | Notes |
-|---|---|---|---|
-| Download MaStR ZIP | ✅ | Nightly 06:00 UTC | Cron + retry + SHA-256 verify |
-| Parse XML → Parquet | ✅ | Nightly | Streaming `lxml.iterparse`, ~25 min on `ubuntu-latest` |
-| Build DuckDB views | ✅ | Nightly | Indexed by `EnergietraegerBruttoleistung`, `Bundesland`, `InbetriebnahmeDatum` |
-| Publish GitHub Release | ✅ | Nightly | Tag `data-YYYY-MM-DD`, assets split by entity type (≤2 GB cap) |
-| Schema-drift detection | ✅ | Nightly | Opens an Issue if BNetzA adds/removes XML fields |
-| Update Shiny apps | ⚠️ | On schema change or new chart request | Human-in-the-loop |
-| Renew `renv.lock` | ✅ | Weekly | Renovate-style PR |
-
-**Bottom line: set-and-forget for ingest + publish. You only intervene when
-BNetzA changes the schema (≈2× per year) or you want a new dashboard.**
-
-See [`docs/AUTONOMY.md`](docs/AUTONOMY.md) for the full state machine.
-
----
-
-## Data licence
-
-MaStR data is published by the Bundesnetzagentur under
-[Datenlizenz Deutschland 2.0 — Namensnennung](LICENSE-DATA.md).
-The Shiny apps and ETL code are MIT-licensed. Attribution is rendered in the
-footer of every dashboard.
-
----
-
-## Source
-
-- [Bundesnetzagentur — MaStR Datendownload](https://www.marktstammdatenregister.de/MaStR/Datendownload)
+MaStR data: [Datenlizenz Deutschland — Namensnennung](LICENSE-DATA.md). Code: MIT where noted in [LICENSE](LICENSE).
