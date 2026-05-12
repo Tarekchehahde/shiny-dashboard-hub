@@ -64,3 +64,9 @@ shiny::runApp("apps/01_overview")
 ```r
 Sys.setenv(MASTR_REPO = "some-other-user/some-fork")
 ```
+
+Pin a specific snapshot (must exist as a release tag on that repo):
+
+```r
+Sys.setenv(MASTR_TAG = "data-2026-05-05")
+```

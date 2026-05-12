@@ -58,14 +58,40 @@ def _gh_ok(*args: str) -> bool:
         return False
 
 
+def _mark_release_latest(tag: str) -> None:
+    """Pin GitHub's *Latest* badge (and ``/releases/latest``) to this tag.
+
+    Without this, an older release that was manually marked *Latest* can win
+    over newer dated ``data-*`` snapshots, which breaks Shiny clients that still
+    call the ``/releases/latest`` API.
+    """
+    try:
+        _gh("release", "edit", tag, "--latest")
+    except subprocess.CalledProcessError as exc:
+        log.warning(
+            "gh release edit --latest failed for %s: %s",
+            tag,
+            (exc.stderr or "").strip()[:200],
+        )
+
+
 def _ensure_release(tag: str, title: str, notes: str) -> None:
     """Create release if absent; uploads happen with --clobber so we can
     rerun the publish step idempotently."""
     if _gh_ok("release", "view", tag):
         log.info("Release %s already exists — re-uploading with --clobber", tag)
     else:
-        _gh("release", "create", tag, "--title", title, "--notes", notes,
-            "--prerelease=false")
+        _gh(
+            "release",
+            "create",
+            tag,
+            "--title",
+            title,
+            "--notes",
+            notes,
+            "--prerelease=false",
+            "--latest",
+        )
 
 
 def _assets_from(dirs: list[Path]) -> list[Path]:
@@ -193,6 +219,7 @@ def main(tag: str, parquet_dir: Path, duckdb_path: Path,
         sys.exit(0)
     log.info("Uploaded %d/%d assets to release %s", len(upload_list),
              len(upload_list), tag)
+    _mark_release_latest(tag)
 
 
 if __name__ == "__main__":

@@ -6,8 +6,9 @@
 # DuckDB's httpfs extension. Only the (usually tiny) result set is transferred.
 #
 # How it works:
-#   1. `mastr_release_base()` resolves the most recent GitHub Release tag
-#      (e.g. data-2026-04-21) and caches the base URL.
+#   1. Release resolution: optional `MASTR_TAG=...`, else newest `data-*` tag by
+#      GitHub `published_at` (not `/releases/latest`, which can point at an old
+#      snapshot if the "Latest" flag was set wrong), else fallback to `/latest`.
 #   2. `mastr_con()` returns an in-memory DuckDB connection with httpfs + a
 #      few CREATE VIEW statements that point at the remote Parquet files.
 #   3. `mastr_query()` / `mastr_table()` are thin wrappers around DBI::dbGetQuery.
@@ -56,24 +57,72 @@ mastr_use_local <- function(duckdb_path) {
 
 # ----- resolve latest release ------------------------------------------------
 
+.github_newest_data_release <- function(repo) {
+  tok <- Sys.getenv("GITHUB_TOKEN", "")
+  rows <- list()
+  for (page in seq_len(10L)) {
+    url <- sprintf("https://api.github.com/repos/%s/releases", repo)
+    req <- httr2::request(url) |>
+      httr2::req_url_query(per_page = 100L, page = page) |>
+      httr2::req_headers("Accept" = "application/vnd.github+json")
+    if (nzchar(tok)) req <- httr2::req_auth_bearer_token(req, tok)
+    resp <- tryCatch(httr2::req_perform(req), error = function(e) NULL)
+    if (is.null(resp) || httr2::resp_status(resp) >= 400) break
+    batch <- httr2::resp_body_json(resp)
+    if (!length(batch)) break
+    for (rel in batch) {
+      if (isTRUE(rel[["draft"]])) next
+      if (isTRUE(rel[["prerelease"]])) next
+      tag <- rel[["tag_name"]]
+      if (!is.character(tag) || length(tag) != 1L || !nzchar(tag)) next
+      if (!startsWith(tag, "data-")) next
+      pub <- rel[["published_at"]] %||% ""
+      rows[[length(rows) + 1L]] <- list(tag_name = tag, published_at = pub)
+    }
+    if (length(batch) < 100L) break
+  }
+  if (!length(rows)) return(NULL)
+  pubs <- vapply(rows, function(r) r$published_at %||% "", character(1))
+  if (!any(nzchar(pubs))) return(rows[[1L]])
+  pick <- order(pubs, decreasing = TRUE, na.last = TRUE)[1L]
+  rows[[pick]]
+}
+
 .resolve_release <- function() {
   if (!is.null(.mastr_env$release_tag)) return(invisible())
   repo <- .mastr_env$repo
-  url  <- sprintf("https://api.github.com/repos/%s/releases/latest", repo)
-  req  <- httr2::request(url) |>
+
+  tag_override <- Sys.getenv("MASTR_TAG", "")
+  if (nzchar(tag_override)) {
+    .mastr_env$release_tag <- tag_override
+    .mastr_env$base_url <- sprintf("https://github.com/%s/releases/download/%s",
+                                   repo, tag_override)
+    return(invisible())
+  }
+
+  best <- .github_newest_data_release(repo)
+  if (!is.null(best) && nzchar(best$tag_name %||% "")) {
+    .mastr_env$release_tag <- best$tag_name
+    .mastr_env$base_url <- sprintf("https://github.com/%s/releases/download/%s",
+                                   repo, best$tag_name)
+    return(invisible())
+  }
+
+  url <- sprintf("https://api.github.com/repos/%s/releases/latest", repo)
+  req <- httr2::request(url) |>
     httr2::req_headers("Accept" = "application/vnd.github+json")
-  tok  <- Sys.getenv("GITHUB_TOKEN", "")
+  tok <- Sys.getenv("GITHUB_TOKEN", "")
   if (nzchar(tok)) req <- httr2::req_auth_bearer_token(req, tok)
   resp <- tryCatch(httr2::req_perform(req), error = function(e) NULL)
   if (is.null(resp) || httr2::resp_status(resp) >= 400) {
     abort(sprintf(
-      "Could not resolve latest release for %s. Set MASTR_REPO or MASTR_TAG, or call mastr_use_local().",
+      "Could not resolve a data release for %s. Set MASTR_REPO or MASTR_TAG, or call mastr_use_local().",
       repo))
   }
   body <- httr2::resp_body_json(resp)
   .mastr_env$release_tag <- body$tag_name
-  .mastr_env$base_url    <- sprintf("https://github.com/%s/releases/download/%s",
-                                    repo, body$tag_name)
+  .mastr_env$base_url <- sprintf("https://github.com/%s/releases/download/%s",
+                                 repo, body$tag_name)
   invisible()
 }
 
