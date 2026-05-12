@@ -391,6 +391,7 @@ mastr-shiny/
 ├── docs/
 │   ├── SOLUTION.md            # this file
 │   ├── RUN.md                 # public-facing quickstart
+│   ├── RSTUDIO_CONTEXTS.md    # RStudio: work vs thesis + per-app runGitHub
 │   ├── AGENT_HANDOFF.md       # ops + agent vocabulary (e.g. Candida dashboard)
 │   ├── ARCHITECTURE.md        # short index into SOLUTION
 │   ├── AUTONOMY.md            # CI autonomy state machine

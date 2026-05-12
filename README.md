@@ -23,7 +23,7 @@ Germany's official register of all electricity- and gas-market units.
 
 **Key docs:**
 - **[`docs/RUN.md`](docs/RUN.md)** — copy-paste launch commands for end users (start here).
-- **[`docs/AGENT_HANDOFF.md`](docs/AGENT_HANDOFF.md)** — operations, incidents, and **internal naming** (e.g. *Candida dashboard* ↔ `most_visited`) for contributors and coding agents.
+- **[`docs/RSTUDIO_CONTEXTS.md`](docs/RSTUDIO_CONTEXTS.md)** — **RStudio copy-paste**: work vs. thesis (`MASTR_TAG`), full `runGitHub` list per dashboard.
 - **[`docs/SOLUTION.md`](docs/SOLUTION.md)** — full architecture, pipeline, data layer, and design decisions.
 - [`docs/DATA_SCHEMA.md`](docs/DATA_SCHEMA.md) — column-level reference.
 - [`docs/AUTONOMY.md`](docs/AUTONOMY.md) — CI state machine.

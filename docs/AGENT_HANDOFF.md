@@ -46,9 +46,13 @@ Step **“Keep only the last 14 releases”** used **`sort_by(.createdAt)`**. Ma
 
 **Fix (ETL):** `etl/src/mastr_etl/publish.py` — `gh release create … --latest` and **`gh release edit <tag> --latest`** after a successful full upload so **`/releases/latest`** matches the nightly snapshot when clients still use it.
 
-### 3.4 **Partial current month** (not a bug)
+### 3.4 Partial current month (not an ETL failure)
 
-For **YTD through May**, **May 2026** totals stay **below** a full calendar month until later MaStR exports and registrations catch up. Compare **Stand** (release tag date) to the month column before treating a low value as an ETL failure.
+For **YTD through the current calendar month**, totals for **that month** stay low until the MaStR export and registrations catch up. Compare footer **Stand** to the month before treating a dip as a bug.
+
+### 3.5 Thesis / downstream projects
+
+Any **other** Shiny (or R) project that reuses **`shiny/R/mastr_data.R`** or the same **GitHub Release** URLs consumes **this** ETL output — there is no separate MaStR publish for a thesis fork unless you maintain one. For **reproducible** thesis numbers, pin **`MASTR_TAG`** (see [`RSTUDIO_CONTEXTS.md`](RSTUDIO_CONTEXTS.md)).
 
 ---
 
@@ -77,6 +81,7 @@ For **YTD through May**, **May 2026** totals stay **below** a full calendar mont
 ## 6. Related documentation
 
 - [`RUN.md`](RUN.md) — launch commands.
+- [`RSTUDIO_CONTEXTS.md`](RSTUDIO_CONTEXTS.md) — work vs. thesis env + full `runGitHub` list.
 - [`SOLUTION.md`](SOLUTION.md) — architecture and pipeline.
 - [`AUTONOMY.md`](AUTONOMY.md) — CI autonomy model.
 
