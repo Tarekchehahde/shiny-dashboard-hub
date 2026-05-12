@@ -61,6 +61,10 @@ If the thesis is on **German grid batteries / storage** using **MaStR**, the nig
 | New storage IBN — table | `shiny/apps/21_ibn_speicher_tabelle` | Year / quarter / month cuts. |
 | Battery capacity histogram | `shiny/apps/22_batteriekapazitaet` | See [`RUN.md`](RUN.md): some **kWh** dimensions may still depend on an ETL extension — check before citing in the thesis. |
 
+**Where they live:** These are **separate app folders**, but all under the **one** repository path **`mastr-shiny/shiny/apps/`** — there is no second “battery-only” MaStR repo in this workspace. Each row is a different `subdir` for `shiny::runGitHub(...)`.
+
+**Other Shiny folders elsewhere in `TarekChehadeCodes`** (not MaStR Germany fleet): for example **`DATALAKE-431/shiny_sap_tesvolt_preview/`** (SAP / Tesvolt CSV preview) and **`DATALAKE-431/notebooks/DATALAKE-431_Transmission_Start_Shiny_App/`** (transmission / BMS device data). Those use **different files and questions** than the BNetzA register; do not mix them with thesis methods for **MaStR Stromspeicher** unless you explicitly bridge them in the text.
+
 **Custom SQL in R** (from a local clone, `setwd("…/mastr-shiny/shiny")`, after `source("R/mastr_data.R")`): query the **`stromspeicher`** view/table the same way the apps do (see [`DATA_SCHEMA.md`](DATA_SCHEMA.md) for columns). Pin **`MASTR_TAG`** for reproducible exports.
 
 **Not found in this workspace:** a separate thesis-only repo path; if it appears later, keep **`MASTR_REPO` / `MASTR_TAG`** aligned with the methods chapter.
