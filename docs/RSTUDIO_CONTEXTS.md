@@ -48,6 +48,25 @@ Then launch the same **`runGitHub`** lines as in work mode — they will honour 
 
 ---
 
+## Thesis focus — **batteries (Stromspeicher) in Germany**
+
+If the thesis is on **German grid batteries / storage** using **MaStR**, the nightly ETL already publishes **`stromspeicher.parquet`** (BNetzA **EinheitStromSpeicher** and related entities in the DuckDB build). The same **`MASTR_TAG`** pin applies as for any other MaStR-Shiny view.
+
+**Most relevant built-in dashboards** (after setting work or thesis env above):
+
+| Topic | `subdir` folder | Notes |
+|--------|-----------------|--------|
+| Storage fleet overview (capacity, C-rate, tech) | `shiny/apps/08_storage` | Good first stop for “batteries in DE”. |
+| New storage IBN — quarterly bars | `shiny/apps/20_ibn_speicher_bars` | Tableau-parity build-out view. |
+| New storage IBN — table | `shiny/apps/21_ibn_speicher_tabelle` | Year / quarter / month cuts. |
+| Battery capacity histogram | `shiny/apps/22_batteriekapazitaet` | See [`RUN.md`](RUN.md): some **kWh** dimensions may still depend on an ETL extension — check before citing in the thesis. |
+
+**Custom SQL in R** (from a local clone, `setwd("…/mastr-shiny/shiny")`, after `source("R/mastr_data.R")`): query the **`stromspeicher`** view/table the same way the apps do (see [`DATA_SCHEMA.md`](DATA_SCHEMA.md) for columns). Pin **`MASTR_TAG`** for reproducible exports.
+
+**Not found in this workspace:** a separate thesis-only repo path; if it appears later, keep **`MASTR_REPO` / `MASTR_TAG`** aligned with the methods chapter.
+
+---
+
 ## Launcher menu (all apps)
 
 **Work or thesis** (after setting env block above):

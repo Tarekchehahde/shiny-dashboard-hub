@@ -52,7 +52,7 @@ For **YTD through the current calendar month**, totals for **that month** stay l
 
 ### 3.5 Thesis / downstream projects
 
-Any **other** Shiny (or R) project that reuses **`shiny/R/mastr_data.R`** or the same **GitHub Release** URLs consumes **this** ETL output — there is no separate MaStR publish for a thesis fork unless you maintain one. For **reproducible** thesis numbers, pin **`MASTR_TAG`** (see [`RSTUDIO_CONTEXTS.md`](RSTUDIO_CONTEXTS.md)).
+Any **other** Shiny (or R) project that reuses **`shiny/R/mastr_data.R`** or the same **GitHub Release** URLs consumes **this** ETL output — there is no separate MaStR publish for a thesis fork unless you maintain one. For **reproducible** thesis numbers, pin **`MASTR_TAG`** (see [`RSTUDIO_CONTEXTS.md`](RSTUDIO_CONTEXTS.md), including the **Germany batteries / Stromspeicher** dashboard map).
 
 ---
 
