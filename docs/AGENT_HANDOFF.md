@@ -89,8 +89,8 @@ Any **other** Shiny (or R) project that reuses **`shiny/R/mastr_data.R`** or the
 
 Battery / thesis Shiny lives in **`Tarekchehahde/mastr`** under **`thesis_energy_mastr_shiny/`** — not in this repo. It uses its own `mastr_data.R` and typically **`MASTR_REPO=Tarekchehahde/transtek`** for Parquet releases (see that repo’s `AGENT_CONTEXT_THESIS_MASTR_SHINY.md`). **No second ETL** is required in the thesis tree if it keeps consuming published release assets.
 
-If your **local** workspace groups both efforts, use a sibling umbrella folder **`MaStR/`** with **`WORK/`** and **`THESIS/`** metadata (paths vary by machine; not stored in this Git repo).
+If your **local** workspace groups both efforts, keep a **sibling** folder **`MaStR/`** (README + `METADATA.json` only — **not** pushed as the thesis repo) and clone this GitHub project as e.g. **`mastr-thesis/`** so the path on disk does not fight with the remote name **`mastr`**.
 
 ---
 
-*Last updated: 2026-05-12 (session: release resolution, CI retention bug, publish Latest pin, UI copy neutralised for “Candida” while retaining code comments for agents).*
+*Last updated: 2026-05-12 (session: release resolution, CI retention bug, publish Latest pin, UI copy neutralised for “Candida” while retaining code comments for agents; §7 local MaStR umbrella vs GitHub `mastr` clone naming).*
