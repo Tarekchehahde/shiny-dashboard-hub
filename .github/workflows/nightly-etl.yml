@@ -233,13 +233,25 @@ jobs:
             --parquet data/parquet \
             --duckdb data/mastr.duckdb
 
+      - name: Verify release exists
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          TAG="${{ steps.meta.outputs.tag }}"
+          gh release view "$TAG" --json tagName,assets \
+            --jq '"release " + .tagName + " has " + (.assets|length|tostring) + " assets"' | tee -a "$GITHUB_STEP_SUMMARY"
+
       - name: Keep only the last 14 releases
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
-          gh release list --limit 100 --json tagName,createdAt \
-            --jq 'sort_by(.createdAt) | reverse | .[14:] | .[].tagName' \
+          # Use publishedAt (not createdAt): many data-* releases share the same
+          # GitHub created_at; sort_by(createdAt) is unstable and reverse|.[14:]
+          # could delete the *newest* snapshots instead of the oldest.
+          gh release list --limit 100 --json tagName,publishedAt \
+            --jq 'sort_by(.publishedAt) | reverse | .[14:] | .[].tagName' \
           | while read -r tag; do
               if [[ "$tag" == data-* ]]; then
                 echo "deleting old release $tag"
