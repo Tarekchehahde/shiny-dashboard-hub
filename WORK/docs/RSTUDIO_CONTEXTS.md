@@ -3,6 +3,8 @@
 All commands below assume the **R console** in RStudio (not PowerShell).  
 They use the public repo **`Tarekchehahde/mastr-shiny`** and branch **`main`**.
 
+> **Monorepo `subdir`:** production apps live under **`WORK/shiny/`**. Never use **`subdir = "shiny"`** or **`"shiny/apps/..."`** — that layout was removed. Use **`"WORK/shiny"`** and **`"WORK/shiny/apps/<folder>"`**. Thesis: **`"THESIS/thesis_energy_mastr_shiny"`**. If `runGitHub` errors with a path containing **`…/mastr-shiny-main/shiny/`**, fix the `subdir` prefix. See [`RUN.md`](RUN.md) § Monorepo paths and [repo `README.md`](../../README.md) § Path trap.
+
 > **Shared data source:** every dashboard reads the same **GitHub Release** assets produced by **`mastr-nightly-etl`** (Parquet + optional DuckDB). Any other project (e.g. a thesis Shiny app that `source()`s `mastr_data.R` or uses the same release URLs) depends on that pipeline — not on a second ETL.
 
 ---

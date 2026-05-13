@@ -1,10 +1,11 @@
-# shiny/ — click-and-run dashboards
+# `WORK/shiny/` — click-and-run dashboards
 
-This folder is the only thing an end user needs. Everything here is pure R.
-No XML, no Python, no local database by default.
+This folder is the **production** Shiny tree inside the monorepo (`WORK/`). End users only need this directory when running from a **clone** (`setwd` here). For **`shiny::runGitHub`**, always set **`subdir = "WORK/shiny"`** or **`"WORK/shiny/apps/…"`** — never **`"shiny/..."`** at repo root (that path was removed).
+
+Everything here is pure R. No XML, no Python, no local database by default.
 
 ```
-shiny/
+WORK/shiny/
 ├── app.R              # launcher with a card for every dashboard (auto-picked by runGitHub)
 ├── R/
 │   ├── mastr_data.R   # shared DuckDB-httpfs loader (queries GitHub Releases)

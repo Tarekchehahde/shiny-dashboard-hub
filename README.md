@@ -9,6 +9,61 @@ One GitHub repository for **two top-level product lines** that both use **Bundes
 
 **Default branch:** `main` (there is no requirement to use a branch named `master`; agents and `runGitHub` should use `ref = "main"` unless you add `master` yourself.)
 
+### Path trap — `runGitHub` `subdir` must include `WORK/` or `THESIS/`
+
+The repo was reorganised into a **monorepo**. Production Shiny is **not** at repo root `shiny/` anymore.
+
+| Wrong (old) | Right (current) |
+|---------------|-----------------|
+| `subdir = "shiny"` | `subdir = "WORK/shiny"` |
+| `subdir = "shiny/apps/most_visited"` | `subdir = "WORK/shiny/apps/most_visited"` |
+
+If you see **`No Shiny application exists at the path …/mastr-shiny-main/shiny/apps/...`**, you are still using the **pre-monorepo** `subdir`. Use the **`WORK/shiny/...`** form above. Thesis launcher: **`THESIS/thesis_energy_mastr_shiny`** (not `thesis_energy_mastr_shiny` at repo root).
+
+See also: [`WORK/docs/AGENT_HANDOFF.md`](WORK/docs/AGENT_HANDOFF.md) §0, [`WORK/docs/RUN.md`](WORK/docs/RUN.md) §Monorepo paths.
+
+---
+
+## Verify layout (after `git pull` or before teaching someone `runGitHub`)
+
+**A — Local clone (repository root):** these files must exist.
+
+```bash
+# macOS / Linux / Git Bash
+test -f WORK/shiny/app.R && test -f WORK/shiny/apps/most_visited/app.R && \
+  test -f THESIS/thesis_energy_mastr_shiny/run_app_thesis_energy.R && echo "OK: monorepo layout"
+```
+
+```powershell
+# Windows PowerShell (repo root)
+@("WORK/shiny/app.R","WORK/shiny/apps/most_visited/app.R","THESIS/thesis_energy_mastr_shiny/run_app_thesis_energy.R") | ForEach-Object { if (-not (Test-Path $_)) { throw "Missing $_" } }; "OK: monorepo layout"
+```
+
+**B — No clone (sanity-check GitHub `main` has the launcher):**
+
+```r
+u <- "https://raw.githubusercontent.com/Tarekchehahde/mastr-shiny/main/WORK/shiny/app.R"
+f <- tempfile(fileext = ".R")
+if (download.file(u, f, quiet = TRUE) != 0L) stop("WORK/shiny/app.R not reachable — check branch/network")
+if (!file.exists(f) || file.info(f)$size < 100) stop("Unexpected download — wrong path?")
+unlink(f)
+message("OK: WORK/shiny/app.R on GitHub main")
+```
+
+**C — Quick Shiny smoke test (downloads tarball once):**
+
+```r
+shiny::runGitHub("mastr-shiny", "Tarekchehahde",
+                 subdir = "WORK/shiny/apps/most_visited", ref = "main", launch.browser = FALSE)
+# If this errors with path …/shiny/apps/… you used the old subdir; use WORK/shiny/apps/…
+```
+
+**D — ETL / CI (contributors):** from repo root, Python 3.12+ with network for pip:
+
+```bash
+pip install -e "WORK/etl[dev]" && ruff check WORK/etl && pytest WORK/etl/tests -q
+```
+
 ---
 
 ## Quick links

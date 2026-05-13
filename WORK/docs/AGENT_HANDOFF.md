@@ -4,6 +4,29 @@ This file is for **humans and coding agents** on any machine. It records what wa
 
 ---
 
+## 0. Monorepo paths — do not use legacy `shiny/` in `runGitHub`
+
+The repo is **`WORK/` + `THESIS/`** on **`main`**. Agents and docs must use:
+
+- Production launcher: **`subdir = "WORK/shiny"`** (not `"shiny"`).
+- Single production app: **`subdir = "WORK/shiny/apps/<folder>"`** (not `"shiny/apps/..."`).
+- Thesis launcher: **`subdir = "THESIS/thesis_energy_mastr_shiny"`**.
+
+**Typical failure:** `shiny::runGitHub(..., subdir = "shiny/apps/most_visited", ...)` →  
+`No Shiny application exists at the path …/mastr-shiny-main/shiny/apps/most_visited`  
+because **`shiny/` at repo root no longer exists**; the app is under **`WORK/shiny/apps/most_visited`**.
+
+**Correct flagship call:**
+
+```r
+shiny::runGitHub("mastr-shiny", "Tarekchehahde",
+                 subdir = "WORK/shiny/apps/most_visited", ref = "main")
+```
+
+**Verify after a doc or path change:** see [repository `README.md`](../../README.md) § “Verify layout” and [`RUN.md`](RUN.md) § “Monorepo paths”.
+
+---
+
 ## 1. Internal vocabulary: **“Candida dashboard”**
 
 Across the repo (comments, this doc, some Roxygen), **“Candida”** refers to an **internal Tableau workbook / monthly panel** that the in-house team used as a visual reference. In code, the **R Shiny equivalent** is:
@@ -100,4 +123,4 @@ If your **local** workspace uses a sibling **`MaStR/`** folder (README stubs onl
 
 ---
 
-*Last updated: 2026-05-12 — monorepo `WORK/` + `THESIS/`; §7 thesis tree in-repo; `runGitHub` subdirs `WORK/shiny…` / `THESIS/thesis_energy_mastr_shiny…`.*
+*Last updated: 2026-05-12 — monorepo `WORK/` + `THESIS/`; §0 legacy `shiny/` `subdir` trap; §7 thesis tree in-repo; `runGitHub` subdirs `WORK/shiny…` / `THESIS/thesis_energy_mastr_shiny…`.*

@@ -8,6 +8,35 @@ two minutes.
 
 ---
 
+## Monorepo paths — read this before `runGitHub`
+
+This repository uses top-level **`WORK/`** (production Shiny + ETL) and **`THESIS/`** (thesis apps). Every production `subdir` must start with **`WORK/shiny`** — not `shiny`.
+
+| Symptom | Cause |
+|---------|--------|
+| `No Shiny application exists at the path …/mastr-shiny-main/shiny/apps/…` | `subdir` still uses legacy **`shiny/...`** — change to **`WORK/shiny/...`** |
+| App launches but wrong / old code | Fork or old branch — use **`ref = "main"`** on **`Tarekchehahde/mastr-shiny`** |
+
+**Flagship (Most Visited) — correct one-liner:**
+
+```r
+shiny::runGitHub("mastr-shiny", "Tarekchehahde",
+                 subdir = "WORK/shiny/apps/most_visited", ref = "main", launch.browser = TRUE)
+```
+
+**Sanity check without opening the app** (confirms `main` has the file on GitHub):
+
+```r
+u <- "https://raw.githubusercontent.com/Tarekchehahde/mastr-shiny/main/WORK/shiny/apps/most_visited/app.R"
+f <- tempfile(fileext = ".R")
+stopifnot(download.file(u, f, quiet = TRUE) == 0L, file.size(f) > 100)
+unlink(f); message("OK: most_visited path on GitHub")
+```
+
+Full checklist: [repository `README.md`](../../README.md) § “Verify layout”.
+
+---
+
 ## Step 1 — install packages (once per machine)
 
 Open the **R or RStudio console** (not a terminal — this is R code).
@@ -130,6 +159,9 @@ go into the **R / RStudio console**, not the system shell.
 **`Error: App dir must contain either app.R or server.R`**
 You're on an old fork. The launcher file is `WORK/shiny/app.R` — make sure
 your `subdir` is exactly `"WORK/shiny"` or `"WORK/shiny/apps/NN_…"`.
+
+**`No Shiny application exists at the path …/mastr-shiny-main/shiny/apps/…`**
+You used the **legacy** `subdir` (`"shiny/..."`). Switch to **`"WORK/shiny/..."`** — see **§ Monorepo paths** at the top of this file.
 
 **`Extension Autoloading Error … Extension 'icu' is an existing extension.`**
 Your network blocks DuckDB's extension CDN. Pre-install once:
