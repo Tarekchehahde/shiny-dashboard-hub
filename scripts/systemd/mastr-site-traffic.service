@@ -1,0 +1,17 @@
+[Unit]
+Description=MaStR site traffic dashboard (private nginx log viewer)
+After=network.target nginx.service
+
+[Service]
+Type=simple
+User=rstudio
+WorkingDirectory=/opt/mastr-shiny/WORK/shiny/apps/site_traffic
+Environment=HOME=/home/rstudio
+Environment=MASTR_HUB_MODE=paths
+EnvironmentFile=-/etc/mastr-shiny/traffic.env
+ExecStart=/usr/lib/R/bin/R -e "options(shiny.url.pathPrefix='/site_traffic'); shiny::runApp('.', host='0.0.0.0', port=3854, launch.browser=FALSE)"
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

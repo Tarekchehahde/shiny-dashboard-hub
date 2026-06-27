@@ -38,7 +38,7 @@ shiny::runApp("apps/11_market_actors")
 
 ```r
 shiny::runGitHub(
-  "mastr-shiny",
+  "shiny-dashboard-hub",
   username = "Tarekchehahde",
   ref      = "main",
   subdir   = "WORK/shiny/apps/01_overview"
@@ -52,7 +52,7 @@ If you'd rather not hit GitHub for every query, download the DuckDB once
 
 ```r
 download.file(
-  "https://github.com/Tarekchehahde/mastr-shiny/releases/latest/download/mastr.duckdb",
+  "https://github.com/Tarekchehahde/shiny-dashboard-hub/releases/latest/download/mastr.duckdb",
   "mastr.duckdb", mode = "wb"
 )
 source("R/mastr_data.R")

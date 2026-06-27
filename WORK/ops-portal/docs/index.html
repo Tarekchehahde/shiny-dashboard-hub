@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Documentation — MaStR Server</title>
+  <link rel="stylesheet" href="assets/docs.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+  <script>mermaid.initialize({ startOnLoad: false, theme: "dark" });</script>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <a class="back" href="/portal/">← Mission Control</a>
+      <h1>Documentation</h1>
+      <p style="margin:0;font-size:.82rem;color:var(--muted)">Dashboards, monitoring, and build methods.</p>
+      <nav id="doc-nav" class="nav" aria-label="Documentation sections"></nav>
+    </aside>
+    <main class="main">
+      <div id="privacy-banner" class="privacy-banner" hidden>
+        <strong>Privacy:</strong> This page documents <em>how</em> the bibliography verification tool works.
+        The actual references, Word file, HTML output, and lookup cache are <strong>not published</strong> here.
+      </div>
+      <article id="doc-content" class="doc-body">
+        <p class="loading">Loading…</p>
+      </article>
+    </main>
+  </div>
+  <script src="assets/docs.js"></script>
+</body>
+</html>

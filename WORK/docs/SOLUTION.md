@@ -219,7 +219,7 @@ GET https://api.github.com/repos/{MASTR_REPO}/releases/latest
 ```
 
 …and memoises the returned tag + base URL. `MASTR_REPO` defaults to
-`Tarekchehahde/mastr-shiny`; forkers can override via
+`Tarekchehahde/shiny-dashboard-hub`; forkers can override via
 `Sys.setenv(MASTR_REPO="your-user/your-fork")`.
 
 A user-supplied personal access token is honoured
@@ -230,7 +230,7 @@ works anonymously against a public repo.
 
 On first `mastr_con()` the layer downloads the 7 aggregate Parquets
 (~300 KB total) to
-`tools::R_user_dir("mastr-shiny", "cache")/<release-tag>/` and rewrites
+`tools::R_user_dir("shiny-dashboard-hub", "cache")/<release-tag>/` and rewrites
 the `CREATE VIEW` URLs to point at local paths. Every chart that uses
 aggregates then renders from local I/O — typically 20 ms per query
 instead of 1–3 s.
@@ -239,7 +239,7 @@ instead of 1–3 s.
 |---------------------|---------|------------------------------------------|
 | `MASTR_PREFETCH=0`  | `1`     | Disable prefetch (stream aggregates too) |
 | `MASTR_QUERY_CACHE=0`| `1`    | Disable the persistent result cache      |
-| `MASTR_REPO`        | `Tarekchehahde/mastr-shiny` | Point at a fork              |
+| `MASTR_REPO`        | `Tarekchehahde/shiny-dashboard-hub` | Point at a fork              |
 
 ### 4.3 Lazy entity views
 
@@ -262,7 +262,7 @@ Every call to `mastr_query(sql, params)` is routed through
 `memoise::memoise()` with `cachem::cache_disk()`:
 
 - 256 MB LRU on disk, in
-  `tools::R_user_dir("mastr-shiny","cache")/<release-tag>/_queries/`.
+  `tools::R_user_dir("shiny-dashboard-hub","cache")/<release-tag>/_queries/`.
 - Cache key = normalised SQL + release tag.
 - New nightly release → new tag → automatic cache invalidation with zero
   code changes.

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>MaStR Server — Mission Control</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --card: #121a2f;
+      --accent: #38bdf8;
+      --accent2: #a78bfa;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --border: rgba(148,163,184,.15);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh;
+      font-family: "Inter", system-ui, -apple-system, sans-serif;
+      background: radial-gradient(ellipse 120% 80% at 50% -20%, #1e3a5f 0%, var(--bg) 55%);
+      color: var(--text);
+    }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 2.5rem 1.25rem 3rem; }
+    header { text-align: center; margin-bottom: 2.5rem; }
+    h1 {
+      font-size: clamp(1.75rem, 5vw, 2.5rem);
+      font-weight: 700; letter-spacing: -.02em; margin: 0 0 .5rem;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .tagline { color: var(--muted); font-size: 1.05rem; max-width: 36rem; margin: 0 auto; line-height: 1.5; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.25rem;
+    }
+    a.card {
+      display: block; text-decoration: none; color: inherit;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 1.35rem 1.4rem;
+      transition: transform .2s, border-color .2s, box-shadow .2s;
+    }
+    a.card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(56,189,248,.45);
+      box-shadow: 0 12px 40px rgba(0,0,0,.35);
+    }
+    .card-icon { font-size: 1.75rem; margin-bottom: .6rem; }
+    .card h2 { font-size: 1.15rem; margin: 0 0 .35rem; font-weight: 600; }
+    .card p { margin: 0; font-size: .88rem; color: var(--muted); line-height: 1.45; }
+    .badge {
+      display: inline-block; margin-top: .75rem;
+      font-size: .7rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: .06em; padding: .2rem .55rem; border-radius: 999px;
+    }
+    .badge-public { background: rgba(34,197,94,.2); color: #86efac; }
+    .badge-login { background: rgba(251,191,36,.15); color: #fcd34d; }
+    .badge-private { background: rgba(248,113,113,.15); color: #fca5a5; }
+  section { margin-top: 2.5rem; }
+    section h3 { font-size: .8rem; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); margin-bottom: 1rem; }
+    footer { text-align: center; margin-top: 3rem; font-size: .78rem; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Mission Control</h1>
+      <p class="tagline">One gateway to dashboards, monitoring, development, and analytics on the MaStR Shiny server.</p>
+    </header>
+
+    <section>
+      <h3>Showcase &amp; apps</h3>
+      <div class="grid">
+        <a class="card" href="/">
+          <div class="card-icon">📊</div>
+          <h2>Dashboard Hub</h2>
+          <p>Public Shiny demos — MaStR, Thüringen erwicon, EU electricity, solar maps, and more.</p>
+          <span class="badge badge-public">Public</span>
+        </a>
+        <a class="card" href="/grafana/d/mastr-live-showcase/mastr-live-showcase?refresh=5s&kiosk">
+          <div class="card-icon">🛰️</div>
+          <h2>MaStR Live Showcase</h2>
+          <p>Real-time CPU, memory, network, nginx traffic, and green/red status for every public dashboard.</p>
+          <span class="badge badge-public">Live · 5s refresh</span>
+        </a>
+        <a class="card" href="/grafana/">
+          <div class="card-icon">📈</div>
+          <h2>Grafana (all dashboards)</h2>
+          <p>Node Exporter, Blackbox HTTP probes, nginx, Prometheus — full monitoring folder.</p>
+          <span class="badge badge-public">Public view</span>
+        </a>
+        <a class="card" href="/netdata/">
+          <div class="card-icon">⚡</div>
+          <h2>Netdata</h2>
+          <p>Real-time per-second charts — processes, containers, system health at a glance.</p>
+          <span class="badge badge-public">Public</span>
+        </a>
+      </div>
+    </section>
+
+    <section>
+      <h3>Documentation</h3>
+      <div class="grid">
+        <a class="card" href="/portal/docs/">
+          <div class="card-icon">📚</div>
+          <h2>Project documentation</h2>
+          <p>Rendered guides for every dashboard, monitoring stack, infrastructure, and the bibliography verification methodology.</p>
+          <span class="badge badge-public">Public</span>
+        </a>
+      </div>
+    </section>
+
+    <section>
+      <h3>Development &amp; ML</h3>
+      <div class="grid">
+        <a class="card" href="http://82.165.167.86:8787/" target="_blank" rel="noopener">
+          <div class="card-icon">🧪</div>
+          <h2>RStudio Server</h2>
+          <p>R &amp; Python notebooks, tidymodels, Shiny dev, and machine learning in the browser IDE.</p>
+          <span class="badge badge-login">Login required</span>
+        </a>
+        <a class="card" href="/portal/docs/?doc=ml">
+          <div class="card-icon">🤖</div>
+          <h2>ML on this server</h2>
+          <p>RStudio + tidymodels, caret, xgboost, torch. What is installed, how to start, and what is not on this VPS.</p>
+          <span class="badge badge-login">Guide</span>
+        </a>
+      </div>
+    </section>
+
+    <section>
+      <h3>Admin</h3>
+      <div class="grid">
+        <a class="card" href="/site_traffic/">
+          <div class="card-icon">🔍</div>
+          <h2>Site traffic</h2>
+          <p>nginx access log analytics — page views, visitor IPs, dashboard popularity.</p>
+          <span class="badge badge-private">Password</span>
+        </a>
+      </div>
+    </section>
+
+    <footer>
+      MaStR Shiny VPS · 82.165.167.86 · RStudio login protects your server — do not disable it on the public internet.
+    </footer>
+  </div>
+</body>
+</html>

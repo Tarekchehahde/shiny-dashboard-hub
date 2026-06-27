@@ -11,11 +11,11 @@ Isolated **thesis** dashboards (Germany batteries, storage technology mix, lithi
 **From GitHub (no clone):**
 
 ```r
-shiny::runGitHub("mastr-shiny", "Tarekchehahde",
+shiny::runGitHub("shiny-dashboard-hub", "Tarekchehahde",
                  subdir = "THESIS/thesis_energy_mastr_shiny", ref = "main")
 ```
 
-**Data:** `thesis_energy_mastr_shiny/R/mastr_data.R` — GitHub Releases / DuckDB `httpfs`; default **`MASTR_REPO`** is **`Tarekchehahde/mastr-shiny`** (same assets as `WORK/shiny`). Override if needed (see app README + agent context).
+**Data:** `thesis_energy_mastr_shiny/R/mastr_data.R` — GitHub Releases / DuckDB `httpfs`; default **`MASTR_REPO`** is **`Tarekchehahde/shiny-dashboard-hub`** (same assets as `WORK/shiny`). Override if needed (see app README + agent context).
 
 **Agent handoff:** [`thesis_energy_mastr_shiny/AGENT_CONTEXT_THESIS_MASTR_SHINY.md`](thesis_energy_mastr_shiny/AGENT_CONTEXT_THESIS_MASTR_SHINY.md).
 

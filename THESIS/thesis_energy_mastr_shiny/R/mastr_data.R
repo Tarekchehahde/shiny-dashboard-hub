@@ -26,7 +26,7 @@ suppressPackageStartupMessages({
 # ----- configuration ---------------------------------------------------------
 
 .mastr_env <- new.env(parent = emptyenv())
-.mastr_env$repo        <- Sys.getenv("MASTR_REPO", "Tarekchehahde/mastr-shiny")
+.mastr_env$repo        <- Sys.getenv("MASTR_REPO", "Tarekchehahde/shiny-dashboard-hub")
 .mastr_env$release_tag <- NULL            # resolved on first use
 .mastr_env$base_url    <- NULL            # e.g. https://github.com/.../releases/download/data-2026-04-21
 .mastr_env$local_db    <- NULL            # optional local .duckdb

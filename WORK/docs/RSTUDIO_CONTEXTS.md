@@ -1,7 +1,7 @@
 # RStudio launch commands — work vs. thesis context
 
 All commands below assume the **R console** in RStudio (not PowerShell).  
-They use the public repo **`Tarekchehahde/mastr-shiny`** and branch **`main`**.
+They use the public repo **`Tarekchehahde/shiny-dashboard-hub`** and branch **`main`**.
 
 > **Monorepo `subdir`:** production apps live under **`WORK/shiny/`**. Never use **`subdir = "shiny"`** or **`"shiny/apps/..."`** — that layout was removed. Use **`"WORK/shiny"`** and **`"WORK/shiny/apps/<folder>"`**. Thesis: **`"THESIS/thesis_energy_mastr_shiny"`**. If `runGitHub` errors with a path containing **`…/mastr-shiny-main/shiny/`**, fix the `subdir` prefix. See [`RUN.md`](RUN.md) § Monorepo paths and [repo `README.md`](../../README.md) § Path trap.
 
@@ -27,7 +27,7 @@ Use this when you want the **latest** nightly MaStR extract (floating tag).
 
 ```r
 Sys.unsetenv("MASTR_TAG")   # ensure no pin from a previous session
-Sys.setenv(MASTR_REPO = "Tarekchehahde/mastr-shiny")
+Sys.setenv(MASTR_REPO = "Tarekchehahde/shiny-dashboard-hub")
 ```
 
 Then launch any block from **§ Single dashboards** below.
@@ -37,10 +37,10 @@ Then launch any block from **§ Single dashboards** below.
 ## Context B — **Thesis** (reproducible, pinned snapshot)
 
 Use this when your wife’s analysis must stay **bit-identical** across months (defence / appendix). Pick a **concrete** release tag from  
-[Releases](https://github.com/Tarekchehahde/mastr-shiny/releases) (pattern **`data-YYYY-MM-DD`**).
+[Releases](https://github.com/Tarekchehahde/shiny-dashboard-hub/releases) (pattern **`data-YYYY-MM-DD`**).
 
 ```r
-Sys.setenv(MASTR_REPO = "Tarekchehahde/mastr-shiny")
+Sys.setenv(MASTR_REPO = "Tarekchehahde/shiny-dashboard-hub")
 Sys.setenv(MASTR_TAG  = "data-2026-05-12")   # <- change to the frozen snapshot you cite in the thesis
 ```
 
@@ -79,7 +79,7 @@ If the thesis is on **German grid batteries / storage** using **MaStR**, the nig
 
 ```r
 shiny::runGitHub(
-  "mastr-shiny",
+  "shiny-dashboard-hub",
   "Tarekchehahde",
   subdir = "WORK/shiny",
   ref    = "main",
@@ -97,7 +97,7 @@ Template:
 
 ```r
 shiny::runGitHub(
-  "mastr-shiny",
+  "shiny-dashboard-hub",
   "Tarekchehahde",
   subdir = "WORK/shiny/apps/<FOLDER>",
   ref    = "main",
@@ -138,13 +138,13 @@ shiny::runGitHub(
 
 ```r
 Sys.unsetenv("MASTR_TAG")
-Sys.setenv(MASTR_REPO = "Tarekchehahde/mastr-shiny")
+Sys.setenv(MASTR_REPO = "Tarekchehahde/shiny-dashboard-hub")
 
-shiny::runGitHub("mastr-shiny", "Tarekchehahde", subdir = "WORK/shiny/apps/most_visited", ref = "main", launch.browser = TRUE)
+shiny::runGitHub("shiny-dashboard-hub", "Tarekchehahde", subdir = "WORK/shiny/apps/most_visited", ref = "main", launch.browser = TRUE)
 ```
 
 ```r
-shiny::runGitHub("mastr-shiny", "Tarekchehahde", subdir = "WORK/shiny/apps/02_solar_pv", ref = "main", launch.browser = TRUE)
+shiny::runGitHub("shiny-dashboard-hub", "Tarekchehahde", subdir = "WORK/shiny/apps/02_solar_pv", ref = "main", launch.browser = TRUE)
 ```
 
 ---
@@ -179,6 +179,6 @@ External check (no R): latest release **`data-*`** and asset **`solar.parquet`**
 
 ## If the thesis project lives in another folder
 
-The **thesis Shiny tree** is **`THESIS/thesis_energy_mastr_shiny/`** in this same repository (`Tarekchehahde/mastr-shiny`). If you maintain a **separate** fork or copy elsewhere, keep **`MASTR_REPO`** / **`MASTR_TAG`** aligned with the methods chapter.
+The **thesis Shiny tree** is **`THESIS/thesis_energy_mastr_shiny/`** in this same repository (`Tarekchehahde/shiny-dashboard-hub`). If you maintain a **separate** fork or copy elsewhere, keep **`MASTR_REPO`** / **`MASTR_TAG`** aligned with the methods chapter.
 
 See also [`AGENT_HANDOFF.md`](AGENT_HANDOFF.md) for release-resolution behaviour.

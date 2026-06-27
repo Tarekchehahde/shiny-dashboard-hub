@@ -1,6 +1,6 @@
 # WORK — production MaStR dashboards & ETL
 
-Everything for **daily / Candida-style** use of the main Shiny suite and the **nightly Python pipeline** that builds Parquet + DuckDB and publishes **GitHub Releases** on `Tarekchehahde/mastr-shiny`.
+Everything for **daily / Candida-style** use of the main Shiny suite and the **nightly Python pipeline** that builds Parquet + DuckDB and publishes **GitHub Releases** on `Tarekchehahde/shiny-dashboard-hub`.
 
 | Path | Role |
 |------|------|

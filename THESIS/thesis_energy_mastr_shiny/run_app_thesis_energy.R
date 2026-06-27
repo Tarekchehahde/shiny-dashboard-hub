@@ -3,7 +3,7 @@
 # (battery tech, storage focus, lithium raw-materials context). Does not modify
 # or reference production run_app.R or apps/01_* … 15_*.
 #
-# Usage (from THESIS/thesis_energy_mastr_shiny/ inside clone of Tarekchehahde/mastr-shiny):
+# Usage (from THESIS/thesis_energy_mastr_shiny/ inside clone of Tarekchehahde/shiny-dashboard-hub):
 #   shiny::runApp("run_app_thesis_energy.R")
 #
 # shiny::runGitHub(..., subdir = "THESIS/thesis_energy_mastr_shiny") loads app.R

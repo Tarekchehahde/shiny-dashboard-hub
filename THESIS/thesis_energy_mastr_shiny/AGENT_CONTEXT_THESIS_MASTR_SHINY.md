@@ -1,14 +1,14 @@
 # Agent context — Thesis track (Batterie, Speicher, Lithium) — MaStR Shiny
 
-**Purpose:** Hand off the **thesis / research** Shiny track. This code lives in **`Tarekchehahde/mastr-shiny`** under **`THESIS/thesis_energy_mastr_shiny/`** (same monorepo as production **WORK/** dashboards and ETL — not the Transtek website repo).
+**Purpose:** Hand off the **thesis / research** Shiny track. This code lives in **`Tarekchehahde/shiny-dashboard-hub`** under **`THESIS/thesis_energy_mastr_shiny/`** (same monorepo as production **WORK/** dashboards and ETL — not the Transtek website repo).
 
-**Remote:** The **authoritative** source is **GitHub** `Tarekchehahde/mastr-shiny`, branch **`main`**. A sibling **`MaStR/`** folder on a laptop (optional README stubs) is **not** the codebase; commit thesis changes **here** under **`THESIS/`**.
+**Remote:** The **authoritative** source is **GitHub** `Tarekchehahde/shiny-dashboard-hub`, branch **`main`**. A sibling **`MaStR/`** folder on a laptop (optional README stubs) is **not** the codebase; commit thesis changes **here** under **`THESIS/`**.
 
 ---
 
 ## Mirror: **WORK** track (same repo)
 
-- **WORK** ([`Tarekchehahde/mastr-shiny`](https://github.com/Tarekchehahde/mastr-shiny) → folder **`WORK/`**): nightly **ETL** + production Shiny (Candida / flagship = `WORK/shiny/apps/most_visited/`). Publishes dated GitHub Releases consumed by `R/mastr_data.R` here unless you override **`MASTR_REPO`**. Agent handoff: [`WORK/docs/AGENT_HANDOFF.md`](https://github.com/Tarekchehahde/mastr-shiny/blob/main/WORK/docs/AGENT_HANDOFF.md).
+- **WORK** ([`Tarekchehahde/shiny-dashboard-hub`](https://github.com/Tarekchehahde/shiny-dashboard-hub) → folder **`WORK/`**): nightly **ETL** + production Shiny (Candida / flagship = `WORK/shiny/apps/most_visited/`). Publishes dated GitHub Releases consumed by `R/mastr_data.R` here unless you override **`MASTR_REPO`**. Agent handoff: [`WORK/docs/AGENT_HANDOFF.md`](https://github.com/Tarekchehahde/shiny-dashboard-hub/blob/main/WORK/docs/AGENT_HANDOFF.md).
 - **Optional local umbrella:** some machines keep **`MaStR/`** with README stubs — metadata only; clone **`mastr-shiny`** once for both WORK and THESIS.
 
 ---
@@ -18,7 +18,7 @@
 ```
 I'm continuing the MaStR Shiny thesis track (battery storage, technology mix, lithium/raw-materials context).
 
-Repo: Tarekchehahde/mastr-shiny
+Repo: Tarekchehahde/shiny-dashboard-hub
 Folder: THESIS/thesis_energy_mastr_shiny/  (entire R working directory for this track)
 
 Please read:
@@ -27,7 +27,7 @@ Please read:
 
 Constraints:
 - This folder is self-contained: run_app_thesis_energy.R, R/, apps/thesis_battery_lithium/, data/.
-- MaStR data: R/mastr_data.R — GitHub Releases / DuckDB httpfs; default MASTR_REPO is Tarekchehahde/mastr-shiny (same as WORK track) unless overridden.
+- MaStR data: R/mastr_data.R — GitHub Releases / DuckDB httpfs; default MASTR_REPO is Tarekchehahde/shiny-dashboard-hub (same as WORK track) unless overridden.
 - Lithium app (03_*) uses data/thesis_static/lithium_projects_de.csv — not MaStR.
 
 Working directory for R (from clone root): THESIS/thesis_energy_mastr_shiny/
@@ -76,7 +76,7 @@ From GitHub (no full clone of parent folder structure — `subdir` must point at
 
 ```r
 shiny::runGitHub(
-  "mastr-shiny",
+  "shiny-dashboard-hub",
   "Tarekchehahde",
   ref    = "main",
   subdir = "THESIS/thesis_energy_mastr_shiny/apps/thesis_battery_lithium/01_batteries_deutschland"
@@ -109,4 +109,4 @@ mastr-shiny/
             └── processed/       # cleaned outputs
 ```
 
-*Last updated: monorepo — thesis tree under `THESIS/` in `Tarekchehahde/mastr-shiny` alongside `WORK/` (ETL + production Shiny).*
+*Last updated: monorepo — thesis tree under `THESIS/` in `Tarekchehahde/shiny-dashboard-hub` alongside `WORK/` (ETL + production Shiny).*

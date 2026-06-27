@@ -2,7 +2,7 @@
 # app.R — single entry point that shows a picker and launches the chosen
 # dashboard. Open this file in RStudio and click "Run App", or call
 #   shiny::runApp("WORK/shiny")               # from the repo root
-#   shiny::runGitHub("mastr-shiny", "Tarekchehahde", subdir = "WORK/shiny",
+#   shiny::runGitHub("shiny-dashboard-hub", "Tarekchehahde", subdir = "WORK/shiny",
 #                    ref = "main", launch.browser = TRUE)
 #
 # Tip: to launch a single dashboard directly, run

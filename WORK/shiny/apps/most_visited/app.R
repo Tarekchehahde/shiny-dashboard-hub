@@ -102,12 +102,13 @@ ui <- mastr_page(
 )
 
 server <- function(input, output, session) {
+  mastr_hub_back_server(session)
 
   data_monthly <- reactive({
     metric_col <- if (input$metric == "netto") "Nettonennleistung"
                   else                          "Bruttoleistung"
     active_filter <- if (input$only_active)
-      "AND EinheitBetriebsstatus = 'InBetrieb'" else ""
+      "AND EinheitBetriebsstatus = 35" else ""
     sql <- sprintf("
       SELECT
         CAST(%s AS INTEGER) AS year,

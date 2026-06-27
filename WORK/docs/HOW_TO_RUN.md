@@ -7,7 +7,7 @@ Three paths, ordered by friction.
 Open the GitHub Pages URL for the repo:
 
 ```
-https://tarekchehahde.github.io/mastr-shiny/
+https://tarekchehahde.github.io/shiny-dashboard-hub/
 ```
 
 (Available once the `mastr-shinylive-deploy` workflow has run at least once.)
@@ -28,7 +28,7 @@ Works on macOS / Windows / Linux. You only need the `WORK/shiny/` folder.
 
 ```bash
 # terminal
-git clone --depth 1 https://github.com/Tarekchehahde/mastr-shiny.git
+git clone --depth 1 https://github.com/Tarekchehahde/shiny-dashboard-hub.git
 cd mastr-shiny/WORK/shiny
 ```
 
@@ -53,7 +53,7 @@ First query pulls ~5 MB of Parquet metadata. Subsequent queries are usually
 Download the DuckDB from the latest release once (~600 MB), then run locally.
 
 ```r
-url <- "https://github.com/Tarekchehahde/mastr-shiny/releases/latest/download/mastr.duckdb"
+url <- "https://github.com/Tarekchehahde/shiny-dashboard-hub/releases/latest/download/mastr.duckdb"
 download.file(url, "mastr.duckdb", mode = "wb")
 
 source("R/mastr_data.R")

@@ -1,7 +1,7 @@
 Package: mastrShiny
 Title: Click-and-Run Shiny Dashboards for the German Marktstammdatenregister
 Version: 0.1.0
-Authors@R: person("mastr-shiny", "contributors", role = c("aut", "cre"),
+Authors@R: person("shiny-dashboard-hub", "contributors", role = c("aut", "cre"),
                   email = "noreply@example.com")
 Description: A collection of bslib-styled Shiny dashboards that visualize the
     Bundesnetzagentur Marktstammdatenregister (MaStR) by reading

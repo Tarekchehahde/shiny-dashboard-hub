@@ -15,19 +15,19 @@ This repository uses top-level **`WORK/`** (production Shiny + ETL) and **`THESI
 | Symptom | Cause |
 |---------|--------|
 | `No Shiny application exists at the path …/mastr-shiny-main/shiny/apps/…` | `subdir` still uses legacy **`shiny/...`** — change to **`WORK/shiny/...`** |
-| App launches but wrong / old code | Fork or old branch — use **`ref = "main"`** on **`Tarekchehahde/mastr-shiny`** |
+| App launches but wrong / old code | Fork or old branch — use **`ref = "main"`** on **`Tarekchehahde/shiny-dashboard-hub`** |
 
 **Flagship (Most Visited) — correct one-liner:**
 
 ```r
-shiny::runGitHub("mastr-shiny", "Tarekchehahde",
+shiny::runGitHub("shiny-dashboard-hub", "Tarekchehahde",
                  subdir = "WORK/shiny/apps/most_visited", ref = "main", launch.browser = TRUE)
 ```
 
 **Sanity check without opening the app** (confirms `main` has the file on GitHub):
 
 ```r
-u <- "https://raw.githubusercontent.com/Tarekchehahde/mastr-shiny/main/WORK/shiny/apps/most_visited/app.R"
+u <- "https://raw.githubusercontent.com/Tarekchehahde/shiny-dashboard-hub/main/WORK/shiny/apps/most_visited/app.R"
 f <- tempfile(fileext = ".R")
 stopifnot(download.file(u, f, quiet = TRUE) == 0L, file.size(f) > 100)
 unlink(f); message("OK: most_visited path on GitHub")
@@ -48,7 +48,7 @@ install.packages(c("shiny","bslib","DBI","duckdb","memoise","cachem","httr2","rl
 ## Step 2 — launch the dashboard menu
 
 ```r
-shiny::runGitHub("mastr-shiny","Tarekchehahde",subdir="WORK/shiny",ref="main",launch.browser=TRUE)
+shiny::runGitHub("shiny-dashboard-hub","Tarekchehahde",subdir="WORK/shiny",ref="main",launch.browser=TRUE)
 ```
 
 You'll see a card grid with the **Flagship** ("Most Visited") at the top,
@@ -58,7 +58,7 @@ that replicate the in-house Tableau workbook.
 ## Step 2 (alternative) — launch one dashboard directly
 
 ```r
-shiny::runGitHub("mastr-shiny","Tarekchehahde",subdir="WORK/shiny/apps/01_overview",ref="main",launch.browser=TRUE)
+shiny::runGitHub("shiny-dashboard-hub","Tarekchehahde",subdir="WORK/shiny/apps/01_overview",ref="main",launch.browser=TRUE)
 ```
 
 Swap `01_overview` for any of:
@@ -114,13 +114,13 @@ cache.
 If you want native DuckDB speed and no network at all:
 
 ```r
-download.file("https://github.com/Tarekchehahde/mastr-shiny/releases/latest/download/mastr.duckdb",destfile="~/mastr.duckdb",mode="wb")
+download.file("https://github.com/Tarekchehahde/shiny-dashboard-hub/releases/latest/download/mastr.duckdb",destfile="~/mastr.duckdb",mode="wb")
 ```
 
 Then, once per session **before** launching any app:
 
 ```r
-source("https://raw.githubusercontent.com/Tarekchehahde/mastr-shiny/main/WORK/shiny/R/mastr_data.R"); mastr_use_local("~/mastr.duckdb")
+source("https://raw.githubusercontent.com/Tarekchehahde/shiny-dashboard-hub/main/WORK/shiny/R/mastr_data.R"); mastr_use_local("~/mastr.duckdb")
 ```
 
 Now every query is <50 ms. Works on a plane.
@@ -137,7 +137,7 @@ The cache auto-invalidates when the release tag changes, so you normally
 don't need this. To wipe manually:
 
 ```r
-source("https://raw.githubusercontent.com/Tarekchehahde/mastr-shiny/main/WORK/shiny/R/mastr_data.R"); mastr_prefetch(force=TRUE)
+source("https://raw.githubusercontent.com/Tarekchehahde/shiny-dashboard-hub/main/WORK/shiny/R/mastr_data.R"); mastr_prefetch(force=TRUE)
 ```
 
 ---
@@ -180,5 +180,5 @@ Either wait 60 s and retry, or switch to offline mode (see above).
 
 **"Could not resolve latest release"**
 The nightly ETL hasn't produced a release yet on the repo you're pointed
-at. Check [Actions → mastr-nightly-etl](https://github.com/Tarekchehahde/mastr-shiny/actions)
-or set `Sys.setenv(MASTR_REPO="Tarekchehahde/mastr-shiny")`.
+at. Check [Actions → mastr-nightly-etl](https://github.com/Tarekchehahde/shiny-dashboard-hub/actions)
+or set `Sys.setenv(MASTR_REPO="Tarekchehahde/shiny-dashboard-hub")`.

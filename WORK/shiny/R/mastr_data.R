@@ -28,7 +28,7 @@ suppressPackageStartupMessages({
 # ----- configuration ---------------------------------------------------------
 
 .mastr_env <- new.env(parent = emptyenv())
-.mastr_env$repo        <- Sys.getenv("MASTR_REPO", "Tarekchehahde/mastr-shiny")
+.mastr_env$repo        <- Sys.getenv("MASTR_REPO", "Tarekchehahde/shiny-dashboard-hub")
 .mastr_env$release_tag <- NULL            # resolved on first use
 .mastr_env$base_url    <- NULL            # e.g. https://github.com/.../releases/download/data-2026-04-21
 .mastr_env$local_db    <- NULL            # optional local .duckdb
@@ -173,7 +173,7 @@ mastr_con <- function() {
   if (!is.null(.mastr_env$cache_dir)) return(.mastr_env$cache_dir)
   tag <- .mastr_env$release_tag %||% "unknown"
   # tools::R_user_dir is available since R 4.0; falls back to tempdir in tests.
-  root <- tryCatch(tools::R_user_dir("mastr-shiny", which = "cache"),
+  root <- tryCatch(tools::R_user_dir("shiny-dashboard-hub", which = "cache"),
                    error = function(e) file.path(tempdir(), "mastr-shiny-cache"))
   dir <- file.path(root, tag)
   dir.create(dir, recursive = TRUE, showWarnings = FALSE)
@@ -423,7 +423,7 @@ mastr_disconnect <- function() {
   }
   dir <- tryCatch({
     tag <- .mastr_env$release_tag %||% "unknown"
-    root <- tryCatch(tools::R_user_dir("mastr-shiny", which = "cache"),
+    root <- tryCatch(tools::R_user_dir("shiny-dashboard-hub", which = "cache"),
                      error = function(e) file.path(tempdir(), "mastr-shiny-cache"))
     d <- file.path(root, tag, "_queries")
     dir.create(d, recursive = TRUE, showWarnings = FALSE)

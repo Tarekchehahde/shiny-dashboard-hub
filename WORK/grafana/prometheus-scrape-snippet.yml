@@ -1,0 +1,25 @@
+  - job_name: nginx
+    static_configs:
+      - targets: ['localhost:9113']
+
+  - job_name: blackbox
+    metrics_path: /probe
+    params:
+      module: [http_2xx]
+    static_configs:
+      - targets:
+          - http://127.0.0.1/
+          - http://127.0.0.1/portal/
+          - http://127.0.0.1/most_visited/
+          - http://127.0.0.1/eu_electricity_live/
+          - http://127.0.0.1/thueringen_kommunal/
+          - http://127.0.0.1/thueringen_solar_wirtschaft/
+          - http://127.0.0.1/deutschland_solar_radiation/
+          - http://127.0.0.1/grafana/
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: 127.0.0.1:9115

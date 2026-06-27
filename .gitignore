@@ -51,7 +51,26 @@ shinylive-site/
 .DS_Store
 Thumbs.db
 
+# Local launch logs (Mac)
+logs/*.log
+
 # Editors
 .vscode/
 .idea/
-mastr-shiny/
+
+WORK/shiny/apps/**/.RData
+WORK/shiny/apps/**/.Rhistory
+
+# Private PhD reference tooling (methodology doc OK; outputs/cache never commit)
+WORK/docs/References_PhD*
+WORK/docs/.scholar*
+WORK/docs/.author_year*
+WORK/docs/build_scholar*
+WORK/docs/export_references*
+WORK/docs/scholar_build.log
+WORK/docs/__pycache__/
+
+# Local-only server credentials (never commit)
+WORK/docs/SERVER.credentials.local.md
+WORK/docs/*.credentials.local.md
+WORK/docs/*.local.md

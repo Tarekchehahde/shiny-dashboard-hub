@@ -2,7 +2,7 @@
 
 **Agent handoff:** [`../AGENT_CONTEXT_THESIS_MASTR_SHINY.md`](../AGENT_CONTEXT_THESIS_MASTR_SHINY.md) (one level up: `thesis_energy_mastr_shiny/`).
 
-This tree is **only** the thesis/research Shiny apps. Production MaStR dashboards live in the **same** GitHub repository under **`WORK/shiny/`** (this monorepo is `Tarekchehahde/mastr-shiny`); this folder does not ship the production `WORK/shiny/app.R` launcher.
+This tree is **only** the thesis/research Shiny apps. Production MaStR dashboards live in the **same** GitHub repository under **`WORK/shiny/`** (this monorepo is `Tarekchehahde/shiny-dashboard-hub`); this folder does not ship the production `WORK/shiny/app.R` launcher.
 
 ## Launcher
 
@@ -25,7 +25,7 @@ shiny::runApp("apps/thesis_battery_lithium/01_batteries_deutschland")
 
 ## If you see “Could not resolve latest release”
 
-The app calls GitHub’s **`/releases/latest`** API for `MASTR_REPO` (default **`Tarekchehahde/mastr-shiny`**). That fails when the repo is **private**, has **no releases**, or you’re **rate-limited**. Pick one fix **before** `runApp()`:
+The app calls GitHub’s **`/releases/latest`** API for `MASTR_REPO` (default **`Tarekchehahde/shiny-dashboard-hub`**). That fails when the repo is **private**, has **no releases**, or you’re **rate-limited**. Pick one fix **before** `runApp()`:
 
 **A — Pin a known data release tag** (no “latest” API call):
 

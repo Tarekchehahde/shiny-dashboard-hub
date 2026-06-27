@@ -19,7 +19,7 @@ because **`shiny/` at repo root no longer exists**; the app is under **`WORK/shi
 **Correct flagship call:**
 
 ```r
-shiny::runGitHub("mastr-shiny", "Tarekchehahde",
+shiny::runGitHub("shiny-dashboard-hub", "Tarekchehahde",
                  subdir = "WORK/shiny/apps/most_visited", ref = "main")
 ```
 
@@ -110,16 +110,16 @@ Any **other** Shiny (or R) project that reuses **`WORK/shiny/R/mastr_data.R`** o
 
 ## 7. THESIS track (same repo — `THESIS/` folder)
 
-Battery / thesis-only Shiny lives **in this repository** under **`THESIS/thesis_energy_mastr_shiny/`** (separate launcher from production `WORK/shiny/`). It ships its own `R/mastr_data.R` and typically uses **`MASTR_REPO=Tarekchehahde/transtek`** for Parquet releases unless overridden. **No second ETL** is required in that tree when consuming published release assets.
+Battery / thesis-only Shiny lives **in this repository** under **`THESIS/thesis_energy_mastr_shiny/`** (separate launcher from production `WORK/shiny/`). It uses the same **`MASTR_REPO=Tarekchehahde/shiny-dashboard-hub`** release assets as **`WORK/shiny`** unless overridden. **No second ETL** is required in that tree when consuming published release assets. *(Unrelated to the separate [transtek](https://github.com/Tarekchehahde/transtek) client repo.)*
 
 ```r
-shiny::runGitHub("mastr-shiny", "Tarekchehahde",
+shiny::runGitHub("shiny-dashboard-hub", "Tarekchehahde",
                  subdir = "THESIS/thesis_energy_mastr_shiny", ref = "main")
 ```
 
 Agent handoff for thesis apps: [`THESIS/thesis_energy_mastr_shiny/AGENT_CONTEXT_THESIS_MASTR_SHINY.md`](../../THESIS/thesis_energy_mastr_shiny/AGENT_CONTEXT_THESIS_MASTR_SHINY.md).
 
-If your **local** workspace uses a sibling **`MaStR/`** folder (README stubs only), it is **not** the GitHub repo — keep clones of **`Tarekchehahde/mastr-shiny`** as the single remote for both WORK and THESIS.
+If your **local** workspace uses a sibling **`MaStR/`** folder (README stubs only), it is **not** the GitHub repo — keep clones of **`Tarekchehahde/shiny-dashboard-hub`** as the single remote for both WORK and THESIS.
 
 ---
 

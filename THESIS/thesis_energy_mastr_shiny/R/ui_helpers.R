@@ -61,7 +61,7 @@ mastr_footer <- function() {
       tags$a(href = "https://www.marktstammdatenregister.de/MaStR/Datendownload",
              target = "_blank", "BNetzA MaStR"),
       " · ",
-      tags$a(href = "https://github.com/Tarekchehahde/mastr-shiny",
+      tags$a(href = "https://github.com/Tarekchehahde/shiny-dashboard-hub",
              target = "_blank", "Source"))
 }
 
