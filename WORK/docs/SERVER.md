@@ -1,9 +1,9 @@
 # MaStR IONOS VPS — server documentation
 
 **Production hub:** http://82.165.167.86/  
-**Repo:** [Tarekchehahde/shiny-dashboard-hub](https://github.com/Tarekchehahde/shiny-dashboard-hub) · branch `main`  
-**Local mirror:** `/Users/tarek-lokal/Documents/mastr-shiny/`  
-**Server clone:** `/opt/mastr-shiny/` on VPS `82.165.167.86`
+**GitHub:** [Tarekchehahde/shiny-dashboard-hub](https://github.com/Tarekchehahde/shiny-dashboard-hub) · branch `main`  
+**Local mirror:** `/Users/tarek-lokal/Documents/mastr-shiny/` *(folder name may still say mastr-shiny)*  
+**Server clone:** `/opt/mastr-shiny/` on VPS `82.165.167.86` *(path unchanged; `git remote` → shiny-dashboard-hub)*
 
 > **Passwords:** not in this file (safe for GitHub). On your Mac see **`SERVER.credentials.local.md`** in this folder (gitignored).
 
