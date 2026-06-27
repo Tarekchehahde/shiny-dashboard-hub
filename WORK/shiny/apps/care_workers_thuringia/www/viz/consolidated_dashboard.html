@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consolidated Data Dashboard - Care Workers in Thuringia</title>
+    
+    <!-- Leaflet CSS for Maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Leaflet Heat -->
+    <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+    <!-- Anime.js for animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #00d9ff;
+            --primary-dark: #0099cc;
+            --secondary: #ff6b6b;
+            --accent: #ffd93d;
+            --success: #6bcb77;
+            --bg-dark: #0a0a1a;
+            --bg-card: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #e4e4e4;
+            --text-muted: #888;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Zoom-in animation on load */
+        .zoom-enter {
+            animation: zoomIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Background particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float 15s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); }
+            25% { transform: translateY(-30px) translateX(10px); }
+            50% { transform: translateY(-10px) translateX(-10px); }
+            75% { transform: translateY(-20px) translateX(5px); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, rgba(0, 217, 255, 0.1), rgba(0, 217, 255, 0.02));
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 217, 255, 0.1) 0%, transparent 50%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .back-btn:hover {
+            background: var(--primary);
+            color: var(--bg-dark);
+            transform: translateX(-5px);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Stats Row */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px rgba(0, 217, 255, 0.2);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary);
+            line-height: 1;
+            margin-bottom: 5px;
+        }
+
+        .stat-number.counting {
+            animation: countPulse 0.5s ease-out;
+        }
+
+        @keyframes countPulse {
+            0% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Main Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto auto auto;
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 25px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: rgba(0, 217, 255, 0.3);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title-icon {
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        /* Map Section */
+        .map-section {
+            grid-column: 1 / -1;
+            height: 500px;
+        }
+
+        #map {
+            width: 100%;
+            height: 400px;
+            border-radius: 16px;
+            z-index: 1;
+        }
+
+        .map-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .map-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+        }
+
+        .map-btn:hover, .map-btn.active {
+            background: var(--primary);
+            color: var(--bg-dark);
+            border-color: var(--primary);
+        }
+
+        /* Charts */
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        /* Data Table */
+        .table-section {
+            grid-column: 1 / -1;
+        }
+
+        .table-wrapper {
+            max-height: 400px;
+            overflow-y: auto;
+            border-radius: 12px;
+        }
+
+        .table-wrapper::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .table-wrapper::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+
+        .table-wrapper::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            position: sticky;
+            top: 0;
+            background: rgba(0, 217, 255, 0.15);
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--primary);
+            backdrop-filter: blur(10px);
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.9rem;
+        }
+
+        tr {
+            transition: all 0.3s ease;
+        }
+
+        tr:hover td {
+            background: rgba(0, 217, 255, 0.05);
+        }
+
+        .org-name {
+            font-weight: 500;
+            color: var(--text);
+            max-width: 250px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .location-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(0, 217, 255, 0.1);
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: var(--primary);
+        }
+
+        .sector-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .sector-R { background: rgba(107, 203, 119, 0.2); color: #6bcb77; }
+        .sector-O { background: rgba(255, 193, 7, 0.2); color: #ffc107; }
+        .sector-Q { background: rgba(156, 39, 176, 0.2); color: #ce93d8; }
+        .sector-T { background: rgba(255, 107, 107, 0.2); color: #ff6b6b; }
+
+        .link-btn {
+            padding: 6px 12px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .link-btn:hover {
+            background: var(--primary);
+            color: var(--bg-dark);
+            border-color: var(--primary);
+        }
+
+        /* Search & Filter */
+        .search-filter {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            color: var(--text);
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.2);
+        }
+
+        .search-box::before {
+            content: '🔍';
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1rem;
+        }
+
+        .filter-select {
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            color: var(--text);
+            font-size: 0.95rem;
+            cursor: pointer;
+            min-width: 180px;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        /* Donut Chart Center Text */
+        .donut-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .donut-center-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .donut-center-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .map-section {
+                height: 400px;
+            }
+            
+            #map {
+                height: 300px;
+            }
+        }
+
+        /* Custom Leaflet Popup */
+        .leaflet-popup-content-wrapper {
+            background: rgba(10, 10, 26, 0.95);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .leaflet-popup-content {
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .leaflet-popup-tip {
+            background: rgba(10, 10, 26, 0.95);
+        }
+
+        .popup-title {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .popup-info {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin: 4px 0;
+        }
+
+        .popup-link {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 6px 12px;
+            background: var(--primary);
+            color: var(--bg-dark);
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        /* Glowing effect for markers */
+        .glow-marker {
+            filter: drop-shadow(0 0 8px var(--primary));
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        /* Loading animation */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loader {
+            width: 60px;
+            height: 60px;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loader">
+        <div class="loader"></div>
+    </div>
+
+    <!-- Background Particles -->
+    <div class="particles" id="particles"></div>
+
+    <div class="container zoom-enter">
+        <header>
+            <a href="metadata_viewer.html" class="back-btn">
+                <span>←</span> Back to Overview
+            </a>
+            <h1>Consolidated Organizations Dashboard</h1>
+            <p class="subtitle">Interactive visualization of 59 healthcare organizations across Thuringia</p>
+        </header>
+
+        <!-- Credits Section -->
+        <div class="card" style="margin-bottom: 30px;">
+            <div class="card-header">
+                <div class="card-title">
+                    <div class="card-title-icon">👥</div>
+                    Credits
+                </div>
+            </div>
+            <div style="color: #ccc; line-height: 1.8; padding: 10px 0;">
+                <p><strong style="color: var(--primary);">Team:</strong> Nour Alwan, Kenny Tam, Ceren Toraman, Aboli Ghodekar, Sarah Agyeiwaa Darko, Luigia Hannah Blankson, Hayelom Belay Seyoum, Oriane Kaiser</p>
+                <p style="margin-top: 10px;"><strong style="color: var(--primary);">Instructor:</strong> Prof. Dr. Achim Kemmerling</p>
+                <p style="margin-top: 10px;"><strong style="color: var(--primary);">Client:</strong> German Center for Integration and Migration Research (DeZIM)</p>
+            </div>
+        </div>
+
+        <!-- Stats Row -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-icon">🏥</div>
+                <div class="stat-number" data-count="59">0</div>
+                <div class="stat-label">Organizations</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📍</div>
+                <div class="stat-number" data-count="25">0</div>
+                <div class="stat-label">Locations</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🏛️</div>
+                <div class="stat-number" data-count="4">0</div>
+                <div class="stat-label">Sectors</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📧</div>
+                <div class="stat-number" data-count="55">0</div>
+                <div class="stat-label">With Contact</div>
+            </div>
+        </div>
+
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+            <!-- Map Section -->
+            <div class="card map-section">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="card-title-icon">🗺️</div>
+                        Geographic Distribution
+                    </div>
+                    <div class="map-controls">
+                        <button class="map-btn active" onclick="showMarkers()">Markers</button>
+                        <button class="map-btn" onclick="showHeatmap()">Heatmap</button>
+                        <button class="map-btn" onclick="showClusters()">Clusters</button>
+                    </div>
+                </div>
+                <div id="map"></div>
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #6bcb77;"></div>
+                        <span>Health & Social (R)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #ffc107;"></div>
+                        <span>Economic Services (O)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #ce93d8;"></div>
+                        <span>Education (Q)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #ff6b6b;"></div>
+                        <span>Other Services (T)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sector Distribution Chart -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="card-title-icon">📊</div>
+                        Sector Distribution
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="sectorChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Location Distribution Chart -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="card-title-icon">📈</div>
+                        Top Locations
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="locationChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Unterklassen Breakdown -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="card-title-icon">📋</div>
+                        Service Types (Unterklassen)
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="unterklassenChart"></canvas>
+                </div>
+                <p style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); color: #888; font-size: 0.85rem; font-style: italic;">* Note: 13 organizations do not have a detailed service type classification (Unterklasse) in the source data.</p>
+            </div>
+
+            <!-- Organization Types Radar -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="card-title-icon">🕸️</div>
+                        Service Categories
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="radarChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Data Table -->
+            <div class="card table-section">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="card-title-icon">📋</div>
+                        Organization Directory
+                    </div>
+                </div>
+                <div class="search-filter">
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="Search organizations...">
+                    </div>
+                    <select class="filter-select" id="locationFilter">
+                        <option value="">All Locations</option>
+                    </select>
+                    <select class="filter-select" id="sectorFilter">
+                        <option value="">All Sectors</option>
+                        <option value="R">Health & Social (R)</option>
+                        <option value="O">Economic Services (O)</option>
+                        <option value="Q">Education (Q)</option>
+                        <option value="T">Other Services (T)</option>
+                    </select>
+                </div>
+                <div class="table-wrapper">
+                    <table id="orgTable">
+                        <thead>
+                            <tr>
+                                <th>Organization</th>
+                                <th>Location</th>
+                                <th>Sector</th>
+                                <th>Service Type (Unterklasse)</th>
+                                <th>Contact</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Open in New Tab Button -->
+    <button id="openNewTabBtn" onclick="openInNewTab()" title="Open in New Tab" style="position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #00d9ff, #0099cc); border: none; cursor: pointer; box-shadow: 0 4px 15px rgba(0, 217, 255, 0.4); z-index: 9999; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0a0a1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+            <polyline points="15 3 21 3 21 9"/>
+            <line x1="10" y1="14" x2="21" y2="3"/>
+        </svg>
+    </button>
+
+    <script>
+        // Organization Data
+        const organizations = [{"name": "Kath. Altenpflegeheime Breitenworbis", "lat": 51.4122567970368, "lng": 10.4298098303849, "location": "Breitenworbis", "email": "info@altenpflegeheim-breitenworbis.de", "website": "https://www.altenpflegeheim-breitenworbis.com/", "sector": "R", "division": "78", "code": "87.30.1", "description": "Vermittlung und Überlassung von Arbeitskräften"}, {"name": "PflegeCentrum Sonnenschein GmbH", "lat": 50.96334632884, "lng": 10.0649064372003, "location": "Gerstungen", "email": "info@pflegesonnenschein.de", "website": "https://pflegesonnenschein.de/", "sector": "R", "division": "86", "code": "86.94.1", "description": "Gesundheitswesen"}, {"name": "Pflegedienst Anita Lüneberg GmbH", "lat": 50.8871536412349, "lng": 11.6132747371053, "location": "Jena", "email": "info@pflege-lueneberg.de", "website": "https://www.pflege-lueneberg.de/", "sector": "R", "division": "85", "code": "86.94.1", "description": "Erziehung und Unterricht"}, {"name": "PFLEGESEGEN Pflegevermittlung", "lat": 51.0818678686557, "lng": 11.211935668038, "location": "Am Ettersberg", "email": "info@pflegesegen.de", "website": "https://pflegesegen.de/", "sector": "O", "division": "82", "code": "82.99.9", "description": "Erbringung von sonstigen wirtschaftlichen Dienstleistungen"}, {"name": "LaVitaCura Pflegedienst GmbH", "lat": 51.2097764295581, "lng": 10.4630868951088, "location": "Mühlhausen", "email": "pflege@lavitacura.de", "website": "https://www.lavitacura.com/", "sector": "R", "division": "87", "code": "86.94.1", "description": "Heime, ohne Erholungs- und Ferienheime"}, {"name": "HK Pflegedienst gemeinnützige GmbH", "lat": 50.9131971453674, "lng": 10.9127246217931, "location": "Nesse-Apfelstädt", "email": "info@hk-pflegedienst.de ", "website": "https://hk-pflegedienst.de/", "sector": "R", "division": "88", "code": "86.94.1", "description": "Sozialwesen, ohne Heime"}, {"name": "Pflegestützpunkt Jena", "lat": 50.9283030842189, "lng": 11.5821113678454, "location": "Jena", "email": "kontakt@pflegestuetzpunkt-jena.de", "website": "https://www.pflegestuetzpunkt-jena.de/", "sector": "R", "division": "94", "code": "88.99.3", "description": "Interessenvertretungen sowie kirchliche und sonstige religiöse Vereinigungen, ohne Sozialwesen und Sport"}, {"name": "Häusliche Krankenpflege Blech", "lat": 50.9117478471822, "lng": 11.5710406831694, "location": "Jena", "email": "Contact through website", "website": "https://www.seniorenhaus-jena.de/#", "sector": "R", "division": "", "code": "86.94.1", "description": ""}, {"name": "Diakonisches Altenhilfezentrum Saalfeld-Rudolstadt gGmbH", "lat": 50.7155496972406, "lng": 11.3168923706929, "location": "Rudolstadt", "email": "Contact through website", "website": "https://www.diakonie-in-rudolstadt.de/kontakt-anfahrt", "sector": "R", "division": "", "code": "NA", "description": ""}, {"name": "soweno Altenhilfe gGmbH", "lat": 51.4960478632223, "lng": 10.7955360452804, "location": "Nordhausen", "email": "info@soweno.de", "website": "https://soweno.de/", "sector": "R", "division": "", "code": "87.30.1", "description": ""}, {"name": "Saale-Betreuungswerk der Lebenshilfe Jena gGmbH", "lat": 50.9601347513335, "lng": 11.6267249789309, "location": "Jena", "email": "info@sbw-jena.de", "website": "https://sbw-jena.info/", "sector": "R", "division": "", "code": "88.10.4", "description": ""}, {"name": "Südthüringer Betreuungsverein e.V.", "lat": 50.4254929031343, "lng": 10.73160655155, "location": "Hildburghausen", "email": "info@sthbv-hbn.com", "website": "https://sthbv-hbn.com/", "sector": "R", "division": "", "code": "88.99.3", "description": ""}, {"name": "AGETHUR – Landesvereinigung für Gesundheitsförderung Thüringen e.V.", "lat": 50.9888155611961, "lng": 11.3262266832656, "location": "Weimar", "email": "info@agethur.de", "website": "https://agethur.de/", "sector": "R", "division": "", "code": "88.99.3", "description": ""}, {"name": "MVZ Gesundheitszentrum Schmalkalden GmbH", "lat": 50.7223914651982, "lng": 10.4413442294881, "location": "Schmalkalden", "email": "info@gz-sm.de", "website": "https://www.gz-sm.de/", "sector": "R", "division": "", "code": "86.21.0", "description": ""}, {"name": "Gesundheitszentrum Weimar GmbH Medizinische Versorgungszentren", "lat": 50.9623554891717, "lng": 11.3198976604765, "location": "Weimar", "email": "info@mvz-weimar.de", "website": "https://www.mvz-weimar.de/", "sector": "R", "division": "", "code": "86.21.0", "description": ""}, {"name": "Grone-Gesundheitsakademie-Thüringen-gGmbH", "lat": 50.9935778886565, "lng": 11.3375840832717, "location": "Weimar", "email": "gesundheitsakademie@grone.de", "website": "https://www.gesundheitsakademie-thueringen.de/", "sector": "Q", "division": "", "code": "85.59.2", "description": ""}, {"name": "AWO Soziale Dienste gGmbH Gotha", "lat": 50.9456379520993, "lng": 10.7156085205215, "location": "Gotha", "email": "geschaeftsstelle@awo-gotha.de", "website": "https://www.awo-gotha.de/startseite", "sector": "R", "division": "", "code": "NA", "description": ""}, {"name": "AWO Soziale Dienste Rudolstadt gGmbH", "lat": 50.7203303954801, "lng": 11.3324369992702, "location": "Rudolstadt", "email": "Contact through website", "website": "https://www.awo-rudolstadt.de/willkommen", "sector": "R", "division": "", "code": "NA", "description": ""}, {"name": "bpa · Bundesverband privater Anbieter sozialer Dienste e.V. · Landesgruppe Thüringen", "lat": 50.9491799238302, "lng": 11.0859900771568, "location": "Erfurt", "email": "thueringen@bpa.de", "website": "https://www.bpa.de/news-landesgruppen/thueringen", "sector": "T", "division": "", "code": "94.99.9", "description": ""}, {"name": "Diakonie Sozialdienst Thüringen", "lat": 50.9758514470419, "lng": 11.3256573339687, "location": "Weimar", "email": "S.Wieduwilt-Erthel@diakonie-wl.de", "website": "https://www.diakonie-wl.de/ueber-uns/tochtergesellschaften/diakonie-sozialdienst-thueringen-ggmbh/", "sector": "R", "division": "", "code": "88.10.1", "description": ""}, {"name": "Diakonie-Sozialstation Ilmenau", "lat": 50.6818913412395, "lng": 10.9113094061606, "location": "Ilmenau", "email": "pflege@dsst-ilmenau.de", "website": "https://www.diakonie-sozialstation-ilmenau.de/", "sector": "R", "division": "", "code": "NA", "description": ""}, {"name": "Institut für Berufsbildung und Sozialmanagement gGmbH", "lat": 50.9851707078515, "lng": 11.0300688218831, "location": "Erfurt", "email": "info@ibs-thueringen.de", "website": "https://ibs-thueringen.de/", "sector": "Q", "division": "", "code": "85.59.2", "description": ""}, {"name": "parisat – Gesellschaft für Paritätische Soziale Arbeit in Thüringen mbH", "lat": 50.9175091945266, "lng": 10.9133556752437, "location": "Neudietendorf", "email": "kontakt@parisat.de", "website": "https://www.parisat.de/", "sector": "Q", "division": "", "code": "85.59.2", "description": ""}, {"name": "Diakonie Sozialstation St. Elisabeth", "lat": 51.1109511898549, "lng": 10.9277844053159, "location": "Gebesee", "email": "verwaltungsleitung@diakonie-gebesee.de", "website": "https://www.diakonie-gebesee.de/", "sector": "R", "division": "", "code": "NA", "description": ""}, {"name": "Arbeiterwohlfahrt Landesverband Thüringen e.V.", "lat": 50.9842858649783, "lng": 11.0305198037539, "location": "Erfurt", "email": "Contact through website", "website": "https://awothueringen.de/startseite", "sector": "R", "division": "", "code": "NA", "description": ""}, {"name": "Caritasverband für das Bistum Erfurt e.V.", "lat": 50.9726841627674, "lng": 11.0213376060013, "location": "Erfurt", "email": "dicv-erfurt@caritas-bistum-erfurt.de", "website": "https://www.caritas-bistum-erfurt.de/startseite/startseite", "sector": "R", "division": "", "code": "88.99.3", "description": ""}, {"name": "Deutsches Rotes Kreuz Landesverband Thüringen e.V.", "lat": 50.9615224198576, "lng": 11.033000313399, "location": "Erfurt", "email": "info@drk-thueringen.de", "website": "https://www.drk-thueringen.de/", "sector": "R", "division": "", "code": "86.92.0", "description": ""}, {"name": "DGB Hessen-Thüringen", "lat": 50.9684192651766, "lng": 11.0306070753075, "location": "Erfurt", "email": "Contact through website", "website": "https://thueringen.dgb.de/", "sector": "T", "division": "", "code": "94.20.0", "description": ""}, {"name": "MigraNetz Thüringen e. V.", "lat": 50.9795070408283, "lng": 11.3283137139431, "location": "Weimar", "email": "kontakt@migranetz-thueringen.org", "website": "https://migranetz-thueringen.org/de/kontakt/", "sector": "T", "division": "", "code": "94.99.9", "description": ""}, {"name": "DaMigra e.V.", "lat": 50.9817748760091, "lng": 11.0417958783989, "location": "Erfurt", "email": "erfurt@damigra.de", "website": "https://www.damigra.de/kontakt/", "sector": "T", "division": "", "code": "94.99.9", "description": ""}, {"name": "LIGA der Freien Wohlfahrtspflege in Thüringen", "lat": 50.9612241751718, "lng": 11.0338398139201, "location": "Erfurt", "email": "info@liga-thueringen.de", "website": "https://liga-thueringen.de/liga-aktuell", "sector": "R", "division": "", "code": "88.99.9", "description": ""}, {"name": "Universitätsklinikum Jena", "lat": 50.8857212750758, "lng": 11.6216779183936, "location": "Jena", "email": "info@med.uni-jena.de", "website": "https://www.uniklinikum-jena.de/", "sector": "R", "division": "", "code": "86.10.2", "description": ""}, {"name": "Diako Thüringen gem. GmbH", "lat": 51.143701314137, "lng": 10.3414779313988, "location": "Eisenach", "email": "info@diako-thueringen.de", "website": "https://www.diako-thueringen.de/", "sector": "R", "division": "", "code": "NA", "description": ""}, {"name": "workconcept service GmbH Arbeitnehmerüberlassung", "lat": 50.8182101192794, "lng": 10.2376588782865, "location": "Bad Salzungen", "email": "zentrale@workconcept-service.de", "website": "https://www.workconcept-service.de/", "sector": "O", "division": "", "code": "78.10.0", "description": ""}, {"name": "Pflegebienen Mittelthüringen GmbH", "lat": 50.9767058376078, "lng": 11.0204542758391, "location": "Erfurt", "email": "info-suedost@aiutanda.de", "website": "https://aiutanda-suedost.de/", "sector": "R", "division": "", "code": "86.94.1", "description": ""}, {"name": "Linimed GmbH", "lat": 50.883432022129, "lng": 11.5990087933177, "location": "Jena", "email": "info@linimed.de", "website": "https://www.linimed.de/", "sector": "R", "division": "", "code": "88.10.1", "description": ""}, {"name": "AWO AJS gGmbH", "lat": 51.0065306389987, "lng": 11.0321821734066, "location": "Erfurt", "email": "AJSgGmbH@awo-thueringen.de", "website": "https://www.awo-ajs-thueringen.de/start", "sector": "R", "division": "", "code": "NA", "description": ""}, {"name": "Henneberg-Klinik Hildburghausen GmbH", "lat": 50.4295893070381, "lng": 10.7290179211913, "location": "Hildburghausen", "email": "info@henneberg-kliniken.de", "website": "https://www.henneberg-kliniken.de/henneberg-klinik-hildburghausen/", "sector": "R", "division": "", "code": "86.10.1", "description": ""}, {"name": "SRH Waldklinikum Gera GmbH", "lat": 50.8693597567018, "lng": 12.0525439058723, "location": "Gera", "email": "info.wkg@srh.de", "website": "https://www.waldklinikumgera.de/", "sector": "R", "division": "", "code": "86.10.1", "description": ""}, {"name": "Südharz Klinikum Nordhausen gGmbH - SHK", "lat": 51.516227978678, "lng": 10.7954325759949, "location": "Nordhausen", "email": "info@shk-ndh.de", "website": "https://www.shk-ndh.de/", "sector": "R", "division": "", "code": "86.10.1", "description": ""}, {"name": "Volkssolidarität e.V. KV Schmalkalden-Meiningen", "lat": 50.5731332380655, "lng": 10.4154811654971, "location": "Meiningen", "email": "info@vs-sm.de", "website": "https://www.vs-sm.de/", "sector": "R", "division": "", "code": "NA", "description": ""}, {"name": "persona service AG & Co. KG", "lat": 50.9772707180283, "lng": 11.0415770739854, "location": "Erfurt", "email": "erfurt@persona.de", "website": "https://www.persona.de/jobboerse", "sector": "O", "division": "", "code": "78.10.0", "description": ""}, {"name": "KMG Klinikum Sömmerda", "lat": 51.163129278363, "lng": 11.1218503448617, "location": "Sömmerda", "email": "d.klebingat@kmg-kliniken.de", "website": "https://kmg-kliniken.de/kmg-klinikum-soemmerda", "sector": "R", "division": "", "code": "86.10.1", "description": ""}, {"name": "Novalis Diakonieverein e.V.", "lat": 51.2857737343352, "lng": 10.7275045143269, "location": "Ebeleben", "email": "info@novalis-diakonie.de", "website": "https://www.novalis-diakonie.de/", "sector": "R", "division": "", "code": "87.30.2", "description": ""}, {"name": "Sophien- und Hufeland-Klinikum gGmbH", "lat": 50.9617590971557, "lng": 11.3230369292657, "location": "Weimar", "email": "info@klinikum-weimar.de", "website": "https://www.klinikum-weimar.de/", "sector": "R", "division": "", "code": "86.10.1", "description": ""}, {"name": "AWO RV Mitte-West-Thüringen e.V.", "lat": 50.9878512586303, "lng": 11.3021182372309, "location": "Weimar", "email": "info@awo-mittewest-thueringen.de", "website": "https://www.awo-mittewest-thueringen.de/", "sector": "R", "division": "", "code": "NA", "description": ""}, {"name": "Johanniter-Unfall-Hilfe e.V. Landesverband Sachsen-Anhalt-Thüringen", "lat": 50.9683325812933, "lng": 11.0303910985843, "location": "Erfurt", "email": "Website", "website": "https://www.johanniter.de/juh/lv-sat/", "sector": "R", "division": "", "code": "86.94.1", "description": ""}, {"name": "Lebenshilfe im Alter GmbH", "lat": 50.5803150723912, "lng": 10.4190631134455, "location": "Meiningen", "email": "info@lebenshilfe-suedthueringen.de", "website": "https://lebenshilfe-im-alter.de/", "sector": "R", "division": "", "code": "87.30.1", "description": ""}, {"name": "Schmidt GmbH Pflege mit Niveau", "lat": 50.8708284532345, "lng": 12.0371180217402, "location": "Gera", "email": "gera@schmidt-pflege.de", "website": "https://www.schmidt-pflege.de/", "sector": "R", "division": "", "code": "86.94.1", "description": ""}, {"name": "AWO Seniorenzentrum", "lat": 50.9536155331417, "lng": 11.0597209392535, "location": "Erfurt", "email": "seniorenpflegeheim.ef@awo-thueringen.de", "website": "https://www.pflegeheim-erfurt.de/", "sector": "R", "division": "", "code": "87.30.1", "description": ""}, {"name": "Augusta-Viktoria-Stift", "lat": 50.9822371454009, "lng": 11.0369662292909, "location": "Erfurt", "email": "info@augusta-viktoria-stift.de", "website": "https://www.augusta-viktoria-stift.de/", "sector": "R", "division": "", "code": "87.30.1", "description": ""}, {"name": "DRK Kreisverband Saale-Orla e.V.", "lat": 50.5963962409053, "lng": 11.7890163820606, "location": "Schleiz", "email": "info@drk-sok.de", "website": "https://www.drk-sok.de/", "sector": "R", "division": "", "code": "86.92.0", "description": ""}, {"name": "Gräfliche Kliniken Moritz Klinik GmbH", "lat": 50.9185970492231, "lng": 11.8604016064556, "location": "Bad Klosterlausnitz", "email": "zentrale@moritz-klinik.de", "website": "https://www.moritz-klinik.de/", "sector": "R", "division": "", "code": "86.10.1", "description": ""}, {"name": "Johanniter Seniorenhäuser GmbH Diakoniezentrum Bethesda Eisenberg", "lat": 50.9628578118121, "lng": 11.898682298721, "location": "Eisenberg", "email": "Website", "website": "https://www.johanniter.de/johanniter-seniorenhaeuser/standorte/diakoniezentrum-bethesda-eisenberg/", "sector": "R", "division": "", "code": "87.30.1", "description": ""}, {"name": "Residenz Ambiente Wohnen im Alter GmbH", "lat": 51.2728417388838, "lng": 11.0296019524693, "location": "Erfurt", "email": "erfurt@residenz-ambiente.de", "website": "https://erfurt.residenz-ambiente.de/", "sector": "R", "division": "", "code": "87.30.1", "description": ""}, {"name": "Seniorenpflege Bad Salzungen GmbH", "lat": 50.8302805678046, "lng": 10.2274913663937, "location": "Bad Salzungen", "email": "info@klinikum-badsalzungen.de", "website": "https://www.klinikum-badsalzungen.de/seniorenpflege", "sector": "R", "division": "", "code": "87.30.1", "description": ""}, {"name": "ASB Regionalverband Ostthüringen e.V.", "lat": 50.8526171094185, "lng": 12.073766237062, "location": "Gera", "email": "Website", "website": "https://www.asb-gera.de/", "sector": "R", "division": "", "code": "NA", "description": ""}, {"name": "AWO Saale-Orla-Kreis", "lat": 50.7070180226445, "lng": 11.5805286029698, "location": "Pößneck", "email": "info@awo-sok.de", "website": "https://www.awo-sok.de/die-awo-sok/struktur/awo-sozialmanagement-saale-orla-kreis-ggmbh", "sector": "R", "division": "", "code": "NA", "description": ""}, {"name": "AZURIT Rohr GmbH Betreiber v. Altenpflegeheimen", "lat": 50.9805690759816, "lng": 11.0466995218779, "location": "Erfurt", "email": "szerfurt@azurit-gruppe.de", "website": "https://www.azurit-gruppe.de/senioren-pflegezentren/erfurt/", "sector": "R", "division": "", "code": "NA", "description": ""}];
+
+        // Sector colors
+        const sectorColors = {
+            'R': '#6bcb77',
+            'O': '#ffc107',
+            'Q': '#ce93d8',
+            'T': '#ff6b6b',
+            '': '#00d9ff'
+        };
+
+        const sectorNames = {
+            'R': 'Health & Social Work',
+            'O': 'Employment Agency',
+            'Q': 'Education',
+            'T': 'Other Services',
+            '': 'Unclassified'
+        };
+
+        // Unterklassen (Subclass) descriptions based on WZ 2008
+        const unterklassenNames = {
+            '78.10.0': 'Temporary Employment Agencies',
+            '82.99.9': 'Other Business Support Services',
+            '85.59.2': 'Vocational Training & Education',
+            '86.10.1': 'General Hospitals',
+            '86.10.2': 'Specialized Clinics',
+            '86.21.0': 'General Medical Practice',
+            '86.92.0': 'Ambulance Services',
+            '86.94.1': 'Outpatient Nursing Care (Home Care)',
+            '87.30.1': 'Residential Care for Elderly',
+            '87.30.2': 'Residential Care for Disabled',
+            '88.10.1': 'Social Work for Elderly (Non-residential)',
+            '88.10.4': 'Social Work for Disabled (Non-residential)',
+            '88.99.3': 'Social Counseling Services',
+            '88.99.9': 'Other Social Work Services',
+            '94.20.0': 'Trade Union Activities',
+            '94.99.9': 'Other Membership Organizations',
+            'NA': 'Not Classified'
+        };
+
+        // Initialize map
+        let map;
+        let markers = [];
+        let heatLayer;
+        let currentView = 'markers';
+
+        function initMap() {
+            map = L.map('map').setView([50.9, 11.0], 8);
+            
+            // Dark theme map tiles
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '© OpenStreetMap contributors © CARTO',
+                maxZoom: 19
+            }).addTo(map);
+
+            // Add markers
+            organizations.forEach(org => {
+                const color = sectorColors[org.sector] || sectorColors[''];
+                
+                const marker = L.circleMarker([org.lat, org.lng], {
+                    radius: 8,
+                    fillColor: color,
+                    color: '#fff',
+                    weight: 2,
+                    opacity: 1,
+                    fillOpacity: 0.8
+                });
+
+                marker.bindPopup(`
+                    <div class="popup-title">${org.name}</div>
+                    <div class="popup-info">📍 ${org.location}</div>
+                    <div class="popup-info">📧 ${org.email}</div>
+                    <div class="popup-info">🏷️ ${sectorNames[org.sector] || 'Unclassified'}</div>
+                    <div class="popup-info">📋 ${unterklassenNames[org.code] || org.code || 'N/A'}</div>
+                    ${org.website ? `<a href="${org.website}" target="_blank" class="popup-link">Visit Website →</a>` : ''}
+                `);
+
+                markers.push(marker);
+                marker.addTo(map);
+            });
+
+            // Prepare heat data
+            const heatData = organizations.map(org => [org.lat, org.lng, 1]);
+            heatLayer = L.heatLayer(heatData, {
+                radius: 25,
+                blur: 15,
+                maxZoom: 10,
+                gradient: {0.4: '#00d9ff', 0.6: '#ffd93d', 0.8: '#ff6b6b', 1: '#ff0000'}
+            });
+        }
+
+        function showMarkers() {
+            document.querySelectorAll('.map-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (heatLayer) map.removeLayer(heatLayer);
+            markers.forEach(m => m.addTo(map));
+            currentView = 'markers';
+        }
+
+        function showHeatmap() {
+            document.querySelectorAll('.map-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            markers.forEach(m => map.removeLayer(m));
+            heatLayer.addTo(map);
+            currentView = 'heatmap';
+        }
+
+        function showClusters() {
+            document.querySelectorAll('.map-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (heatLayer) map.removeLayer(heatLayer);
+            markers.forEach(m => m.addTo(map));
+            map.setZoom(7);
+            currentView = 'clusters';
+        }
+
+        // Initialize charts
+        function initCharts() {
+            // Sector Distribution (Doughnut)
+            const sectorCounts = {};
+            organizations.forEach(org => {
+                const sector = org.sector || 'Unclassified';
+                sectorCounts[sector] = (sectorCounts[sector] || 0) + 1;
+            });
+
+            new Chart(document.getElementById('sectorChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(sectorCounts).map(s => sectorNames[s] || s),
+                    datasets: [{
+                        data: Object.values(sectorCounts),
+                        backgroundColor: Object.keys(sectorCounts).map(s => sectorColors[s] || '#00d9ff'),
+                        borderColor: '#0a0a1a',
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '65%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#888',
+                                padding: 15,
+                                font: { size: 11 }
+                            }
+                        }
+                    },
+                    animation: {
+                        animateRotate: true,
+                        duration: 2000
+                    }
+                }
+            });
+
+            // Location Distribution (Bar)
+            const locationCounts = {};
+            organizations.forEach(org => {
+                locationCounts[org.location] = (locationCounts[org.location] || 0) + 1;
+            });
+
+            const sortedLocations = Object.entries(locationCounts)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 10);
+
+            new Chart(document.getElementById('locationChart'), {
+                type: 'bar',
+                data: {
+                    labels: sortedLocations.map(l => l[0]),
+                    datasets: [{
+                        label: 'Organizations',
+                        data: sortedLocations.map(l => l[1]),
+                        backgroundColor: 'rgba(0, 217, 255, 0.6)',
+                        borderColor: '#00d9ff',
+                        borderWidth: 2,
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { color: '#888' }
+                        },
+                        y: {
+                            grid: { display: false },
+                            ticks: { color: '#888', font: { size: 11 } }
+                        }
+                    },
+                    animation: {
+                        duration: 1500,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+
+            // Unterklassen Breakdown (Horizontal Bar)
+            const unterklassenCounts = {};
+            organizations.forEach(org => {
+                const code = org.code || 'NA';
+                unterklassenCounts[code] = (unterklassenCounts[code] || 0) + 1;
+            });
+
+            // Sort by count and get top entries, excluding 'NA' (not classified)
+            const sortedUnterklassen = Object.entries(unterklassenCounts)
+                .filter(u => u[0] !== 'NA') // Exclude not classified entries
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 10);
+
+            const unterklassenColors = {
+                '86.94.1': '#6bcb77', '87.30.1': '#4ecdc4', '86.10.1': '#00d9ff',
+                '88.99.3': '#ffc107', '85.59.2': '#ce93d8', '94.99.9': '#ff6b6b',
+                'NA': '#888888', '78.10.0': '#ff9f43', '86.21.0': '#a55eea',
+                '86.92.0': '#00ff88', '88.10.1': '#ffdd59'
+            };
+
+            new Chart(document.getElementById('unterklassenChart'), {
+                type: 'bar',
+                data: {
+                    labels: sortedUnterklassen.map(u => unterklassenNames[u[0]] || u[0]),
+                    datasets: [{
+                        label: 'Organizations',
+                        data: sortedUnterklassen.map(u => u[1]),
+                        backgroundColor: sortedUnterklassen.map(u => unterklassenColors[u[0]] || '#00d9ff'),
+                        borderColor: sortedUnterklassen.map(u => unterklassenColors[u[0]] || '#00d9ff'),
+                        borderWidth: 1,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                title: function(context) {
+                                    const code = sortedUnterklassen[context[0].dataIndex][0];
+                                    return `${unterklassenNames[code] || code} (${code})`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { color: '#888' }
+                        },
+                        y: {
+                            grid: { display: false },
+                            ticks: { color: '#888', font: { size: 10 } }
+                        }
+                    }
+                }
+            });
+
+            // Division Breakdown (Polar Area) - keeping for radar chart data
+            const divisionCounts = {};
+            const divisionNames = {
+                '78': 'HR Services',
+                '82': 'Business Services',
+                '85': 'Education',
+                '86': 'Healthcare',
+                '87': 'Residential Care',
+                '88': 'Social Work',
+                '94': 'Advocacy',
+                '': 'Other'
+            };
+
+            organizations.forEach(org => {
+                const div = org.division || '';
+                divisionCounts[div] = (divisionCounts[div] || 0) + 1;
+            });
+
+            const divColors = ['#00d9ff', '#6bcb77', '#ffc107', '#ff6b6b', '#ce93d8', '#4ecdc4', '#ff9f43', '#a55eea'];
+
+
+            // Radar Chart for Service Categories
+            new Chart(document.getElementById('radarChart'), {
+                type: 'radar',
+                data: {
+                    labels: ['Healthcare', 'Social Work', 'Residential Care', 'Education', 'HR Services', 'Advocacy'],
+                    datasets: [{
+                        label: 'Organizations',
+                        data: [21, 17, 11, 3, 2, 4],
+                        backgroundColor: 'rgba(0, 217, 255, 0.2)',
+                        borderColor: '#00d9ff',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#00d9ff',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: '#00d9ff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(255,255,255,0.1)' },
+                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            pointLabels: { color: '#888', font: { size: 11 } },
+                            ticks: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize table
+        function initTable() {
+            const tbody = document.getElementById('tableBody');
+            const locationFilter = document.getElementById('locationFilter');
+            
+            // Populate location filter
+            const locations = [...new Set(organizations.map(o => o.location))].sort();
+            locations.forEach(loc => {
+                const option = document.createElement('option');
+                option.value = loc;
+                option.textContent = loc;
+                locationFilter.appendChild(option);
+            });
+
+            renderTable(organizations);
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            data.forEach(org => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><span class="org-name" title="${org.name}">${org.name}</span></td>
+                    <td><span class="location-badge">${org.location}</span></td>
+                    <td><span class="sector-badge sector-${org.sector || 'R'}">${sectorNames[org.sector] || 'Unclassified'}</span></td>
+                    <td><span title="${org.code}">${unterklassenNames[org.code] || org.code || '-'}</span></td>
+                    <td>
+                        ${org.website ? `<a href="${org.website}" target="_blank" class="link-btn">Website</a>` : ''}
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Filter functionality
+        function filterTable() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const location = document.getElementById('locationFilter').value;
+            const sector = document.getElementById('sectorFilter').value;
+
+            const filtered = organizations.filter(org => {
+                const matchSearch = org.name.toLowerCase().includes(search) || 
+                                   org.location.toLowerCase().includes(search);
+                const matchLocation = !location || org.location === location;
+                const matchSector = !sector || org.sector === sector;
+                return matchSearch && matchLocation && matchSector;
+            });
+
+            renderTable(filtered);
+        }
+
+        // Animated counter
+        function animateCounters() {
+            document.querySelectorAll('.stat-number[data-count]').forEach(counter => {
+                const target = parseInt(counter.dataset.count);
+                const duration = 2000;
+                const step = target / (duration / 16);
+                let current = 0;
+
+                const timer = setInterval(() => {
+                    current += step;
+                    if (current >= target) {
+                        counter.textContent = target;
+                        counter.classList.add('counting');
+                        clearInterval(timer);
+                    } else {
+                        counter.textContent = Math.floor(current);
+                    }
+                }, 16);
+            });
+        }
+
+        // Create particles
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (10 + Math.random() * 10) + 's';
+                container.appendChild(particle);
+            }
+        }
+
+        // Initialize everything
+        window.addEventListener('load', () => {
+            createParticles();
+            
+            setTimeout(() => {
+                document.getElementById('loader').classList.add('hidden');
+                initMap();
+                initCharts();
+                initTable();
+                animateCounters();
+            }, 500);
+
+            // Event listeners
+            document.getElementById('searchInput').addEventListener('input', filterTable);
+            document.getElementById('locationFilter').addEventListener('change', filterTable);
+            document.getElementById('sectorFilter').addEventListener('change', filterTable);
+        });
+
+        // Open in New Tab functionality
+        function openInNewTab() {
+            window.open(window.location.href, '_blank');
+        }
+    </script>
+</body>
+</html>

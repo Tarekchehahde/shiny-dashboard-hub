@@ -1,0 +1,1722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Insights Dashboard | Care Worker Recruitment in Thuringia</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: #1a1a24;
+            --bg-card-hover: #22222e;
+            --bg-sidebar: #0d0d14;
+            --accent-primary: #6366f1;
+            --accent-secondary: #8b5cf6;
+            --accent-tertiary: #ec4899;
+            --accent-warning: #f59e0b;
+            --accent-success: #10b981;
+            --accent-danger: #ef4444;
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+            --border-color: rgba(255,255,255,0.08);
+            --gradient-1: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            --sidebar-width: 280px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 5px;
+        }
+
+        .sidebar-subtitle {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 15px 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            font-size: 0.9rem;
+        }
+
+        .nav-item:hover {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: rgba(99, 102, 241, 0.15);
+            color: var(--accent-primary);
+            border-left-color: var(--accent-primary);
+        }
+
+        .nav-icon {
+            font-size: 1.1rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .nav-number {
+            width: 22px;
+            height: 22px;
+            background: var(--bg-card);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: auto;
+        }
+
+        .nav-item.active .nav-number {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .sidebar-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .sidebar-stat {
+            text-align: center;
+            padding: 10px;
+            background: var(--bg-card);
+            border-radius: 8px;
+        }
+
+        .sidebar-stat-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+        }
+
+        .sidebar-stat-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        /* Main Content Area */
+        .main-wrapper {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+            padding: 30px 40px;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header .subtitle {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+        }
+
+        .btn-primary {
+            background: var(--gradient-1);
+            border: none;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Sections Container */
+        .sections-container {
+            padding: 30px 40px;
+        }
+
+        /* Section */
+        .section {
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .section.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .section-number {
+            width: 45px;
+            height: 45px;
+            background: var(--gradient-1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .section-title {
+            font-size: 1.6rem;
+            font-weight: 600;
+        }
+
+        .section-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        /* Grid Layouts */
+        .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+        .grid-6 { display: grid; grid-template-columns: repeat(6, 1fr); gap: 15px; }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            background: var(--bg-card-hover);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .card-icon {
+            font-size: 1.5rem;
+        }
+
+        /* Metric Cards */
+        .metric-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+        }
+
+        .metric-card.purple::before { background: var(--accent-primary); }
+        .metric-card.pink::before { background: var(--accent-tertiary); }
+        .metric-card.green::before { background: var(--accent-success); }
+        .metric-card.orange::before { background: var(--accent-warning); }
+        .metric-card.red::before { background: var(--accent-danger); }
+        .metric-card.blue::before { background: #3b82f6; }
+
+        .metric-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Chart Containers */
+        .chart-container { position: relative; height: 300px; }
+        .chart-container-large { height: 400px; }
+        .chart-container-small { height: 250px; }
+
+        /* Insight Boxes */
+        .insight-box {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .insight-box.warning {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(239, 68, 68, 0.1) 100%);
+            border-color: rgba(245, 158, 11, 0.3);
+        }
+
+        .insight-box.success {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(99, 102, 241, 0.1) 100%);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .insight-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--accent-primary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .insight-box.warning .insight-title { color: var(--accent-warning); }
+        .insight-box.success .insight-title { color: var(--accent-success); }
+
+        .insight-text {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* Quote Boxes */
+        .quote-box {
+            background: var(--bg-secondary);
+            border-left: 4px solid var(--accent-primary);
+            padding: 20px 25px;
+            margin: 15px 0;
+            border-radius: 0 12px 12px 0;
+        }
+
+        .quote-text {
+            font-style: italic;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        .quote-source {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 10px;
+        }
+
+        /* Tables */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 12px 15px;
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .data-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.9rem;
+        }
+
+        .data-table tr:hover td {
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        /* Progress Bars */
+        .progress-bar-container { margin: 12px 0; }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 0.85rem;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--bg-secondary);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 1s ease;
+        }
+
+        /* Tags */
+        .tag {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .tag-critical { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+        .tag-high { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+        .tag-moderate { background: rgba(99, 102, 241, 0.2); color: #6366f1; }
+
+        /* Universal Codes */
+        .universal-codes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .universal-code {
+            background: var(--gradient-1);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        /* Country Cards */
+        .country-card {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            transition: transform 0.2s;
+        }
+
+        .country-card:hover {
+            transform: translateX(5px);
+        }
+
+        .country-flag { font-size: 2rem; }
+        .country-info h4 { font-size: 0.95rem; font-weight: 600; }
+        .country-info p { font-size: 0.8rem; color: var(--text-muted); }
+        .country-mentions {
+            margin-left: auto;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+        }
+
+        /* Temporal Flow */
+        .temporal-flow {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 30px 0;
+            position: relative;
+        }
+
+        .temporal-flow::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 10%;
+            right: 10%;
+            height: 4px;
+            background: var(--border-color);
+            transform: translateY(-50%);
+            z-index: 0;
+        }
+
+        .temporal-phase {
+            text-align: center;
+            z-index: 1;
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid var(--border-color);
+            min-width: 140px;
+            transition: all 0.3s;
+        }
+
+        .temporal-phase:hover {
+            transform: scale(1.05);
+        }
+
+        .temporal-phase.active {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .temporal-value { font-size: 1.8rem; font-weight: 700; }
+        .temporal-label { font-size: 0.8rem; color: var(--text-muted); margin-top: 5px; }
+
+        /* Paradox Visual */
+        .paradox-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            padding: 30px;
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            margin: 20px 0;
+        }
+
+        .paradox-side { text-align: center; flex: 1; }
+        .paradox-value { font-size: 3rem; font-weight: 700; }
+        .paradox-label { font-size: 0.9rem; color: var(--text-secondary); margin-top: 5px; }
+
+        .paradox-vs {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            padding: 15px 25px;
+            background: var(--bg-card);
+            border-radius: 50%;
+        }
+
+        /* Strengths & Gaps */
+        .strength-gap-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .strength-item, .gap-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 15px;
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            transition: transform 0.2s;
+        }
+
+        .strength-item:hover, .gap-item:hover {
+            transform: translateX(5px);
+        }
+
+        .strength-icon { color: var(--accent-success); font-size: 1.2rem; }
+        .gap-icon { color: var(--accent-danger); font-size: 1.2rem; }
+
+        /* Credits Section */
+        .credits-card {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .credits-card h3 {
+            font-size: 0.85rem;
+            color: var(--accent-primary);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .credits-card p {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            line-height: 1.8;
+        }
+
+        /* Navigation Buttons */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .nav-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .nav-btn:hover {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .nav-btn.prev:hover {
+            transform: translateX(-5px);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .nav-btn:disabled:hover {
+            background: var(--bg-card);
+            border-color: var(--border-color);
+            color: var(--text-secondary);
+            transform: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .grid-4 { grid-template-columns: repeat(2, 1fr); }
+            .grid-6 { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        @media (max-width: 992px) {
+            .sidebar { width: 70px; }
+            .sidebar-header, .sidebar-footer { display: none; }
+            .nav-item span:not(.nav-icon) { display: none; }
+            .nav-item { justify-content: center; padding: 14px; }
+            .nav-number { display: none; }
+            .main-wrapper { margin-left: 70px; }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            .header { padding: 20px; }
+            .sections-container { padding: 20px; }
+            .grid-2, .grid-3, .grid-4, .grid-6 { grid-template-columns: 1fr; }
+            .temporal-flow { flex-direction: column; gap: 15px; }
+            .temporal-flow::before { display: none; }
+            .paradox-container { flex-direction: column; }
+            .strength-gap-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Animations */
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-slide { animation: slideIn 0.5s ease forwards; }
+        .animate-fade { animation: fadeInUp 0.5s ease forwards; }
+
+        .delay-1 { animation-delay: 0.1s; opacity: 0; }
+        .delay-2 { animation-delay: 0.2s; opacity: 0; }
+        .delay-3 { animation-delay: 0.3s; opacity: 0; }
+        .delay-4 { animation-delay: 0.4s; opacity: 0; }
+        .delay-5 { animation-delay: 0.5s; opacity: 0; }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">Interview Insights</div>
+            <div class="sidebar-subtitle">Care Worker Recruitment</div>
+        </div>
+        
+        <div class="sidebar-nav">
+            <div class="nav-item active" data-section="1">
+                <span class="nav-icon">📊</span>
+                <span>Executive Summary</span>
+                <span class="nav-number">1</span>
+            </div>
+            <div class="nav-item" data-section="2">
+                <span class="nav-icon">📈</span>
+                <span>Interview Comparison</span>
+                <span class="nav-number">2</span>
+            </div>
+            <div class="nav-item" data-section="3">
+                <span class="nav-icon">🎯</span>
+                <span>Thematic Distribution</span>
+                <span class="nav-number">3</span>
+            </div>
+            <div class="nav-item" data-section="4">
+                <span class="nav-icon">🏷️</span>
+                <span>Code Analysis</span>
+                <span class="nav-number">4</span>
+            </div>
+            <div class="nav-item" data-section="5">
+                <span class="nav-icon">🌍</span>
+                <span>Geographic Patterns</span>
+                <span class="nav-number">5</span>
+            </div>
+            <div class="nav-item" data-section="6">
+                <span class="nav-icon">⚠️</span>
+                <span>Challenge Analysis</span>
+                <span class="nav-number">6</span>
+            </div>
+            <div class="nav-item" data-section="7">
+                <span class="nav-icon">🎭</span>
+                <span>Agency Behavior</span>
+                <span class="nav-number">7</span>
+            </div>
+            <div class="nav-item" data-section="8">
+                <span class="nav-icon">💬</span>
+                <span>Key Narratives</span>
+                <span class="nav-number">8</span>
+            </div>
+            <div class="nav-item" data-section="9">
+                <span class="nav-icon">💡</span>
+                <span>Strategic Insights</span>
+                <span class="nav-number">9</span>
+            </div>
+            <div class="nav-item" data-section="10">
+                <span class="nav-icon">🎯</span>
+                <span>Conclusion</span>
+                <span class="nav-number">10</span>
+            </div>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-stats">
+                <div class="sidebar-stat">
+                    <div class="sidebar-stat-value">125</div>
+                    <div class="sidebar-stat-label">Entries</div>
+                </div>
+                <div class="sidebar-stat">
+                    <div class="sidebar-stat-value">5</div>
+                    <div class="sidebar-stat-label">Interviews</div>
+                </div>
+                <div class="sidebar-stat">
+                    <div class="sidebar-stat-value">18</div>
+                    <div class="sidebar-stat-label">Codes</div>
+                </div>
+                <div class="sidebar-stat">
+                    <div class="sidebar-stat-value">6</div>
+                    <div class="sidebar-stat-label">Themes</div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-wrapper">
+        <header class="header">
+            <div class="header-content">
+                <div>
+                    <h1>Interview Insights Dashboard</h1>
+                    <p class="subtitle">Qualitative Analysis of Care Worker Recruitment in Thuringia, Germany</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-primary" onclick="window.open(window.location.href, '_blank')">
+                        <span>↗</span> Open in New Tab
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="sections-container">
+            <!-- Section 1: Executive Summary -->
+            <section class="section active" id="section-1">
+                <div class="section-header">
+                    <div class="section-number">1</div>
+                    <div>
+                        <h2 class="section-title">Executive Summary</h2>
+                        <p class="section-description">Key findings from 125 coded interview entries</p>
+                    </div>
+                </div>
+
+                <div class="credits-card">
+                    <h3>Research Team</h3>
+                    <p><strong>Team:</strong> Nour Alwan, Kenny Tam, Ceren Toraman, Aboli Ghodekar, Sarah Agyeiwaa Darko, Luigia Hannah Blankson, Hayelom Belay Seyoum, Oriane Kaiser<br>
+                    <strong>Instructor:</strong> Prof. Dr. Achim Kemmerling | <strong>Client:</strong> German Center for Integration and Migration Research (DeZIM)</p>
+                </div>
+
+                <div class="grid-6">
+                    <div class="metric-card purple animate-fade delay-1">
+                        <div class="metric-value">125</div>
+                        <div class="metric-label">Total Coded Entries</div>
+                    </div>
+                    <div class="metric-card pink animate-fade delay-2">
+                        <div class="metric-value">5</div>
+                        <div class="metric-label">Interviews Analyzed</div>
+                    </div>
+                    <div class="metric-card green animate-fade delay-3">
+                        <div class="metric-value">18</div>
+                        <div class="metric-label">Codes Used</div>
+                    </div>
+                    <div class="metric-card orange animate-fade delay-4">
+                        <div class="metric-value">6</div>
+                        <div class="metric-label">Major Themes</div>
+                    </div>
+                    <div class="metric-card red animate-fade delay-5">
+                        <div class="metric-value">36%</div>
+                        <div class="metric-label">Language Challenge</div>
+                    </div>
+                    <div class="metric-card blue animate-fade delay-5">
+                        <div class="metric-value">4</div>
+                        <div class="metric-label">Source Countries</div>
+                    </div>
+                </div>
+
+                <div class="insight-box" style="margin-top: 25px;">
+                    <div class="insight-title">Key Finding</div>
+                    <div class="insight-text">The interview data reveals a <strong>care worker recruitment system in Thuringia that is operationally sophisticated but strategically reactive</strong>. Agencies demonstrate remarkable commitment to supporting migrant workers after arrival, yet the data suggests insufficient investment in pre-arrival preparation and structural solutions to persistent challenges.</div>
+                </div>
+
+                <div class="nav-buttons">
+                    <button class="nav-btn prev" disabled>← Previous</button>
+                    <button class="nav-btn next" onclick="navigateToSection(2)">Next: Interview Comparison →</button>
+                </div>
+            </section>
+
+            <!-- Section 2: Interview Comparison -->
+            <section class="section" id="section-2">
+                <div class="section-header">
+                    <div class="section-number">2</div>
+                    <div>
+                        <h2 class="section-title">Cross-Interview Patterns</h2>
+                        <p class="section-description">Comparing perspectives across organizations</p>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">Interview Comparison Matrix</span>
+                            <span class="card-icon">📊</span>
+                        </div>
+                        <div class="chart-container-large">
+                            <canvas id="interviewComparisonChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">Theme Distribution (Pie)</span>
+                            <span class="card-icon">🥧</span>
+                        </div>
+                        <div class="chart-container-large">
+                            <canvas id="themeDistributionPieChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid-2" style="margin-top: 25px;">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">Interview Sources</span>
+                            <span class="card-icon">🏢</span>
+                        </div>
+                        <table class="data-table">
+                            <thead><tr><th>Organization</th><th>Type</th><th>Entries</th></tr></thead>
+                            <tbody>
+                                <tr><td>LEG</td><td>Public Agency</td><td>24</td></tr>
+                                <tr><td>AWO AJS</td><td>Welfare Organization</td><td>35</td></tr>
+                                <tr><td>IBS (Nov)</td><td>Training Institution</td><td>27</td></tr>
+                                <tr><td>IBS (Jan)</td><td>Training Institution</td><td>16</td></tr>
+                                <tr><td>Diako</td><td>Church-based Welfare</td><td>23</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">Organizational Profiles</span>
+                            <span class="card-icon">👥</span>
+                        </div>
+                        <div style="color: var(--text-secondary); font-size: 0.9rem;">
+                            <p style="margin-bottom: 12px;"><strong style="color: var(--accent-primary);">LEG (Public Agency):</strong> Balanced focus on suitability criteria and adverse outcomes; strong emphasis on preparation.</p>
+                            <p style="margin-bottom: 12px;"><strong style="color: var(--accent-tertiary);">AWO (Welfare Organization):</strong> Highest focus on extended support and adverse outcomes; most comprehensive coverage.</p>
+                            <p style="margin-bottom: 12px;"><strong style="color: var(--accent-success);">IBS (Training Institution):</strong> Strongest focus on transnational recruitment mechanics; operational perspective.</p>
+                            <p><strong style="color: var(--accent-warning);">Diako (Church-based):</strong> Emphasis on worker suitability and extended support; pastoral care orientation.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="nav-buttons">
+                    <button class="nav-btn prev" onclick="navigateToSection(1)">← Previous: Executive Summary</button>
+                    <button class="nav-btn next" onclick="navigateToSection(3)">Next: Thematic Distribution →</button>
+                </div>
+            </section>
+
+            <!-- Section 3: Thematic Distribution -->
+            <section class="section" id="section-3">
+                <div class="section-header">
+                    <div class="section-number">3</div>
+                    <div>
+                        <h2 class="section-title">Thematic Distribution</h2>
+                        <p class="section-description">Analysis of 6 major themes across all interviews</p>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">Theme Prevalence</span>
+                            <span class="card-icon">📊</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="themeChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">Theme Distribution</span>
+                            <span class="card-icon">🎯</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="themePieChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 25px;">
+                    <div class="card-header">
+                        <span class="card-title">The Support-Problem Paradox</span>
+                        <span class="card-icon">⚖️</span>
+                    </div>
+                    <div class="paradox-container">
+                        <div class="paradox-side">
+                            <div class="paradox-value" style="color: var(--accent-success);">27.2%</div>
+                            <div class="paradox-label">Extended Support<br><small>Agencies invest heavily in post-arrival support</small></div>
+                        </div>
+                        <div class="paradox-vs">vs</div>
+                        <div class="paradox-side">
+                            <div class="paradox-value" style="color: var(--accent-danger);">20.8%</div>
+                            <div class="paradox-label">Adverse Outcomes<br><small>Challenges acknowledged but unresolved</small></div>
+                        </div>
+                    </div>
+                    <div class="insight-box warning">
+                        <div class="insight-title">Critical Insight</div>
+                        <div class="insight-text">This pattern suggests a <strong>reactive rather than preventive</strong> approach to integration challenges. Agencies dedicate the most attention to post-arrival support while simultaneously acknowledging adverse outcomes they cannot resolve.</div>
+                    </div>
+                </div>
+
+                <div class="nav-buttons">
+                    <button class="nav-btn prev" onclick="navigateToSection(2)">← Previous: Interview Comparison</button>
+                    <button class="nav-btn next" onclick="navigateToSection(4)">Next: Code Analysis →</button>
+                </div>
+            </section>
+
+            <!-- Section 4: Code Analysis -->
+            <section class="section" id="section-4">
+                <div class="section-header">
+                    <div class="section-number">4</div>
+                    <div>
+                        <h2 class="section-title">Code-Level Analysis</h2>
+                        <p class="section-description">Frequency and distribution of 18 analytical codes</p>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">Most Frequent Codes</span>
+                            <span class="card-icon">📈</span>
+                        </div>
+                        <div class="chart-container-large">
+                            <canvas id="codeFrequencyChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">Code Details</span>
+                            <span class="card-icon">📋</span>
+                        </div>
+                        <table class="data-table">
+                            <thead>
+                                <tr><th>Rank</th><th>Code</th><th>Description</th><th>Count</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>1</td><td>C10</td><td>Proactive assistance from agencies</td><td>14 (11.2%)</td></tr>
+                                <tr><td>2</td><td>C08</td><td>Description of xenophobia</td><td>13 (10.4%)</td></tr>
+                                <tr><td>3</td><td>C04</td><td>Informative experience for decision-making</td><td>10 (8.0%)</td></tr>
+                                <tr><td>4</td><td>C16</td><td>Concern of social isolation</td><td>10 (8.0%)</td></tr>
+                                <tr><td>5</td><td>C01</td><td>Cooperation with external agencies</td><td>8 (6.4%)</td></tr>
+                                <tr><td>6</td><td>C11</td><td>Pre-arrival information provision</td><td>8 (6.4%)</td></tr>
+                                <tr><td>7</td><td>C02</td><td>Participation in workers recruitment</td><td>7 (5.6%)</td></tr>
+                                <tr><td>8</td><td>C18</td><td>Exogenous negative experience</td><td>7 (5.6%)</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 25px;">
+                    <div class="card-header">
+                        <span class="card-title">Universal Concerns (Appear in ALL 5 Interviews)</span>
+                        <span class="card-icon">🔗</span>
+                    </div>
+                    <p style="color: var(--text-secondary); margin-bottom: 15px;">These six codes represent the <strong>core challenges and responses</strong> in the Thuringian care worker recruitment system:</p>
+                    <div class="universal-codes">
+                        <div class="universal-code">C06 – Resignation of careworkers</div>
+                        <div class="universal-code">C08 – Description of xenophobia</div>
+                        <div class="universal-code">C10 – Proactive assistance from agencies</div>
+                        <div class="universal-code">C11 – Pre-arrival information provision</div>
+                        <div class="universal-code">C12 – Pre-emptive preferences correction</div>
+                        <div class="universal-code">C16 – Concern of social isolation</div>
+                    </div>
+                </div>
+
+                <div class="nav-buttons">
+                    <button class="nav-btn prev" onclick="navigateToSection(3)">← Previous: Thematic Distribution</button>
+                    <button class="nav-btn next" onclick="navigateToSection(5)">Next: Geographic Patterns →</button>
+                </div>
+            </section>
+
+            <!-- Section 5: Geographic Patterns -->
+            <section class="section" id="section-5">
+                <div class="section-header">
+                    <div class="section-number">5</div>
+                    <div>
+                        <h2 class="section-title">Geographic & Organizational Patterns</h2>
+                        <p class="section-description">Source countries and partner organizations</p>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">Source Countries</span>
+                            <span class="card-icon">🌍</span>
+                        </div>
+                        <div class="country-card">
+                            <span class="country-flag">🇻🇳</span>
+                            <div class="country-info"><h4>Vietnam</h4><p>Primary source country</p></div>
+                            <span class="country-mentions">17</span>
+                        </div>
+                        <div class="country-card">
+                            <span class="country-flag">🇲🇽</span>
+                            <div class="country-info"><h4>Mexico</h4><p>Growing source country</p></div>
+                            <span class="country-mentions">10</span>
+                        </div>
+                        <div class="country-card">
+                            <span class="country-flag">🇮🇳</span>
+                            <div class="country-info"><h4>India</h4><p>Skilled worker source</p></div>
+                            <span class="country-mentions">8</span>
+                        </div>
+                        <div class="country-card">
+                            <span class="country-flag">🇸🇻</span>
+                            <div class="country-info"><h4>El Salvador</h4><p>Emerging source</p></div>
+                            <span class="country-mentions">5</span>
+                        </div>
+                        <div class="chart-container-small" style="margin-top: 20px;">
+                            <canvas id="countryChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">Key Partner Organizations</span>
+                            <span class="card-icon">🤝</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="orgChart"></canvas>
+                        </div>
+                        <table class="data-table" style="margin-top: 20px;">
+                            <thead><tr><th>Organization</th><th>Function</th><th>Mentions</th></tr></thead>
+                            <tbody>
+                                <tr><td>Goethe Institut</td><td>Language training, cultural bridge</td><td>6</td></tr>
+                                <tr><td>LEG</td><td>State-level coordination</td><td>5</td></tr>
+                                <tr><td>IBS</td><td>Training and qualification</td><td>5</td></tr>
+                                <tr><td>GPS</td><td>Recruitment program</td><td>3</td></tr>
+                                <tr><td>ZAV</td><td>Federal employment agency</td><td>3</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="nav-buttons">
+                    <button class="nav-btn prev" onclick="navigateToSection(4)">← Previous: Code Analysis</button>
+                    <button class="nav-btn next" onclick="navigateToSection(6)">Next: Challenge Analysis →</button>
+                </div>
+            </section>
+
+            <!-- Section 6: Challenge Analysis -->
+            <section class="section" id="section-6">
+                <div class="section-header">
+                    <div class="section-number">6</div>
+                    <div>
+                        <h2 class="section-title">Challenge Analysis</h2>
+                        <p class="section-description">Key barriers and their severity</p>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">Challenge Categories by Frequency</span>
+                            <span class="card-icon">⚠️</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="challengeChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">Challenge Severity</span>
+                            <span class="card-icon">🎚️</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-label"><span>Language</span><span>36.0% <span class="tag tag-critical">Critical</span></span></div>
+                            <div class="progress-bar"><div class="progress-fill" style="width: 36%; background: var(--accent-danger);"></div></div>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-label"><span>Bureaucracy</span><span>10.4% <span class="tag tag-high">High</span></span></div>
+                            <div class="progress-bar"><div class="progress-fill" style="width: 10.4%; background: var(--accent-warning);"></div></div>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-label"><span>Integration</span><span>7.2% <span class="tag tag-high">High</span></span></div>
+                            <div class="progress-bar"><div class="progress-fill" style="width: 7.2%; background: var(--accent-warning);"></div></div>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-label"><span>Retention</span><span>6.4% <span class="tag tag-moderate">Moderate</span></span></div>
+                            <div class="progress-bar"><div class="progress-fill" style="width: 6.4%; background: var(--accent-primary);"></div></div>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-label"><span>Discrimination</span><span>3.2% <span class="tag tag-moderate">Moderate</span></span></div>
+                            <div class="progress-bar"><div class="progress-fill" style="width: 3.2%; background: var(--accent-primary);"></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 25px;">
+                    <div class="card-header">
+                        <span class="card-title">The Language Barrier - Deep Dive</span>
+                        <span class="card-icon">🗣️</span>
+                    </div>
+                    <div class="grid-2" style="gap: 30px;">
+                        <div>
+                            <p style="color: var(--text-secondary); margin-bottom: 15px;">Language emerges as the <strong>dominant challenge</strong>, appearing in over one-third of all coded entries.</p>
+                            <ul style="color: var(--text-secondary); padding-left: 20px;">
+                                <li><strong>B1 level</strong> is considered insufficient for nursing training</li>
+                                <li><strong>B2 level</strong> is the minimum threshold for success</li>
+                                <li>Language difficulties compound other challenges</li>
+                                <li>Agencies invest significant resources in language support</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <div class="quote-box">
+                                <p class="quote-text">"Because experience has shown that entering with B1 or lower makes it too difficult for the young person during the intensive and challenging generalist training to become a nursing specialist."</p>
+                                <p class="quote-source">— Interview Extract</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 25px;">
+                    <div class="card-header">
+                        <span class="card-title">Xenophobia and Discrimination</span>
+                        <span class="card-icon">🚨</span>
+                    </div>
+                    <div class="insight-box warning">
+                        <div class="insight-title">The Xenophobia Paradox</div>
+                        <div class="insight-text">Despite appearing in only 3.2% of entries explicitly, <strong>xenophobia (C08) is the second most frequent code at 10.4%</strong>. Agencies discuss xenophobia frequently but frame it as external to their control, a regional characteristic, and something workers must be "prepared for" rather than protected from.</div>
+                    </div>
+                    <div class="quote-box" style="margin-top: 20px;">
+                        <p class="quote-text">"We still try to be neutral... But you still prepare people for the countryside, where it might happen—even in the city. You're no longer protected anywhere."</p>
+                        <p class="quote-source">— Interview Extract</p>
+                    </div>
+                </div>
+
+                <div class="nav-buttons">
+                    <button class="nav-btn prev" onclick="navigateToSection(5)">← Previous: Geographic Patterns</button>
+                    <button class="nav-btn next" onclick="navigateToSection(7)">Next: Agency Behavior →</button>
+                </div>
+            </section>
+
+            <!-- Section 7: Agency Behavior -->
+            <section class="section" id="section-7">
+                <div class="section-header">
+                    <div class="section-number">7</div>
+                    <div>
+                        <h2 class="section-title">Agency Behavior Analysis</h2>
+                        <p class="section-description">Behavioral patterns and temporal focus</p>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">Behavioral Profile</span>
+                            <span class="card-icon">🎭</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="behaviorChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">Temporal Focus</span>
+                            <span class="card-icon">⏱️</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="temporalChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 25px;">
+                    <div class="card-header">
+                        <span class="card-title">The Recruitment Journey - Temporal Focus</span>
+                        <span class="card-icon">🛤️</span>
+                    </div>
+                    <div class="temporal-flow">
+                        <div class="temporal-phase">
+                            <div class="temporal-value">20.8%</div>
+                            <div class="temporal-label">Pre-Arrival</div>
+                        </div>
+                        <div class="temporal-phase">
+                            <div class="temporal-value">→</div>
+                            <div class="temporal-label">Journey</div>
+                        </div>
+                        <div class="temporal-phase active">
+                            <div class="temporal-value" style="color: var(--accent-primary);">40.0%</div>
+                            <div class="temporal-label">Post-Arrival</div>
+                        </div>
+                        <div class="temporal-phase">
+                            <div class="temporal-value">22.4%</div>
+                            <div class="temporal-label">Ongoing</div>
+                        </div>
+                    </div>
+                    <div class="insight-box warning">
+                        <div class="insight-title">Critical Finding</div>
+                        <div class="insight-text">The <strong>2:1 ratio</strong> of post-arrival to pre-arrival focus suggests <strong>reactive rather than preventive</strong> integration strategies. Heavy investment after workers arrive, but limited preparation before arrival.</div>
+                    </div>
+                </div>
+
+                <div class="nav-buttons">
+                    <button class="nav-btn prev" onclick="navigateToSection(6)">← Previous: Challenge Analysis</button>
+                    <button class="nav-btn next" onclick="navigateToSection(8)">Next: Key Narratives →</button>
+                </div>
+            </section>
+
+            <!-- Section 8: Key Narratives -->
+            <section class="section" id="section-8">
+                <div class="section-header">
+                    <div class="section-number">8</div>
+                    <div>
+                        <h2 class="section-title">Key Narratives from the Data</h2>
+                        <p class="section-description">Representative quotes and themes</p>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">The Complexity of Transnational Coordination</span>
+                            <span class="card-icon">🌐</span>
+                        </div>
+                        <div class="quote-box">
+                            <p class="quote-text">"And this is especially a highly complex process in connection with foreign embassies, German schools, Goethe Institutes, and so on. Everything has to be coordinated properly."</p>
+                        </div>
+                        <p style="color: var(--text-secondary); margin-top: 15px; font-size: 0.9rem;">Recruitment involves multiple actors across borders, requiring sophisticated coordination.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">The Expectation Management Challenge</span>
+                            <span class="card-icon">🎯</span>
+                        </div>
+                        <div class="quote-box">
+                            <p class="quote-text">"We explain what the training involves... We dispel that notion relatively early and tell people if you want to go to a hospital, then this isn't the right thing for you."</p>
+                        </div>
+                        <p style="color: var(--text-secondary); margin-top: 15px; font-size: 0.9rem;">Agencies actively work to align worker expectations with German realities.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">The Support Beyond Duty</span>
+                            <span class="card-icon">💪</span>
+                        </div>
+                        <div class="quote-box">
+                            <p class="quote-text">"They also wanted to network, or they wanted a bicycle—I then organized that via eBay classifieds—such small things."</p>
+                        </div>
+                        <p style="color: var(--text-secondary); margin-top: 15px; font-size: 0.9rem;">Support extends far beyond formal responsibilities into personal assistance.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">The Unresolved Tensions</span>
+                            <span class="card-icon">😔</span>
+                        </div>
+                        <div class="quote-box">
+                            <p class="quote-text">"But if that can't resolve it, then unfortunately there are young people who move away... That's just how it is."</p>
+                        </div>
+                        <p style="color: var(--text-secondary); margin-top: 15px; font-size: 0.9rem;">Some challenges are acknowledged but accepted as unchangeable.</p>
+                    </div>
+                </div>
+
+                <div class="nav-buttons">
+                    <button class="nav-btn prev" onclick="navigateToSection(7)">← Previous: Agency Behavior</button>
+                    <button class="nav-btn next" onclick="navigateToSection(9)">Next: Strategic Insights →</button>
+                </div>
+            </section>
+
+            <!-- Section 9: Strategic Insights -->
+            <section class="section" id="section-9">
+                <div class="section-header">
+                    <div class="section-number">9</div>
+                    <div>
+                        <h2 class="section-title">Strategic Insights</h2>
+                        <p class="section-description">Strengths, gaps, and opportunities</p>
+                    </div>
+                </div>
+
+                <div class="strength-gap-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">Strengths of the Current System</span>
+                            <span class="card-icon">✅</span>
+                        </div>
+                        <div class="strength-item"><span class="strength-icon">✓</span><span><strong>Robust support infrastructure</strong> once workers arrive</span></div>
+                        <div class="strength-item"><span class="strength-icon">✓</span><span><strong>Strong inter-organizational cooperation</strong> (Goethe, ZAV, LEG)</span></div>
+                        <div class="strength-item"><span class="strength-icon">✓</span><span><strong>Diverse source country portfolio</strong> reducing dependency</span></div>
+                        <div class="strength-item"><span class="strength-icon">✓</span><span><strong>Active expectation management</strong> before arrival</span></div>
+                        <div class="strength-item"><span class="strength-icon">✓</span><span><strong>Universal recognition</strong> of key challenges across all stakeholders</span></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">Gaps and Vulnerabilities</span>
+                            <span class="card-icon">⚠️</span>
+                        </div>
+                        <div class="gap-item"><span class="gap-icon">✗</span><span><strong>Reactive orientation</strong> – more resources on post-arrival than prevention</span></div>
+                        <div class="gap-item"><span class="gap-icon">✗</span><span><strong>Language barrier</strong> remains critical despite awareness</span></div>
+                        <div class="gap-item"><span class="gap-icon">✗</span><span><strong>Xenophobia</strong> acknowledged but not actively countered</span></div>
+                        <div class="gap-item"><span class="gap-icon">✗</span><span><strong>Qualification recognition</strong> underaddressed (only 4.8%)</span></div>
+                        <div class="gap-item"><span class="gap-icon">✗</span><span><strong>Retention challenges</strong> accepted rather than solved</span></div>
+                        <div class="gap-item"><span class="gap-icon">✗</span><span><strong>Pre-arrival preparation</strong> insufficient relative to post-arrival support</span></div>
+                    </div>
+                </div>
+
+                <div class="nav-buttons">
+                    <button class="nav-btn prev" onclick="navigateToSection(8)">← Previous: Key Narratives</button>
+                    <button class="nav-btn next" onclick="navigateToSection(10)">Next: Conclusion →</button>
+                </div>
+            </section>
+
+            <!-- Section 10: Conclusion -->
+            <section class="section" id="section-10">
+                <div class="section-header">
+                    <div class="section-number">10</div>
+                    <div>
+                        <h2 class="section-title">Conclusion</h2>
+                        <p class="section-description">Key takeaways and recommendations</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="insight-box">
+                        <div class="insight-title">The Central Paradox</div>
+                        <div class="insight-text">Organizations acknowledge xenophobia, retention problems, and qualification mismatches as significant issues, yet frame them as <strong>external constraints</strong> rather than problems requiring systemic intervention.</div>
+                    </div>
+                    <div class="insight-box success" style="margin-top: 20px;">
+                        <div class="insight-title">The Opportunity</div>
+                        <div class="insight-text">Shifting resources toward <strong>pre-arrival preparation</strong>, <strong>language threshold enforcement</strong>, and <strong>proactive anti-discrimination measures</strong> could reduce the burden of post-arrival support while improving worker outcomes.</div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 25px; background: var(--bg-secondary);">
+                    <div class="card-header">
+                        <span class="card-title">Methodology</span>
+                        <span class="card-icon">📚</span>
+                    </div>
+                    <div class="grid-4" style="color: var(--text-secondary); font-size: 0.9rem;">
+                        <div><strong>Data Source</strong><br>5 semi-structured interviews with recruitment stakeholders</div>
+                        <div><strong>Coding Framework</strong><br>18 codes organized into 6 thematic categories</div>
+                        <div><strong>Analysis Method</strong><br>Thematic analysis with frequency counting</div>
+                        <div><strong>Analysis Date</strong><br>January 2026</div>
+                    </div>
+                </div>
+
+                <div class="nav-buttons">
+                    <button class="nav-btn prev" onclick="navigateToSection(9)">← Previous: Strategic Insights</button>
+                    <button class="nav-btn next" onclick="navigateToSection(1)">Back to Start →</button>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        // Navigation
+        let currentSection = 1;
+        const totalSections = 10;
+        let chartsInitialized = false;
+
+        function navigateToSection(sectionNum) {
+            // Hide current section
+            document.getElementById(`section-${currentSection}`).classList.remove('active');
+            document.querySelector(`.nav-item[data-section="${currentSection}"]`).classList.remove('active');
+
+            // Show new section
+            currentSection = sectionNum;
+            const newSection = document.getElementById(`section-${currentSection}`);
+            newSection.classList.add('active');
+            document.querySelector(`.nav-item[data-section="${currentSection}"]`).classList.add('active');
+
+            // Scroll to top of section
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // Initialize charts if needed
+            if (!chartsInitialized) {
+                initCharts();
+                chartsInitialized = true;
+            }
+        }
+
+        // Sidebar navigation click handlers
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const section = parseInt(item.dataset.section);
+                navigateToSection(section);
+            });
+        });
+
+        // Chart.js Configuration
+        Chart.defaults.color = '#a1a1aa';
+        Chart.defaults.borderColor = 'rgba(255,255,255,0.08)';
+
+        const colors = {
+            purple: '#6366f1',
+            pink: '#ec4899',
+            green: '#10b981',
+            orange: '#f59e0b',
+            red: '#ef4444',
+            blue: '#3b82f6',
+            violet: '#8b5cf6'
+        };
+
+        const gradientColors = [colors.purple, colors.pink, colors.green, colors.orange, colors.blue, colors.violet];
+
+        function initCharts() {
+            // Theme Distribution Chart
+            new Chart(document.getElementById('themeChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Extended Support', 'Adverse Outcomes', 'Transnational Recruitment', 'Worker Suitability', 'Pre-Arrival Expectations', 'Qualification Mismatches'],
+                    datasets: [{ label: 'Entries', data: [34, 26, 25, 21, 13, 6], backgroundColor: gradientColors, borderRadius: 8, borderSkipped: false }]
+                },
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: 'rgba(255,255,255,0.05)' } }, y: { grid: { display: false } } } }
+            });
+
+            // Theme Pie Chart
+            new Chart(document.getElementById('themePieChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Extended Support (27.2%)', 'Adverse Outcomes (20.8%)', 'Transnational Recruitment (20.0%)', 'Worker Suitability (16.8%)', 'Pre-Arrival (10.4%)', 'Qualification (4.8%)'],
+                    datasets: [{ data: [34, 26, 25, 21, 13, 6], backgroundColor: gradientColors, borderWidth: 0 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'right', labels: { padding: 15, font: { size: 11 } } } } }
+            });
+
+            // Code Frequency Chart
+            new Chart(document.getElementById('codeFrequencyChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['C10', 'C08', 'C04', 'C16', 'C01', 'C11', 'C02', 'C18', 'C05', 'C06', 'C15', 'C14', 'C03', 'C12', 'C17', 'C09', 'C13', 'C07'],
+                    datasets: [{ label: 'Count', data: [14, 13, 10, 10, 8, 8, 7, 7, 6, 6, 6, 6, 5, 5, 4, 4, 4, 2], backgroundColor: colors.purple, borderRadius: 4 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false } } } }
+            });
+
+            // Country Chart
+            new Chart(document.getElementById('countryChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Vietnam', 'Mexico', 'India', 'El Salvador', 'Others'],
+                    datasets: [{ data: [17, 10, 8, 5, 5], backgroundColor: [colors.purple, colors.pink, colors.orange, colors.green, colors.blue], borderWidth: 0 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, cutout: '50%', plugins: { legend: { display: false } } }
+            });
+
+            // Organization Chart
+            new Chart(document.getElementById('orgChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Goethe Institut', 'LEG', 'IBS', 'GPS', 'ZAV'],
+                    datasets: [{ label: 'Mentions', data: [6, 5, 5, 3, 3], backgroundColor: [colors.purple, colors.pink, colors.green, colors.orange, colors.blue], borderRadius: 8 }]
+                },
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: 'rgba(255,255,255,0.05)' } }, y: { grid: { display: false } } } }
+            });
+
+            // Challenge Chart
+            new Chart(document.getElementById('challengeChart'), {
+                type: 'polarArea',
+                data: {
+                    labels: ['Language (36%)', 'Bureaucracy (10.4%)', 'Integration (7.2%)', 'Retention (6.4%)', 'Discrimination (3.2%)'],
+                    datasets: [{ data: [36, 10.4, 7.2, 6.4, 3.2], backgroundColor: ['rgba(239, 68, 68, 0.7)', 'rgba(245, 158, 11, 0.7)', 'rgba(245, 158, 11, 0.5)', 'rgba(99, 102, 241, 0.7)', 'rgba(99, 102, 241, 0.5)'], borderWidth: 0 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { padding: 15 } } }, scales: { r: { grid: { color: 'rgba(255,255,255,0.1)' } } } }
+            });
+
+            // Behavior Chart
+            new Chart(document.getElementById('behaviorChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Proactive Support (32.8%)', 'Structural/Systemic (24.8%)', 'Reactive/Acknowledgment (20.8%)'],
+                    datasets: [{ data: [41, 31, 26], backgroundColor: [colors.green, colors.purple, colors.orange], borderWidth: 0 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, cutout: '55%', plugins: { legend: { position: 'bottom', labels: { padding: 20 } } } }
+            });
+
+            // Temporal Chart
+            new Chart(document.getElementById('temporalChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Pre-Arrival', 'Post-Arrival', 'Ongoing/Structural'],
+                    datasets: [{ label: 'Entries', data: [26, 50, 28], backgroundColor: [colors.blue, colors.purple, colors.green], borderRadius: 8 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false } } } }
+            });
+
+            // Interview Comparison Chart
+            new Chart(document.getElementById('interviewComparisonChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['LEG', 'AWO', 'IBS-Nov', 'IBS-Jan', 'Diako'],
+                    datasets: [
+                        { label: 'Transnational Recruitment', data: [5, 5, 11, 0, 4], backgroundColor: colors.purple },
+                        { label: 'Worker Suitability', data: [7, 4, 1, 2, 7], backgroundColor: colors.pink },
+                        { label: 'Pre-Arrival Expectations', data: [2, 4, 3, 2, 2], backgroundColor: colors.blue },
+                        { label: 'Extended Support', data: [3, 10, 7, 7, 7], backgroundColor: colors.green },
+                        { label: 'Qualification Mismatches', data: [1, 3, 1, 1, 0], backgroundColor: colors.orange },
+                        { label: 'Adverse Outcomes', data: [6, 9, 4, 4, 3], backgroundColor: colors.red }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { padding: 15, font: { size: 11 } } } }, scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true, grid: { color: 'rgba(255,255,255,0.05)' } } } }
+            });
+
+            // Theme Distribution Pie Chart (Section 7) - Viridis color palette with outside labels
+            const viridisColors = ['#440154', '#31688e', '#35b779', '#fde725', '#21918c', '#5ec962'];
+            new Chart(document.getElementById('themeDistributionPieChart'), {
+                type: 'pie',
+                data: {
+                    labels: ['Extended Support', 'Adverse Outcomes', 'Transnational Recruitment', 'Worker Suitability', 'Pre-Arrival Expectations', 'Qualification Mismatches'],
+                    datasets: [{
+                        data: [27.2, 20.8, 20.0, 16.8, 10.4, 4.8],
+                        backgroundColor: viridisColors,
+                        borderWidth: 2,
+                        borderColor: '#1e293b'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    layout: {
+                        padding: { top: 30, bottom: 30, left: 80, right: 80 }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': ' + context.raw + '%';
+                                }
+                            }
+                        }
+                    }
+                },
+                plugins: [{
+                    id: 'outsideLabels',
+                    afterDraw: function(chart) {
+                        const ctx = chart.ctx;
+                        const meta = chart.getDatasetMeta(0);
+                        
+                        meta.data.forEach((element, index) => {
+                            const data = chart.data.datasets[0].data[index];
+                            const label = chart.data.labels[index];
+                            const bgColor = chart.data.datasets[0].backgroundColor[index];
+                            
+                            const centerX = element.x;
+                            const centerY = element.y;
+                            const midAngle = (element.startAngle + element.endAngle) / 2;
+                            const outerRadius = element.outerRadius;
+                            
+                            // Point on the edge of the pie
+                            const edgeX = centerX + Math.cos(midAngle) * outerRadius;
+                            const edgeY = centerY + Math.sin(midAngle) * outerRadius;
+                            
+                            // Point for the elbow (extends outward)
+                            const elbowLength = 20;
+                            const elbowX = centerX + Math.cos(midAngle) * (outerRadius + elbowLength);
+                            const elbowY = centerY + Math.sin(midAngle) * (outerRadius + elbowLength);
+                            
+                            // Horizontal line direction
+                            const isRightSide = midAngle < Math.PI / 2 || midAngle > 3 * Math.PI / 2;
+                            const horizontalLength = 25;
+                            const endX = isRightSide ? elbowX + horizontalLength : elbowX - horizontalLength;
+                            const endY = elbowY;
+                            
+                            // Draw connector line
+                            ctx.save();
+                            ctx.beginPath();
+                            ctx.moveTo(edgeX, edgeY);
+                            ctx.lineTo(elbowX, elbowY);
+                            ctx.lineTo(endX, endY);
+                            ctx.strokeStyle = bgColor;
+                            ctx.lineWidth = 2;
+                            ctx.stroke();
+                            
+                            // Draw label text
+                            ctx.fillStyle = '#e2e8f0';
+                            ctx.font = 'bold 11px Inter, sans-serif';
+                            ctx.textAlign = isRightSide ? 'left' : 'right';
+                            ctx.textBaseline = 'middle';
+                            
+                            const textX = isRightSide ? endX + 5 : endX - 5;
+                            ctx.fillText(label, textX, endY - 7);
+                            ctx.fillText(data + '%', textX, endY + 7);
+                            ctx.restore();
+                        });
+                    }
+                }]
+            });
+        }
+
+        // Initialize charts on load
+        document.addEventListener('DOMContentLoaded', () => {
+            initCharts();
+            chartsInitialized = true;
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' && currentSection < totalSections) {
+                navigateToSection(currentSection + 1);
+            } else if (e.key === 'ArrowLeft' && currentSection > 1) {
+                navigateToSection(currentSection - 1);
+            }
+        });
+    </script>
+</body>
+</html>

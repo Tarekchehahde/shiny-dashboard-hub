@@ -472,6 +472,14 @@ mastr_footer <- function(footer = "mastr") {
       "Data: Fraunhofer ISE Energy-Charts API (day-ahead prices). ",
       tags$a(href = "https://energy-charts.info/", target = "_blank", "Energy-Charts")
     ),
+    care_workers = tagList(
+      "Research: Navigating Expectations \u2014 Care Worker Recruitment in Th\u00fcringen. ",
+      "5 stakeholder interviews (125 coded extracts) + 59 mapped organizations (Nov 2025). ",
+      tags$a(
+        href = "https://github.com/Tarekchehahde/Navigating-Expectations-Care-Workers-Thuringia",
+        target = "_blank", rel = "noopener", "Project repo"
+      )
+    ),
     hub = "Dashboard hub — select an app above.",
     minimal = NULL,
     stop("Unknown mastr_footer preset: ", footer, call. = FALSE)

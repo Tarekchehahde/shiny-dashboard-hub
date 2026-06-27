@@ -1,0 +1,255 @@
+{
+  "summary": {
+    "total_entries": 125,
+    "total_interviews": 5,
+    "total_codes": 18,
+    "total_themes": 6
+  },
+  "themes": {
+    "Transnational Recruitment": {
+      "count": 25,
+      "percentage": 20.0,
+      "codes": [
+        "C01",
+        "C02",
+        "C05",
+        "C13"
+      ]
+    },
+    "Worker Suitability": {
+      "count": 21,
+      "percentage": 16.8,
+      "codes": [
+        "C03",
+        "C04",
+        "C07",
+        "C09"
+      ]
+    },
+    "Pre-Arrival Expectations": {
+      "count": 13,
+      "percentage": 10.4,
+      "codes": [
+        "C11",
+        "C12"
+      ]
+    },
+    "Extended Support": {
+      "count": 34,
+      "percentage": 27.2,
+      "codes": [
+        "C10",
+        "C14",
+        "C16",
+        "C17"
+      ]
+    },
+    "Qualification Mismatches": {
+      "count": 6,
+      "percentage": 4.8,
+      "codes": [
+        "C15"
+      ]
+    },
+    "Adverse Outcomes": {
+      "count": 26,
+      "percentage": 20.8,
+      "codes": [
+        "C06",
+        "C08",
+        "C18"
+      ]
+    }
+  },
+  "codes": {
+    "C01": {
+      "name": "Cooperation with external agencies",
+      "count": 8,
+      "percentage": 6.4,
+      "theme": "Transnational Recruitment"
+    },
+    "C02": {
+      "name": "Participation in workers recruitment",
+      "count": 7,
+      "percentage": 5.6,
+      "theme": "Transnational Recruitment"
+    },
+    "C03": {
+      "name": "Age of workers",
+      "count": 5,
+      "percentage": 4.0,
+      "theme": "Worker Suitability"
+    },
+    "C04": {
+      "name": "Informative experience for decision-making",
+      "count": 10,
+      "percentage": 8.0,
+      "theme": "Worker Suitability"
+    },
+    "C05": {
+      "name": "Presence in partnering countries",
+      "count": 6,
+      "percentage": 4.8,
+      "theme": "Transnational Recruitment"
+    },
+    "C06": {
+      "name": "Resignation of careworkers",
+      "count": 6,
+      "percentage": 4.8,
+      "theme": "Adverse Outcomes"
+    },
+    "C08": {
+      "name": "Description of xenophobia",
+      "count": 13,
+      "percentage": 10.4,
+      "theme": "Adverse Outcomes"
+    },
+    "C10": {
+      "name": "Proactive assistance from agencies",
+      "count": 14,
+      "percentage": 11.2,
+      "theme": "Extended Support"
+    },
+    "C11": {
+      "name": "Pre-arrival information provision",
+      "count": 8,
+      "percentage": 6.4,
+      "theme": "Pre-Arrival Expectations"
+    },
+    "C12": {
+      "name": "Pre-emptive preferences correction",
+      "count": 5,
+      "percentage": 4.0,
+      "theme": "Pre-Arrival Expectations"
+    },
+    "C15": {
+      "name": "Perceived discrepancy of qualification quality",
+      "count": 6,
+      "percentage": 4.8,
+      "theme": "Qualification Mismatches"
+    },
+    "C16": {
+      "name": "Concern of social isolation of migrant workers",
+      "count": 10,
+      "percentage": 8.0,
+      "theme": "Extended Support"
+    },
+    "C17": {
+      "name": "Emphasis of transparency",
+      "count": 4,
+      "percentage": 3.2,
+      "theme": "Extended Support"
+    },
+    "C09": {
+      "name": "Gender of workers",
+      "count": 4,
+      "percentage": 3.2,
+      "theme": "Worker Suitability"
+    },
+    "C14": {
+      "name": "Concern of migrant workers family conditions",
+      "count": 6,
+      "percentage": 4.8,
+      "theme": "Extended Support"
+    },
+    "C18": {
+      "name": "Report of exogenous negative migrant worker experience",
+      "count": 7,
+      "percentage": 5.6,
+      "theme": "Adverse Outcomes"
+    },
+    "C13": {
+      "name": "Report of uncooperative partners",
+      "count": 4,
+      "percentage": 3.2,
+      "theme": "Transnational Recruitment"
+    },
+    "C07": {
+      "name": "Importance of language proficiency",
+      "count": 2,
+      "percentage": 1.6,
+      "theme": "Worker Suitability"
+    }
+  },
+  "interviews": {
+    "LEG": {
+      "total": 24,
+      "themes": {
+        "Transnational Recruitment": 5,
+        "Worker Suitability": 7,
+        "Adverse Outcomes": 6,
+        "Extended Support": 3,
+        "Pre-Arrival Expectations": 2,
+        "Qualification Mismatches": 1
+      }
+    },
+    "AWO AJS": {
+      "total": 35,
+      "themes": {
+        "Transnational Recruitment": 5,
+        "Worker Suitability": 4,
+        "Adverse Outcomes": 9,
+        "Extended Support": 10,
+        "Pre-Arrival Expectations": 4,
+        "Qualification Mismatches": 3
+      }
+    },
+    "IBS (Nov)": {
+      "total": 27,
+      "themes": {
+        "Transnational Recruitment": 11,
+        "Adverse Outcomes": 4,
+        "Worker Suitability": 1,
+        "Extended Support": 7,
+        "Pre-Arrival Expectations": 3,
+        "Qualification Mismatches": 1
+      }
+    },
+    "IBS (Jan)": {
+      "total": 16,
+      "themes": {
+        "Worker Suitability": 2,
+        "Adverse Outcomes": 4,
+        "Extended Support": 7,
+        "Pre-Arrival Expectations": 2,
+        "Qualification Mismatches": 1
+      }
+    },
+    "Diako": {
+      "total": 23,
+      "themes": {
+        "Transnational Recruitment": 4,
+        "Worker Suitability": 7,
+        "Adverse Outcomes": 3,
+        "Extended Support": 7,
+        "Pre-Arrival Expectations": 2
+      }
+    }
+  },
+  "challenges": {
+    "Language": 45,
+    "Bureaucracy": 13,
+    "Integration": 9,
+    "Retention": 8,
+    "Discrimination": 4
+  },
+  "countries": {
+    "Vietnam": 17,
+    "Mexico": 10,
+    "India": 8,
+    "El Salvador": 5,
+    "Bosnia": 2,
+    "Ukraine": 1,
+    "Philippines": 1
+  },
+  "temporal": {
+    "Pre-Arrival": 26,
+    "Post-Arrival": 50,
+    "Ongoing": 28
+  },
+  "behaviors": {
+    "Proactive Support": 41,
+    "Reactive/Acknowledgment": 26,
+    "Structural/Systemic": 31
+  }
+}

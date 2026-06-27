@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organization Network - Care Workers in Thuringia</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #00d9ff;
+            --primary-dark: #0099cc;
+            --secondary: #ff6b6b;
+            --accent: #ffd93d;
+            --success: #6bcb77;
+            --bg-dark: #0a0a1a;
+            --bg-card: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #e4e4e4;
+            --text-muted: #888;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            color: var(--text);
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            padding: 12px;
+        }
+
+        .credits-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 8px 15px;
+            border: 1px solid var(--border);
+            margin-bottom: 6px;
+        }
+
+        .credits-section h2 {
+            color: var(--primary);
+            margin-bottom: 4px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .credits-section p {
+            color: #aaa;
+            font-size: 0.7rem;
+            margin: 2px 0;
+        }
+
+        .credits-section strong { color: var(--primary); }
+
+        header {
+            text-align: center;
+            padding: 10px;
+            background: linear-gradient(135deg, rgba(0, 217, 255, 0.1), rgba(0, 217, 255, 0.02));
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            margin-bottom: 6px;
+        }
+
+        h1 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 3px;
+        }
+
+        .subtitle { color: var(--text-muted); font-size: 0.75rem; }
+
+        .instructions {
+            color: var(--accent);
+            font-size: 0.7rem;
+            margin-top: 5px;
+            padding: 5px 10px;
+            background: rgba(255, 217, 61, 0.1);
+            border-radius: 5px;
+            display: inline-block;
+        }
+
+        .instructions strong { color: #fff; }
+
+        .network-container {
+            flex: 1;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #network { width: 100%; height: 100%; }
+
+        .view-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(10, 10, 26, 0.95);
+            border: 2px solid var(--primary);
+            border-radius: 14px;
+            padding: 18px 25px;
+            text-align: center;
+            z-index: 200;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .view-indicator.visible { opacity: 1; }
+        .view-indicator h3 { color: var(--primary); font-size: 1rem; margin-bottom: 6px; }
+        .view-indicator p { color: var(--text-muted); font-size: 0.8rem; }
+
+        .legend, .relationship-legend {
+            position: absolute;
+            top: 10px;
+            background: rgba(10, 10, 26, 0.95);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px;
+            z-index: 100;
+            font-size: 0.65rem;
+        }
+
+        .legend { left: 10px; max-width: 180px; }
+        .relationship-legend { right: 10px; max-width: 200px; }
+
+        .legend h3, .relationship-legend h3 {
+            color: var(--primary);
+            font-size: 0.7rem;
+            margin-bottom: 6px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 4px;
+        }
+
+        .legend-item, .rel-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin: 4px 0;
+            color: var(--text-muted);
+        }
+
+        .legend-color {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .legend-color.square { border-radius: 2px; }
+        .legend-color.diamond { width: 8px; height: 8px; transform: rotate(45deg); }
+
+        .rel-line {
+            width: 22px;
+            height: 2px;
+            flex-shrink: 0;
+            border-radius: 1px;
+        }
+
+        .tooltip {
+            position: absolute;
+            background: rgba(10, 10, 26, 0.98);
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            padding: 10px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            z-index: 1000;
+            max-width: 280px;
+            box-shadow: 0 6px 25px rgba(0, 217, 255, 0.3);
+            font-size: 0.75rem;
+        }
+
+        .tooltip.visible { opacity: 1; }
+        .tooltip h4 {
+            color: var(--primary);
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 4px;
+        }
+
+        .tooltip-row { display: flex; gap: 6px; margin: 3px 0; }
+        .tooltip-label { color: var(--text-muted); min-width: 55px; }
+        .tooltip-value { color: var(--text); word-break: break-word; }
+        .tooltip-value a { color: var(--primary); text-decoration: none; }
+
+        .tooltip-click-hint {
+            margin-top: 6px;
+            padding-top: 6px;
+            border-top: 1px solid var(--border);
+            color: var(--accent);
+            font-size: 0.7rem;
+            text-align: center;
+        }
+
+        .stats-panel {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(10, 10, 26, 0.95);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px;
+            z-index: 100;
+            font-size: 0.65rem;
+        }
+
+        .stats-panel h3 { color: var(--primary); font-size: 0.7rem; margin-bottom: 5px; }
+        .stat-row { display: flex; justify-content: space-between; margin: 3px 0; gap: 10px; }
+        .stat-label { color: var(--text-muted); }
+        .stat-value { color: var(--primary); font-weight: 600; }
+
+        .back-btn {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 8px 20px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border: none;
+            border-radius: 20px;
+            color: var(--bg-dark);
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.8rem;
+            z-index: 100;
+            transition: all 0.3s ease;
+            opacity: 0;
+            pointer-events: none;
+            box-shadow: 0 4px 12px rgba(0, 217, 255, 0.4);
+        }
+
+        .back-btn.visible { opacity: 1; pointer-events: auto; }
+        .back-btn:hover { transform: translateX(-50%) scale(1.05); }
+
+        .zoom-controls {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            display: flex;
+            gap: 4px;
+            z-index: 100;
+        }
+
+        .zoom-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 5px;
+            background: rgba(10, 10, 26, 0.95);
+            border: 1px solid var(--border);
+            color: var(--primary);
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .zoom-btn:hover {
+            background: var(--primary);
+            color: var(--bg-dark);
+            border-color: var(--primary);
+        }
+
+        .open-tab-btn {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00d9ff, #0099cc);
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 3px 12px rgba(0, 217, 255, 0.4);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .open-tab-btn:hover { transform: scale(1.1); }
+
+        .node { cursor: pointer; transition: all 0.3s ease; }
+        .node:hover { filter: brightness(1.3); }
+        .node.clickable:hover { filter: brightness(1.4) drop-shadow(0 0 8px rgba(0, 217, 255, 0.5)); }
+
+        .node-label {
+            font-size: 7px;
+            fill: var(--text);
+            text-anchor: middle;
+            pointer-events: none;
+            text-shadow: 0 0 3px rgba(0,0,0,0.9), 0 0 6px rgba(0,0,0,0.8);
+        }
+
+        .link { fill: none; stroke-opacity: 0.6; }
+        .link:hover { stroke-opacity: 1; stroke-width: 3px !important; }
+
+        .entity-node { cursor: pointer; }
+        .entity-node:hover { filter: brightness(1.2) drop-shadow(0 0 6px rgba(255, 217, 61, 0.5)); }
+
+        /* Detail Panel for Entity View */
+        .detail-panel {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(10, 10, 26, 0.98);
+            border: 2px solid var(--primary);
+            border-radius: 16px;
+            padding: 25px 35px;
+            z-index: 300;
+            max-width: 450px;
+            min-width: 350px;
+            box-shadow: 0 15px 50px rgba(0, 217, 255, 0.4);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        .detail-panel.visible { opacity: 1; pointer-events: auto; }
+
+        .detail-panel h3 {
+            color: var(--primary);
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .detail-row {
+            display: flex;
+            margin: 10px 0;
+            font-size: 0.9rem;
+        }
+
+        .detail-label {
+            color: var(--text-muted);
+            min-width: 100px;
+            font-weight: 500;
+        }
+
+        .detail-value { color: var(--text); }
+        .detail-value a { color: var(--primary); text-decoration: none; }
+        .detail-value a:hover { text-decoration: underline; }
+
+        .detail-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .detail-close:hover {
+            background: var(--primary);
+            color: var(--bg-dark);
+            border-color: var(--primary);
+        }
+
+        .umbrella-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-top: 10px;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 0.2; }
+            100% { transform: scale(1); opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <section class="credits-section">
+            <h2>👥 Credits</h2>
+            <p><strong>Team:</strong> Nour Alwan, Kenny Tam, Ceren Toraman, Aboli Ghodekar, Sarah Agyeiwaa Darko, Luigia Hannah Blankson, Hayelom Belay Seyoum, Oriane Kaiser</p>
+            <p><strong>Instructor:</strong> Prof. Dr. Achim Kemmerling | <strong>Client:</strong> German Center for Integration and Migration Research (DeZIM)</p>
+        </section>
+
+        <header>
+            <h1>Care Worker Recruitment Network</h1>
+            <p class="subtitle">Stakeholder Relationships in Thuringia's International Care Worker Recruitment Ecosystem</p>
+            <p class="instructions">💡 <strong>Click LIGA Thüringen</strong> → then <strong>click any member</strong> to see details | Drag to pan | Scroll to zoom</p>
+        </header>
+
+        <div class="network-container">
+            <svg id="network"></svg>
+            
+            <div class="view-indicator" id="viewIndicator">
+                <h3>Loading...</h3>
+                <p>Expanding network view</p>
+            </div>
+            
+            <div class="legend" id="nodeLegend">
+                <h3>🏛️ Node Types</h3>
+                <div class="legend-item"><div class="legend-color square" style="background: #e74c3c;"></div><span>Government</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: #3498db;"></div><span>Public Agency</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: #9b59b6;"></div><span>Welfare Org</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: #1abc9c;"></div><span>Training</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: #f39c12;"></div><span>International</span></div>
+                <div class="legend-item"><div class="legend-color diamond" style="background: #2ecc71;"></div><span>Country</span></div>
+            </div>
+
+            <div class="relationship-legend" id="relLegend">
+                <h3>🔗 Relationships</h3>
+                <div class="rel-item"><div class="rel-line" style="background: #e74c3c;"></div><span>Governance</span></div>
+                <div class="rel-item"><div class="rel-line" style="background: #3498db;"></div><span>Structural</span></div>
+                <div class="rel-item"><div class="rel-line" style="background: #2ecc71;"></div><span>Collaboration</span></div>
+                <div class="rel-item"><div class="rel-line" style="background: #f39c12;"></div><span>Migrant Med.</span></div>
+                <div class="rel-item"><div class="rel-line" style="background: #9b59b6;"></div><span>Employer Med.</span></div>
+                <div class="rel-item"><div class="rel-line" style="background: #1abc9c;"></div><span>Recruitment</span></div>
+            </div>
+
+            <div class="stats-panel" id="statsPanel">
+                <h3>📊 Statistics</h3>
+                <div class="stat-row"><span class="stat-label">Nodes:</span><span class="stat-value" id="totalNodes">0</span></div>
+                <div class="stat-row"><span class="stat-label">Links:</span><span class="stat-value" id="totalLinks">0</span></div>
+                <div class="stat-row"><span class="stat-label">Countries:</span><span class="stat-value" id="totalCountries">4</span></div>
+            </div>
+
+            <button class="back-btn" id="backBtn">↻ Back to Main Network</button>
+
+            <div class="zoom-controls">
+                <button class="zoom-btn" id="zoomIn" title="Zoom In">+</button>
+                <button class="zoom-btn" id="zoomOut" title="Zoom Out">−</button>
+                <button class="zoom-btn" id="zoomReset" title="Reset">⟲</button>
+            </div>
+            
+            <div class="tooltip" id="tooltip"></div>
+
+            <!-- Detail Panel for Entity Click -->
+            <div class="detail-panel" id="detailPanel">
+                <button class="detail-close" id="detailClose">×</button>
+                <h3 id="detailTitle">Organization Name</h3>
+                <div class="detail-row"><span class="detail-label">Umbrella:</span><span class="detail-value" id="detailUmbrella">-</span></div>
+                <div class="detail-row"><span class="detail-label">Location:</span><span class="detail-value" id="detailLocation">-</span></div>
+                <div class="detail-row"><span class="detail-label">Email:</span><span class="detail-value" id="detailEmail">-</span></div>
+                <div class="detail-row"><span class="detail-label">Website:</span><span class="detail-value" id="detailWebsite">-</span></div>
+                <div id="detailBadge"></div>
+            </div>
+        </div>
+    </div>
+
+    <button class="open-tab-btn" onclick="window.open(window.location.href, '_blank')" title="Open in New Tab">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0a0a1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+            <polyline points="15 3 21 3 21 9"/>
+            <line x1="10" y1="14" x2="21" y2="3"/>
+        </svg>
+    </button>
+
+    <script>
+        // ===========================================
+        // NETWORK DATA
+        // ===========================================
+
+        const mainNodes = [
+            { id: "ministry_labor", name: "Ministry of Labor", type: "government", fullName: "Thüringer Ministerium für Arbeit, Soziales, Gesundheit, Frauen und Familie", role: "Advisory role for securing skilled labor", location: "Erfurt" },
+            { id: "ministry_economic", name: "Ministry of Economic Affairs", type: "government", fullName: "Thüringer Ministerium für Wirtschaft, Wissenschaft und Digitale Gesellschaft", role: "Funding and economic policy", location: "Erfurt" },
+            { id: "landesverwaltungsamt", name: "Landesverwaltungsamt", type: "government", fullName: "Landesverwaltungsamt Thüringen", role: "Qualification recognition authority", location: "Weimar" },
+            { id: "thaff", name: "ThAFF", type: "public_agency", fullName: "Thüringer Agentur für Fachkräftegewinnung", role: "State agency for skilled worker acquisition", location: "Erfurt", website: "https://thaff-thueringen.de/" },
+            { id: "leg", name: "LEG", type: "public_agency", fullName: "Landesentwicklungsgesellschaft Thüringen mbH", role: "State development company", location: "Erfurt", website: "https://www.leg-thueringen.de/", email: "info@leg-thueringen.de" },
+            { id: "gps", name: "GPS", type: "public_agency", fullName: "German Professional School", role: "Service unit at LEG", location: "Erfurt", website: "https://www.german-professional-school.de/", email: "gps-serviceeinheit@leg-thueringen.de" },
+            { id: "zav", name: "ZAV", type: "public_agency", fullName: "Zentrale Auslands- und Fachvermittlung", role: "Federal employment agency", location: "Bonn", website: "https://www.arbeitsagentur.de/vor-ort/zav/startseite" },
+            { id: "ihk", name: "IHK", type: "public_agency", fullName: "Industrie- und Handelskammer", role: "Chamber of commerce", location: "Erfurt" },
+            { id: "liga", name: "LIGA Thüringen", type: "welfare", fullName: "LIGA der Freien Wohlfahrtspflege in Thüringen", role: "Click to explore 59 member organizations!", location: "Erfurt", website: "https://liga-thueringen.de/", expandable: true, memberCount: 59 },
+            { id: "awo", name: "AWO", type: "welfare", fullName: "AWO AJS gGmbH", role: "Welfare organization", location: "Erfurt", website: "https://www.awo-ajs-thueringen.de/", email: "AJSgGmbH@awo-thueringen.de" },
+            { id: "diakonie", name: "Diakonie", type: "welfare", fullName: "Diako Thüringen gem. GmbH", role: "Church-based welfare", location: "Eisenach", website: "https://www.diako-thueringen.de/", email: "info@diako-thueringen.de" },
+            { id: "ibs", name: "IBS", type: "training", fullName: "Institut für Berufsbildung und Sozialmanagement gGmbH", role: "Training institution", location: "Erfurt", website: "https://ibs-thueringen.de/", email: "info@ibs-thueringen.de" },
+            { id: "isgt", name: "ISGT", type: "training", fullName: "Internationales Servicebüro für die Gesundheits- und Sozialwirtschaft", role: "International service office", location: "Erfurt" },
+            { id: "goethe", name: "Goethe Institut", type: "international", fullName: "Goethe-Institut", role: "Language training", location: "Multiple", website: "https://www.goethe.de/" },
+            { id: "gca", name: "German Competence Academy", type: "international", fullName: "German Competence Academy Vietnam", role: "Vietnam recruitment", location: "Hanoi", website: "https://www.gca-vietnam.com.vn/" },
+            { id: "udn", name: "University of Da Nang", type: "international", fullName: "University of Da Nang", role: "Academic partner", location: "Da Nang", website: "https://www.udn.vn/english" },
+            { id: "apal", name: "Project APAL", type: "international", fullName: "Project APAL (Mexico)", role: "Trainee program", location: "Mexico" },
+            { id: "india_recruiter", name: "Recruiter (India)", type: "international", fullName: "External Recruitment Partners", role: "Skilled migrant recruitment", location: "India" },
+            { id: "vietnam", name: "Vietnam", type: "country", fullName: "Socialist Republic of Vietnam", role: "Primary source (17 mentions)", mentions: 17 },
+            { id: "mexico", name: "Mexico", type: "country", fullName: "United Mexican States", role: "Growing source (10 mentions)", mentions: 10 },
+            { id: "india", name: "India", type: "country", fullName: "Republic of India", role: "Skilled workers (8 mentions)", mentions: 8 },
+            { id: "el_salvador", name: "El Salvador", type: "country", fullName: "Republic of El Salvador", role: "Emerging source (5 mentions)", mentions: 5 }
+        ];
+
+        const mainLinks = [
+            { source: "ministry_labor", target: "thaff", type: "governance", label: "Advisory oversight" },
+            { source: "ministry_economic", target: "leg", type: "governance", label: "Funding & policy" },
+            { source: "ministry_economic", target: "gps", type: "governance", label: "Funding" },
+            { source: "landesverwaltungsamt", target: "leg", type: "governance", label: "Qualification recognition" },
+            { source: "leg", target: "gps", type: "structural", label: "GPS integrated into LEG" },
+            { source: "leg", target: "thaff", type: "structural", label: "Operational connection" },
+            { source: "awo", target: "ibs", type: "structural", label: "IBS is daughter company" },
+            { source: "ibs", target: "isgt", type: "structural", label: "Project coordination" },
+            { source: "thaff", target: "liga", type: "collaboration", label: "Regular meetings" },
+            { source: "liga", target: "awo", type: "collaboration", label: "Member" },
+            { source: "liga", target: "diakonie", type: "collaboration", label: "Member" },
+            { source: "awo", target: "leg", type: "collaboration", label: "Partnership" },
+            { source: "awo", target: "thaff", type: "collaboration", label: "Collaboration" },
+            { source: "diakonie", target: "leg", type: "collaboration", label: "Partnership" },
+            { source: "diakonie", target: "zav", type: "collaboration", label: "Recruitment" },
+            { source: "ibs", target: "awo", type: "collaboration", label: "Organizational link" },
+            { source: "leg", target: "goethe", type: "mediation_migrants", label: "Language coordination" },
+            { source: "awo", target: "goethe", type: "mediation_migrants", label: "Language prep" },
+            { source: "awo", target: "gca", type: "mediation_migrants", label: "Vietnam recruitment" },
+            { source: "awo", target: "udn", type: "mediation_migrants", label: "Academic recruitment" },
+            { source: "ibs", target: "goethe", type: "mediation_migrants", label: "Language" },
+            { source: "diakonie", target: "goethe", type: "mediation_migrants", label: "Language support" },
+            { source: "leg", target: "gps", type: "mediation_employers", label: "Employer services" },
+            { source: "leg", target: "ihk", type: "mediation_employers", label: "Employer network" },
+            { source: "goethe", target: "vietnam", type: "recruitment_source", label: "Primary" },
+            { source: "gca", target: "vietnam", type: "recruitment_source", label: "Partner" },
+            { source: "udn", target: "vietnam", type: "recruitment_source", label: "Academic" },
+            { source: "apal", target: "mexico", type: "recruitment_source", label: "Trainee" },
+            { source: "awo", target: "mexico", type: "recruitment_source", label: "Growing" },
+            { source: "india_recruiter", target: "india", type: "recruitment_source", label: "Skilled" },
+            { source: "awo", target: "el_salvador", type: "recruitment_source", label: "Emerging" }
+        ];
+
+        // LIGA Members with full details
+        const ligaMembers = [
+            { name: "Kath. Altenpflegeheime Breitenworbis", umbrella: "Caritas", location: "Breitenworbis", email: "info@altenpflegeheim-breitenworbis.de", website: "https://www.altenpflegeheim-breitenworbis.com/" },
+            { name: "PflegeCentrum Sonnenschein GmbH", umbrella: "Private", location: "Gerstungen", email: "info@pflegesonnenschein.de", website: "https://pflegesonnenschein.de/" },
+            { name: "Pflegedienst Anita Lüneberg GmbH", umbrella: "Private", location: "Jena", email: "info@pflege-lueneberg.de", website: "https://www.pflege-lueneberg.de/" },
+            { name: "LaVitaCura Pflegedienst GmbH", umbrella: "Private", location: "Mühlhausen", email: "pflege@lavitacura.de", website: "https://www.lavitacura.com/" },
+            { name: "HK Pflegedienst gemeinnützige GmbH", umbrella: "Private", location: "Nesse-Apfelstädt", email: "info@hk-pflegedienst.de", website: "https://hk-pflegedienst.de/" },
+            { name: "Diakonisches Altenhilfezentrum Saalfeld-Rudolstadt", umbrella: "Diakonie", location: "Rudolstadt", website: "https://www.diakonie-in-rudolstadt.de/" },
+            { name: "soweno Altenhilfe gGmbH", umbrella: "Private", location: "Nordhausen", email: "info@soweno.de", website: "https://soweno.de/" },
+            { name: "Saale-Betreuungswerk der Lebenshilfe Jena", umbrella: "Paritätische", location: "Jena", email: "info@sbw-jena.de", website: "https://sbw-jena.info/" },
+            { name: "AWO Soziale Dienste gGmbH Gotha", umbrella: "AWO", location: "Gotha", email: "geschaeftsstelle@awo-gotha.de", website: "https://www.awo-gotha.de/" },
+            { name: "AWO Soziale Dienste Rudolstadt gGmbH", umbrella: "AWO", location: "Rudolstadt", website: "https://www.awo-rudolstadt.de/" },
+            { name: "Diakonie Sozialdienst Thüringen gGmbH", umbrella: "Diakonie", location: "Weimar", email: "S.Wieduwilt-Erthel@diakonie-wl.de", website: "https://www.diakonie-wl.de/" },
+            { name: "Diakonie-Sozialstation Ilmenau", umbrella: "Diakonie", location: "Ilmenau", email: "pflege@dsst-ilmenau.de", website: "https://www.diakonie-sozialstation-ilmenau.de/" },
+            { name: "IBS - Institut für Berufsbildung", umbrella: "Paritätische", location: "Erfurt", email: "info@ibs-thueringen.de", website: "https://ibs-thueringen.de/" },
+            { name: "parisat GmbH", umbrella: "Paritätische", location: "Neudietendorf", email: "kontakt@parisat.de", website: "https://www.parisat.de/" },
+            { name: "Diakonie Sozialstation St. Elisabeth", umbrella: "Diakonie", location: "Gebesee", email: "verwaltungsleitung@diakonie-gebesee.de", website: "https://www.diakonie-gebesee.de/" },
+            { name: "AWO Landesverband Thüringen e.V.", umbrella: "AWO", location: "Erfurt", website: "https://awothueringen.de/" },
+            { name: "Caritasverband für das Bistum Erfurt e.V.", umbrella: "Caritas", location: "Erfurt", email: "dicv-erfurt@caritas-bistum-erfurt.de", website: "https://www.caritas-bistum-erfurt.de/" },
+            { name: "DRK Landesverband Thüringen e.V.", umbrella: "DRK", location: "Erfurt", email: "info@drk-thueringen.de", website: "https://www.drk-thueringen.de/" },
+            { name: "Diako Thüringen gem. GmbH", umbrella: "Diakonie", location: "Eisenach", email: "info@diako-thueringen.de", website: "https://www.diako-thueringen.de/" },
+            { name: "AWO AJS gGmbH", umbrella: "AWO", location: "Erfurt", email: "AJSgGmbH@awo-thueringen.de", website: "https://www.awo-ajs-thueringen.de/" },
+            { name: "Johanniter Landesverband Sachsen-Anhalt/Thüringen", umbrella: "Johanniter", location: "Erfurt", website: "https://www.johanniter.de/juh/lv-sat/" },
+            { name: "Lebenshilfe im Alter GmbH", umbrella: "Paritätische", location: "Meiningen", email: "info@lebenshilfe-suedthueringen.de", website: "https://lebenshilfe-im-alter.de/" },
+            { name: "AWO Seniorenzentrum Erfurt", umbrella: "AWO", location: "Erfurt", email: "seniorenpflegeheim.ef@awo-thueringen.de", website: "https://www.pflegeheim-erfurt.de/" },
+            { name: "Augusta-Viktoria-Stift", umbrella: "Diakonie", location: "Erfurt", email: "info@augusta-viktoria-stift.de", website: "https://www.augusta-viktoria-stift.de/" },
+            { name: "DRK Kreisverband Saale-Orla e.V.", umbrella: "DRK", location: "Schleiz", email: "info@drk-sok.de", website: "https://www.drk-sok.de/" },
+            { name: "Johanniter Seniorenhäuser Bethesda Eisenberg", umbrella: "Johanniter", location: "Eisenberg", website: "https://www.johanniter.de/johanniter-seniorenhaeuser/" },
+            { name: "ASB Regionalverband Ostthüringen e.V.", umbrella: "Paritätische", location: "Gera", website: "https://www.asb-gera.de/" },
+            { name: "AWO Saale-Orla-Kreis", umbrella: "AWO", location: "Pößneck", email: "info@awo-sok.de", website: "https://www.awo-sok.de/" },
+            { name: "Volkssolidarität KV Schmalkalden-Meiningen", umbrella: "Paritätische", location: "Meiningen", email: "info@vs-sm.de", website: "https://www.vs-sm.de/" },
+            { name: "Novalis Diakonieverein e.V.", umbrella: "Diakonie", location: "Ebeleben", email: "info@novalis-diakonie.de", website: "https://www.novalis-diakonie.de/" }
+        ];
+
+        const umbrellaColors = {
+            "AWO": "#ff6b6b",
+            "Diakonie": "#4ecdc4",
+            "Caritas": "#ffd93d",
+            "DRK": "#e74c3c",
+            "Paritätische": "#9b59b6",
+            "Johanniter": "#3498db",
+            "Private": "#95a5a6"
+        };
+
+        const nodeColors = {
+            government: "#e74c3c",
+            public_agency: "#3498db",
+            welfare: "#9b59b6",
+            training: "#1abc9c",
+            international: "#f39c12",
+            country: "#2ecc71"
+        };
+
+        const linkColors = {
+            governance: "#e74c3c",
+            structural: "#3498db",
+            collaboration: "#2ecc71",
+            mediation_migrants: "#f39c12",
+            mediation_employers: "#9b59b6",
+            recruitment_source: "#1abc9c",
+            membership: "#9b59b6"
+        };
+
+        // ===========================================
+        // D3 SETUP
+        // ===========================================
+
+        const container = document.querySelector('.network-container');
+        const svg = d3.select('#network');
+        let width = container.clientWidth;
+        let height = container.clientHeight;
+
+        svg.attr('width', width).attr('height', height);
+
+        const tooltip = document.getElementById('tooltip');
+        const backBtn = document.getElementById('backBtn');
+        const viewIndicator = document.getElementById('viewIndicator');
+        const detailPanel = document.getElementById('detailPanel');
+
+        let currentView = 'main';
+        let mainGroup;
+        let simulation;
+
+        const zoom = d3.zoom()
+            .scaleExtent([0.3, 3])
+            .on('zoom', (event) => {
+                if (mainGroup) mainGroup.attr('transform', event.transform);
+            });
+
+        svg.call(zoom);
+
+        const defs = svg.append('defs');
+        Object.entries(linkColors).forEach(([type, color]) => {
+            defs.append('marker')
+                .attr('id', `arrow-${type}`)
+                .attr('viewBox', '0 -5 10 10')
+                .attr('refX', 20)
+                .attr('refY', 0)
+                .attr('markerWidth', 4)
+                .attr('markerHeight', 4)
+                .attr('orient', 'auto')
+                .append('path')
+                .attr('fill', color)
+                .attr('d', 'M0,-5L10,0L0,5');
+        });
+
+        // ===========================================
+        // RENDER MAIN VIEW
+        // ===========================================
+
+        function renderMainView() {
+            currentView = 'main';
+            backBtn.classList.remove('visible');
+            detailPanel.classList.remove('visible');
+            svg.selectAll('.main-group').remove();
+            svg.call(zoom.transform, d3.zoomIdentity);
+
+            document.getElementById('totalNodes').textContent = mainNodes.length;
+            document.getElementById('totalLinks').textContent = mainLinks.length;
+
+            resetLegends();
+
+            const nodes = mainNodes.map(d => ({...d}));
+            const links = mainLinks.map(d => ({...d}));
+
+            mainGroup = svg.append('g').attr('class', 'main-group');
+
+            simulation = d3.forceSimulation(nodes)
+                .force('link', d3.forceLink(links).id(d => d.id).distance(90))
+                .force('charge', d3.forceManyBody().strength(-300))
+                .force('center', d3.forceCenter(width / 2, height / 2))
+                .force('collision', d3.forceCollide().radius(40));
+
+            const linkElements = mainGroup.append('g')
+                .selectAll('line')
+                .data(links)
+                .enter()
+                .append('line')
+                .attr('class', 'link')
+                .attr('stroke', d => linkColors[d.type])
+                .attr('stroke-width', 1.5)
+                .attr('marker-end', d => `url(#arrow-${d.type})`)
+                .on('mouseover', (event, d) => showLinkTooltip(event, d))
+                .on('mouseout', hideTooltip);
+
+            const nodeElements = mainGroup.append('g')
+                .selectAll('g')
+                .data(nodes)
+                .enter()
+                .append('g')
+                .attr('class', d => d.expandable ? 'node clickable' : 'node')
+                .call(d3.drag().on('start', dragStarted).on('drag', dragged).on('end', dragEnded))
+                .on('mouseover', (event, d) => showNodeTooltip(event, d))
+                .on('mouseout', hideTooltip)
+                .on('click', (event, d) => { if (d.expandable) expandLigaView(d); });
+
+            nodeElements.each(function(d) {
+                const node = d3.select(this);
+                const color = nodeColors[d.type];
+                
+                if (d.type === 'government') {
+                    node.append('rect').attr('width', 28).attr('height', 28).attr('x', -14).attr('y', -14).attr('rx', 3)
+                        .attr('fill', color).attr('stroke', '#fff').attr('stroke-width', 1.5);
+                } else if (d.type === 'country') {
+                    node.append('rect').attr('width', 22).attr('height', 22).attr('x', -11).attr('y', -11)
+                        .attr('transform', 'rotate(45)').attr('fill', color).attr('stroke', '#fff').attr('stroke-width', 1.5);
+                } else {
+                    const r = d.expandable ? 24 : (d.type === 'welfare' || d.type === 'public_agency' ? 18 : 14);
+                    node.append('circle').attr('r', r).attr('fill', color)
+                        .attr('stroke', d.expandable ? '#ffd93d' : '#fff').attr('stroke-width', d.expandable ? 2.5 : 1.5);
+                    if (d.expandable) {
+                        node.append('circle').attr('r', r + 4).attr('fill', 'none')
+                            .attr('stroke', '#ffd93d').attr('stroke-width', 1).attr('opacity', 0.5)
+                            .style('animation', 'pulse 2s infinite');
+                    }
+                }
+            });
+
+            nodeElements.append('text').attr('class', 'node-label').attr('dy', d => d.type === 'country' ? 28 : 24)
+                .text(d => d.name).style('font-weight', '500');
+
+            simulation.on('tick', () => {
+                linkElements.attr('x1', d => d.source.x).attr('y1', d => d.source.y)
+                    .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
+                nodeElements.attr('transform', d => `translate(${d.x}, ${d.y})`);
+            });
+        }
+
+        // ===========================================
+        // RENDER LIGA EXPANDED VIEW
+        // ===========================================
+
+        function expandLigaView(ligaNode) {
+            viewIndicator.querySelector('h3').textContent = 'LIGA Thüringen';
+            viewIndicator.querySelector('p').textContent = 'Loading member organizations...';
+            viewIndicator.classList.add('visible');
+
+            setTimeout(() => {
+                viewIndicator.classList.remove('visible');
+                currentView = 'liga';
+                backBtn.classList.add('visible');
+                backBtn.textContent = '↻ Back to Main Network';
+                
+                if (simulation) simulation.stop();
+                svg.selectAll('.main-group').remove();
+                svg.call(zoom.transform, d3.zoomIdentity);
+
+                document.getElementById('totalNodes').textContent = ligaMembers.length + 1;
+                document.getElementById('totalLinks').textContent = ligaMembers.length;
+
+                document.getElementById('nodeLegend').innerHTML = `
+                    <h3>🏛️ Umbrellas</h3>
+                    <div class="legend-item"><div class="legend-color" style="background: #ff6b6b;"></div><span>AWO</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background: #4ecdc4;"></div><span>Diakonie</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background: #ffd93d;"></div><span>Caritas</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background: #e74c3c;"></div><span>DRK</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background: #9b59b6;"></div><span>Paritätische</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background: #3498db;"></div><span>Johanniter</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background: #95a5a6;"></div><span>Private</span></div>
+                `;
+
+                document.getElementById('relLegend').innerHTML = `
+                    <h3>🔗 Relationship</h3>
+                    <div class="rel-item"><div class="rel-line" style="background: #9b59b6;"></div><span>LIGA Member</span></div>
+                    <p style="color: #ffd93d; font-size: 0.65rem; margin-top: 8px;">👆 Click any member to see details</p>
+                `;
+
+                mainGroup = svg.append('g').attr('class', 'main-group');
+
+                const centerNode = { id: 'liga_center', name: 'LIGA Thüringen', type: 'center', fx: width / 2, fy: height / 2 };
+                const memberNodes = ligaMembers.map((m, i) => ({ id: `member_${i}`, ...m, type: 'member', index: i }));
+                const allNodes = [centerNode, ...memberNodes];
+                const memberLinks = memberNodes.map(m => ({ source: 'liga_center', target: m.id, type: 'membership' }));
+
+                const expandedSim = d3.forceSimulation(allNodes)
+                    .force('link', d3.forceLink(memberLinks).id(d => d.id).distance(160))
+                    .force('charge', d3.forceManyBody().strength(-180))
+                    .force('collision', d3.forceCollide().radius(30));
+
+                const linkElements = mainGroup.append('g').selectAll('line').data(memberLinks).enter()
+                    .append('line').attr('class', 'link').attr('stroke', '#9b59b6')
+                    .attr('stroke-width', 1.2).attr('stroke-opacity', 0.3);
+
+                const centerGroup = mainGroup.append('g').attr('transform', `translate(${width/2}, ${height/2})`);
+                centerGroup.append('circle').attr('r', 45).attr('fill', '#9b59b6').attr('stroke', '#fff').attr('stroke-width', 2.5);
+                centerGroup.append('text').attr('class', 'node-label').attr('dy', -6).text('LIGA').style('font-size', '12px').style('font-weight', '700');
+                centerGroup.append('text').attr('class', 'node-label').attr('dy', 8).text('Thüringen').style('font-size', '8px');
+                centerGroup.append('text').attr('class', 'node-label').attr('dy', 20).text(`(${ligaMembers.length})`).style('font-size', '7px').style('fill', '#888');
+
+                const memberElements = mainGroup.append('g').selectAll('g').data(memberNodes).enter()
+                    .append('g').attr('class', 'entity-node').attr('transform', `translate(${width/2}, ${height/2})`)
+                    .on('mouseover', (event, d) => showMemberTooltip(event, d))
+                    .on('mouseout', hideTooltip)
+                    .on('click', (event, d) => showEntityDetail(d));
+
+                memberElements.append('circle').attr('r', 18)
+                    .attr('fill', d => umbrellaColors[d.umbrella] || '#95a5a6')
+                    .attr('stroke', '#fff').attr('stroke-width', 1.2).attr('opacity', 0.85);
+
+                memberElements.append('text').attr('class', 'node-label').attr('dy', 3)
+                    .text((d, i) => i + 1).style('font-size', '9px').style('font-weight', '600');
+
+                memberElements.transition().duration(700).ease(d3.easeElasticOut.amplitude(1).period(0.5))
+                    .attr('transform', d => `translate(${d.x || width/2}, ${d.y || height/2})`);
+
+                expandedSim.on('tick', () => {
+                    linkElements.attr('x1', width / 2).attr('y1', height / 2)
+                        .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
+                    memberElements.attr('transform', d => `translate(${d.x}, ${d.y})`);
+                });
+            }, 400);
+        }
+
+        // ===========================================
+        // SHOW ENTITY DETAIL PANEL
+        // ===========================================
+
+        function showEntityDetail(d) {
+            hideTooltip();
+            
+            document.getElementById('detailTitle').textContent = d.name;
+            document.getElementById('detailUmbrella').textContent = d.umbrella;
+            document.getElementById('detailLocation').textContent = d.location || '-';
+            document.getElementById('detailEmail').textContent = d.email || 'Not available';
+            
+            if (d.website) {
+                document.getElementById('detailWebsite').innerHTML = `<a href="${d.website}" target="_blank">${d.website.replace('https://', '').substring(0, 35)}...</a>`;
+            } else {
+                document.getElementById('detailWebsite').textContent = 'Not available';
+            }
+
+            const badgeColor = umbrellaColors[d.umbrella] || '#95a5a6';
+            document.getElementById('detailBadge').innerHTML = `<span class="umbrella-badge" style="background: ${badgeColor}; color: ${d.umbrella === 'Caritas' ? '#000' : '#fff'};">${d.umbrella}</span>`;
+
+            detailPanel.classList.add('visible');
+        }
+
+        // ===========================================
+        // TOOLTIP FUNCTIONS
+        // ===========================================
+
+        function showNodeTooltip(event, d) {
+            let content = `<h4>${d.fullName || d.name}</h4>`;
+            content += `<div class="tooltip-row"><span class="tooltip-label">Role:</span><span class="tooltip-value">${d.role || 'N/A'}</span></div>`;
+            if (d.location) content += `<div class="tooltip-row"><span class="tooltip-label">Location:</span><span class="tooltip-value">${d.location}</span></div>`;
+            if (d.expandable) content += `<div class="tooltip-click-hint">👆 Click to explore members</div>`;
+            tooltip.innerHTML = content;
+            positionTooltip(event);
+            tooltip.classList.add('visible');
+        }
+
+        function showMemberTooltip(event, d) {
+            tooltip.innerHTML = `
+                <h4>${d.name}</h4>
+                <div class="tooltip-row"><span class="tooltip-label">Umbrella:</span><span class="tooltip-value">${d.umbrella}</span></div>
+                <div class="tooltip-row"><span class="tooltip-label">Location:</span><span class="tooltip-value">${d.location}</span></div>
+                <div class="tooltip-click-hint">👆 Click for full details</div>
+            `;
+            positionTooltip(event);
+            tooltip.classList.add('visible');
+        }
+
+        function showLinkTooltip(event, d) {
+            tooltip.innerHTML = `
+                <h4>Connection</h4>
+                <div class="tooltip-row"><span class="tooltip-label">From:</span><span class="tooltip-value">${d.source.name}</span></div>
+                <div class="tooltip-row"><span class="tooltip-label">To:</span><span class="tooltip-value">${d.target.name}</span></div>
+                <div class="tooltip-row"><span class="tooltip-label">Type:</span><span class="tooltip-value">${d.label}</span></div>
+            `;
+            positionTooltip(event);
+            tooltip.classList.add('visible');
+        }
+
+        function positionTooltip(event) {
+            const rect = container.getBoundingClientRect();
+            let x = event.clientX - rect.left + 12;
+            let y = event.clientY - rect.top + 12;
+            if (x + 240 > rect.width) x = event.clientX - rect.left - 260;
+            if (y + 140 > rect.height) y = event.clientY - rect.top - 140;
+            tooltip.style.left = x + 'px';
+            tooltip.style.top = y + 'px';
+        }
+
+        function hideTooltip() { tooltip.classList.remove('visible'); }
+
+        function resetLegends() {
+            document.getElementById('nodeLegend').innerHTML = `
+                <h3>🏛️ Node Types</h3>
+                <div class="legend-item"><div class="legend-color square" style="background: #e74c3c;"></div><span>Government</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: #3498db;"></div><span>Public Agency</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: #9b59b6;"></div><span>Welfare Org</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: #1abc9c;"></div><span>Training</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: #f39c12;"></div><span>International</span></div>
+                <div class="legend-item"><div class="legend-color diamond" style="background: #2ecc71;"></div><span>Country</span></div>
+            `;
+            document.getElementById('relLegend').innerHTML = `
+                <h3>🔗 Relationships</h3>
+                <div class="rel-item"><div class="rel-line" style="background: #e74c3c;"></div><span>Governance</span></div>
+                <div class="rel-item"><div class="rel-line" style="background: #3498db;"></div><span>Structural</span></div>
+                <div class="rel-item"><div class="rel-line" style="background: #2ecc71;"></div><span>Collaboration</span></div>
+                <div class="rel-item"><div class="rel-line" style="background: #f39c12;"></div><span>Migrant Med.</span></div>
+                <div class="rel-item"><div class="rel-line" style="background: #9b59b6;"></div><span>Employer Med.</span></div>
+                <div class="rel-item"><div class="rel-line" style="background: #1abc9c;"></div><span>Recruitment</span></div>
+            `;
+        }
+
+        // ===========================================
+        // DRAG & EVENT HANDLERS
+        // ===========================================
+
+        function dragStarted(event, d) {
+            if (!event.active && simulation) simulation.alphaTarget(0.3).restart();
+            d.fx = d.x; d.fy = d.y;
+        }
+
+        function dragged(event, d) { d.fx = event.x; d.fy = event.y; }
+
+        function dragEnded(event, d) {
+            if (!event.active && simulation) simulation.alphaTarget(0);
+            d.fx = null; d.fy = null;
+        }
+
+        backBtn.addEventListener('click', () => {
+            detailPanel.classList.remove('visible');
+            renderMainView();
+        });
+
+        document.getElementById('detailClose').addEventListener('click', () => {
+            detailPanel.classList.remove('visible');
+        });
+
+        document.getElementById('zoomIn').addEventListener('click', () => svg.transition().duration(300).call(zoom.scaleBy, 1.3));
+        document.getElementById('zoomOut').addEventListener('click', () => svg.transition().duration(300).call(zoom.scaleBy, 0.7));
+        document.getElementById('zoomReset').addEventListener('click', () => svg.transition().duration(300).call(zoom.transform, d3.zoomIdentity));
+
+        window.addEventListener('resize', () => {
+            width = container.clientWidth;
+            height = container.clientHeight;
+            svg.attr('width', width).attr('height', height);
+            if (currentView === 'main') renderMainView();
+        });
+
+        // Initial render
+        renderMainView();
+    </script>
+</body>
+</html>

@@ -38,6 +38,14 @@ HUB_HIDDEN_IDS <- c("thueringen_fachkraefte")
 
 DASHBOARDS <- list(
   list(
+    id = "care_workers_thuringia",
+    title = "Care Workers in Th\u00fcringen",
+    badge = "Research",
+    badge_class = "bg-info text-dark",
+    desc = "Qualitative recruitment research \u2014 5 stakeholder interviews, 125 coded extracts, 59 mapped organizations, advanced viz gallery.",
+    highlight = TRUE
+  ),
+  list(
     id = "my_manager_demo",
     title = "MyManager Demo",
     badge = "Pitch",
@@ -169,6 +177,7 @@ hub_dashboards <- function() {
 .app_href <- function(id) {
   if (identical(Sys.getenv("MASTR_HUB_MODE", "paths"), "ports")) {
     ports <- c(
+      care_workers_thuringia = 3855L,
       thueringen_mittelstand_digital = 3853L,
       thueringen_kommunal = 3852L,
       thueringen_tourismus = 3851L,
