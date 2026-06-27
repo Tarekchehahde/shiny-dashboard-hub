@@ -15,6 +15,8 @@
 |------|-----|------|
 | Dashboard hub | http://82.165.167.86/ | Public |
 | Mission Control | http://82.165.167.86/portal/ | Public |
+| **About / CV** | http://82.165.167.86/about/ | Public — primary personal page |
+| `/cv` | redirects → `/about/` | Short link |
 | Web documentation | http://82.165.167.86/portal/docs/ | Public |
 | Grafana (live metrics) | http://82.165.167.86/grafana/ | Public view; admin to edit |
 | MaStR Live Showcase | http://82.165.167.86/grafana/d/mastr-live-showcase/mastr-live-showcase?refresh=5s | Public |

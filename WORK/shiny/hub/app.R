@@ -239,9 +239,9 @@ ui <- page_fluid(
         class = "text-muted",
         "Select a dashboard below. ",
         tags$a(href = "/portal/", class = "text-decoration-none", "Mission Control"),
-        " — Grafana, Netdata, RStudio, ",
-        tags$a(href = "/portal/docs/", class = "text-decoration-none", "documentation"),
-        "."
+        " — ",
+        tags$a(href = "/about/", class = "text-decoration-none", "About"),
+        ", Grafana, docs."
       ),
       p(
         class = "text-muted small mb-0",

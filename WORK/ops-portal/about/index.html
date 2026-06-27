@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="description" content="Tarek Chehade — data engineer, Shiny developer, energy analytics. How I work, what I build, and what I care about."/>
+  <title>Tarek Chehade — About</title>
+  <link rel="stylesheet" href="about.css"/>
+</head>
+<body>
+  <nav class="topnav">
+    <a class="brand" href="/about/">Tarek Chehade</a>
+    <div class="nav-links">
+      <a href="#work">Work</a>
+      <a href="#method">How I work</a>
+      <a href="#projects">Projects</a>
+      <a href="#life">Life</a>
+      <a href="#contact">Contact</a>
+      <a class="nav-muted" href="/portal/">Mission Control</a>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <p class="eyebrow">Data · Energy · Interactive systems</p>
+    <h1>Tarek Chehade</h1>
+    <p class="lead">
+      I turn messy public data into clear, interactive stories — mostly around
+      <strong>German energy</strong>, open registers, and the kind of questions
+      policymakers and teams actually ask in a meeting.
+    </p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="#projects">See my work</a>
+      <a class="btn btn-ghost" href="https://github.com/Tarekchehahde" target="_blank" rel="noopener">GitHub</a>
+      <a class="btn btn-ghost" href="https://www.linkedin.com/in/tarek-chehade-995218251" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <section class="panel" id="about">
+      <h2>About me</h2>
+      <p>
+        I'm a data-focused builder working at the intersection of
+        <strong>renewable energy</strong>, <strong>analytics engineering</strong>, and
+        <strong>browser-based dashboards</strong>. My day-to-day mixes R and Python,
+        SQL over large registers, and shipping things people can click — not slide decks
+        that go stale overnight.
+      </p>
+      <p>
+        I live and work in <strong>Germany</strong>, with roots and projects that also
+        connect me to <strong>Lebanon</strong> — civic data, elections, and cross-cultural
+        perspectives show up in my portfolio alongside MaStR and EU energy work.
+      </p>
+      <p>
+        I'm deepening my research track (policy &amp; infrastructure questions) while
+        operating a public <strong>dashboard hub</strong> on my own VPS — the same stack
+        I use to demo delivery to teams and conference audiences (e.g. erwicon connect, Erfurt).
+      </p>
+    </section>
+
+    <section class="panel" id="work">
+      <h2>What I do</h2>
+      <div class="pill-grid">
+        <article class="pill-card">
+          <h3>Energy &amp; MaStR analytics</h3>
+          <p>Nightly ETL from BNetzA Marktstammdatenregister → Parquet/DuckDB → Shiny views: solar build-out, storage, wind, regional Kreis dashboards.</p>
+        </article>
+        <article class="pill-card">
+          <h3>Live &amp; API-driven dashboards</h3>
+          <p>Day-ahead EU electricity prices, live solar irradiance maps, auto-refreshing charts — real data, not screenshots.</p>
+        </article>
+        <article class="pill-card">
+          <h3>Platform &amp; delivery</h3>
+          <p>Multi-app Shiny hub behind nginx, systemd, Grafana monitoring, documentation site, reproducible GitHub Actions pipelines.</p>
+        </article>
+        <article class="pill-card">
+          <h3>Research &amp; methods</h3>
+          <p>Thesis-oriented work on batteries, storage technology mix, and raw-material context; rigorous bibliography and data verification workflows.</p>
+        </article>
+        <article class="pill-card">
+          <h3>Civic &amp; geospatial viz</h3>
+          <p>Election and social data stories — interactive maps and treemaps built for public understanding, not just insiders.</p>
+        </article>
+        <article class="pill-card">
+          <h3>Stakeholder demos</h3>
+          <p>Executive-ready pitch flows: from business question → scoped app → deployed URL on a shared hub in days, not quarters.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel" id="method">
+      <h2>How I work</h2>
+      <ol class="timeline">
+        <li>
+          <strong>Start from the question, not the tool.</strong>
+          Who needs the answer, how often does data change, and what decision does the chart support?
+        </li>
+        <li>
+          <strong>Reproducible data first.</strong>
+          Versioned ETL, pinned release tags, documented schemas — so a number in a dashboard can be traced back to a source row.
+        </li>
+        <li>
+          <strong>Build in the open where possible.</strong>
+          Code on GitHub (<a href="https://github.com/Tarekchehahde/shiny-dashboard-hub">shiny-dashboard-hub</a>), public demos on a real server, docs next to the apps.
+        </li>
+        <li>
+          <strong>One app, one URL, one process.</strong>
+          Each dashboard is an isolated Shiny service — deploy, restart, and monitor independently without breaking the rest of the hub.
+        </li>
+        <li>
+          <strong>Iterate with humans in the loop.</strong>
+          Filters, mobile layout, language toggles, and “does this match what you expect?” reviews before calling it done.
+        </li>
+        <li>
+          <strong>Automate the boring ops.</strong>
+          Prometheus probes, Grafana live panels, nginx logs — so I spend time on analysis, not guessing if something is down.
+        </li>
+      </ol>
+    </section>
+
+    <section class="panel" id="projects">
+      <h2>Selected work (live)</h2>
+      <p class="section-note">Public demos on my dashboard server — click through; no install required.</p>
+      <div class="project-grid">
+        <a class="project-card" href="/most_visited/">
+          <span class="tag">MaStR</span>
+          <h3>Most Visited — Solar Zubau</h3>
+          <p>Monthly new PV capacity by segment with YTD comparison — R replica of a flagship Tableau panel.</p>
+        </a>
+        <a class="project-card" href="/eu_electricity_live/">
+          <span class="tag">Live</span>
+          <h3>EU Electricity Prices</h3>
+          <p>Day-ahead bidding zones across Europe — map, chart, and table from Energy-Charts.</p>
+        </a>
+        <a class="project-card" href="/deutschland_solar_radiation/">
+          <span class="tag">Live</span>
+          <h3>Solar Radiation Germany</h3>
+          <p>Live GHI map and hourly series from Open-Meteo / DWD models.</p>
+        </a>
+        <a class="project-card" href="/thueringen_kommunal/">
+          <span class="tag">Regional</span>
+          <h3>Thüringen Kommunal</h3>
+          <p>Large-scale solar, storage, and wind by Kreis — built for municipal stakeholders.</p>
+        </a>
+        <a class="project-card" href="/lebanese_elections/">
+          <span class="tag">Civic</span>
+          <h3>Lebanese Elections</h3>
+          <p>2022 parliamentary casas — density, candidates, treemap (Tableau → Shiny).</p>
+        </a>
+        <a class="project-card" href="/">
+          <span class="tag">Hub</span>
+          <h3>Full dashboard catalog</h3>
+          <p>All public apps, including Gapminder-style demos and conference pitch boards.</p>
+        </a>
+      </div>
+      <p class="section-note">
+        Infrastructure &amp; docs:
+        <a href="/portal/">Mission Control</a> ·
+        <a href="/portal/docs/">Documentation</a> ·
+        <a href="/grafana/d/mastr-live-showcase/mastr-live-showcase?refresh=5s">Live server metrics</a>
+      </p>
+    </section>
+
+    <section class="panel" id="stack">
+      <h2>Tools I reach for</h2>
+      <div class="stack-row">
+        <span>R</span><span>Shiny</span><span>bslib</span><span>plotly</span><span>DuckDB</span>
+        <span>Python</span><span>GitHub Actions</span><span>nginx</span><span>Prometheus</span>
+        <span>Grafana</span><span>Docker-free VPS ops</span><span>RStudio Server</span>
+        <span>tidymodels</span><span>SQL</span><span>Parquet</span>
+      </div>
+    </section>
+
+    <section class="panel" id="life">
+      <h2>Life &amp; hobbies</h2>
+      <div class="life-grid">
+        <article>
+          <h3>Curiosity</h3>
+          <p>I like following how grids, markets, and climate data move in real time — and building small tools so friends can see it too.</p>
+        </article>
+        <article>
+          <h3>Making things legible</h3>
+          <p>Good charts, clear docs, and honest footnotes about data limits. I'd rather show uncertainty than fake precision.</p>
+        </article>
+        <article>
+          <h3>Languages &amp; places</h3>
+          <p>Working in German and English daily; projects tied to both Europe and the Middle East keep me grounded in different public debates.</p>
+        </article>
+        <article>
+          <h3>Learning in public</h3>
+          <p>New stacks (ML, monitoring, licensing nuance for Posit/RStudio), open-source repos, and conference demos — learn by shipping.</p>
+        </article>
+        <article>
+          <h3>Away from the screen</h3>
+          <p>Time with family and friends, cooking, and unplugged walks — the best antidote to staring at time-series charts.</p>
+        </article>
+        <article>
+          <h3>What’s next</h3>
+          <p>This page is my single home on the web: portfolio, CV, and front door to everything I run on this server.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel contact-panel" id="contact">
+      <h2>Contact</h2>
+      <p>Open to collaborations on data products, energy analytics, Shiny delivery, and research-oriented tooling.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="https://www.linkedin.com/in/tarek-chehade-995218251" target="_blank" rel="noopener">LinkedIn</a>
+        <a class="btn btn-ghost" href="https://github.com/Tarekchehahde" target="_blank" rel="noopener">GitHub</a>
+        <a class="btn btn-ghost" href="https://public.tableau.com/app/profile/tarek.chehade/viz/lebanese-elections/Dashboard1" target="_blank" rel="noopener">Tableau Public</a>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <p>Tarek Chehade · <a href="/about/">About</a> · <a href="/">Dashboards</a> · <a href="/portal/">Portal</a></p>
+    <p class="fine">Hosted on a private VPS · This page is intended as my primary public CV.</p>
+  </footer>
+</body>
+</html>
