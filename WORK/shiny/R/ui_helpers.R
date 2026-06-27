@@ -201,15 +201,21 @@ mastr_creator_qr_ui <- function(lang = "en") {
   }
   is_de <- identical(lang, "de")
   tab_label <- if (is_de) "LinkedIn QR ein-/ausblenden" else "Show or hide LinkedIn QR"
+  linkedin_url <- "https://www.linkedin.com/in/tarek-shehadi/"
   div(
     class = "mastr-creator-qr-wrap",
     div(
       class = "mastr-creator-qr",
-      tags$img(
-        src = src,
-        alt = if (is_de) "LinkedIn QR-Code Tarek Chehade" else "LinkedIn QR code Tarek Chehade",
-        width = "96", height = "96",
-        style = "object-fit: contain; display: block;"
+      tags$a(
+        href = linkedin_url,
+        target = "_blank",
+        rel = "noopener",
+        tags$img(
+          src = src,
+          alt = if (is_de) "LinkedIn QR-Code Tarek Chehade" else "LinkedIn QR code Tarek Chehade",
+          width = "96", height = "96",
+          style = "object-fit: contain; display: block;"
+        )
       ),
       div(
         class = "mastr-creator-qr-text",
