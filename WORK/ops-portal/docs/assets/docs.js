@@ -4,8 +4,8 @@ const DOCS = [
   { id: "thueringen", title: "Thüringen demos", group: "Server" },
   { id: "monitoring", title: "Monitoring & ops", group: "Server" },
   { id: "infrastructure", title: "Infrastructure", group: "Server" },
-  { id: "ml", title: "Machine learning", group: "Development" },
   { id: "reference-verification", title: "Reference verification tool", group: "Methods" },
+  { id: "reference-verification-session", title: "Verification session (interactive)", group: "Methods", href: "reference-verification-session.html" },
 ];
 
 const navEl = document.getElementById("doc-nav");
@@ -30,7 +30,13 @@ function buildNav(activeId) {
       lastGroup = doc.group;
     }
     const a = document.createElement("a");
-    a.href = `?doc=${doc.id}`;
+    if (doc.href) {
+      a.href = doc.href;
+      a.target = "_blank";
+      a.rel = "noopener";
+    } else {
+      a.href = `?doc=${doc.id}`;
+    }
     a.textContent = doc.title;
     if (doc.id === activeId) a.classList.add("active");
     navEl.appendChild(a);
@@ -71,6 +77,8 @@ document.addEventListener("DOMContentLoaded", () => {
   navEl.addEventListener("click", (e) => {
     const a = e.target.closest("a");
     if (!a) return;
+    // External / standalone HTML decks open normally
+    if (a.target === "_blank" || a.getAttribute("href")?.endsWith(".html")) return;
     e.preventDefault();
     const url = new URL(a.href, window.location.origin);
     history.pushState({}, "", url.pathname + url.search);

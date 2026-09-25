@@ -7,10 +7,11 @@ How dashboards are deployed on the IONOS VPS. **No secrets** in this page — pa
 ## Architecture
 
 ```
-Browser → nginx :80
-            ├─ /              → Shiny hub :3838
+Browser → nginx :443
+            ├─ /              → Mission Control (static /var/www/mastr-portal/index.html)
+            ├─ /dashboards/   → Shiny hub :3838
             ├─ /{app_id}/     → Shiny app :3839–3854
-            ├─ /portal/       → static HTML /var/www/mastr-portal/
+            ├─ /portal/…      → static HTML (docs, IG Metall hub; /portal/ itself 301 → /)
             ├─ /grafana/      → Grafana :3000
             ├─ /netdata/      → Netdata :19999
             └─ /site_traffic/ → Shiny :3854
@@ -35,7 +36,6 @@ Each Shiny app is a **systemd** unit `mastr-{id}` running `R -e 'shiny::runApp(.
 | 3846 | eu_electricity_live |
 | 3854 | site_traffic |
 | 3000 | Grafana |
-| 8787 | RStudio Server |
 
 ---
 
@@ -87,4 +87,4 @@ Apps that only use external APIs (EU electricity, solar radiation) call HTTP API
 
 ## Swap & resources
 
-2 GB swap file (`/swapfile`) added for headroom when multiple Shiny sessions and RStudio run concurrently on 8 GB RAM.
+2 GB swap file (`/swapfile`) added for headroom when multiple Shiny sessions run concurrently on 8 GB RAM.

@@ -1,21 +1,20 @@
 # MaStR Shiny Server — Overview
 
-**Public hub:** [http://82.165.167.86/](http://82.165.167.86/)  
-**Mission Control:** [http://82.165.167.86/portal/](http://82.165.167.86/portal/)  
+**Public home:** [https://82.165.167.86/](https://82.165.167.86/) (Mission Control)  
+**Dashboard Hub:** [https://82.165.167.86/dashboards/](https://82.165.167.86/dashboards/)  
 **Documentation:** you are here.
 
-This VPS hosts a **Dashboard Hub** — a collection of R Shiny applications behind nginx, plus live monitoring (Grafana, Netdata) and an optional password-protected traffic analytics app.
+This VPS hosts **Mission Control** as the public gateway, a **Dashboard Hub** of R Shiny applications behind nginx, plus live monitoring (Grafana, Netdata) and an optional password-protected traffic analytics app.
 
 ## What lives on this server
 
 | Area | URL | Access |
 |------|-----|--------|
-| Dashboard Hub | `/` | Public |
-| Mission Control portal | `/portal/` | Public |
+| Mission Control | `/` | Public |
+| Dashboard Hub | `/dashboards/` | Public |
 | Documentation | `/portal/docs/` | Public |
-| Grafana live metrics | `/grafana/` | Public view (read-only) |
-| Netdata | `/netdata/` | Public |
-| RStudio Server | `:8787` | Login required |
+| Grafana live metrics | `/grafana/` | Public view; `/grafana/metrics` is login-gated |
+| Netdata | `/netdata/` | Login (same as Grafana admin) |
 | Site traffic analytics | `/site_traffic/` | Password |
 
 ## Technology stack

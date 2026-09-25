@@ -57,6 +57,16 @@ main_ui <- function() {
           "days", "Window", choices = c("24 hours" = 1, "7 days" = 7, "30 days" = 30),
           selected = 7, width = "140px"
         ),
+        selectInput(
+          "audience", "Show",
+          choices = c(
+            "All traffic" = "all",
+            "Organic only" = "organic",
+            "Bots & scanners" = "non_organic"
+          ),
+          selected = "all",
+          width = "170px"
+        ),
         actionButton("refresh", "Refresh", class = "btn-primary"),
         actionLink("logout", "Sign out", class = "small")
       )
@@ -65,9 +75,16 @@ main_ui <- function() {
     layout_columns(
       col_widths = c(3, 3, 3, 3),
       mastr_kpi("Page views", textOutput("kpi_hits", inline = TRUE), color = "primary"),
+      mastr_kpi("Organic", textOutput("kpi_organic", inline = TRUE), color = "success"),
+      mastr_kpi("Bots / scanners", textOutput("kpi_bots", inline = TRUE), color = "warning"),
+      mastr_kpi("Cloud / VPS", textOutput("kpi_cloud", inline = TRUE), color = "danger")
+    ),
+    layout_columns(
+      col_widths = c(3, 3, 3, 3),
       mastr_kpi("Unique IPs", textOutput("kpi_ips", inline = TRUE), color = "info"),
-      mastr_kpi("Top dashboard", textOutput("kpi_top", inline = TRUE), color = "success"),
-      mastr_kpi("Log file", textOutput("kpi_log", inline = TRUE), color = "secondary")
+      mastr_kpi("Top dashboard", textOutput("kpi_top", inline = TRUE), color = "dark"),
+      mastr_kpi("Log file", textOutput("kpi_log", inline = TRUE), color = "secondary"),
+      mastr_kpi("Filter", textOutput("kpi_filter", inline = TRUE), color = "light")
     ),
     layout_columns(
       col_widths = c(7, 5),
@@ -76,8 +93,8 @@ main_ui <- function() {
         card_body(plotOutput("plot_day", height = "260px"))
       ),
       card(
-        card_header("Device mix"),
-        card_body(plotOutput("plot_device", height = "260px"))
+        card_header("Organic vs automated"),
+        card_body(plotOutput("plot_kind", height = "260px"))
       )
     ),
     layout_columns(
@@ -97,7 +114,7 @@ main_ui <- function() {
     ),
     div(
       class = "traffic-meta text-center mt-3",
-      "Not on the public hub. IPs are from nginx; may include bots and mobile networks."
+      "Organic = real browser with referer or repeat views. Cloud = datacenter/proxy IP. Bot/Scanner = crawlers and scripts."
     )
   )
 }
@@ -132,7 +149,7 @@ server <- function(input, output, session) {
   }, ignoreInit = TRUE)
 
   traffic_data <- eventReactive(
-    list(input$refresh, input$days, authed()),
+    list(input$refresh, input$days, input$audience, authed()),
     {
       req(authed())
       path <- nginx_log_path()
@@ -147,7 +164,11 @@ server <- function(input, output, session) {
       }
       list(
         path = path,
-        summary = nginx_traffic_summary(raw, days = as.integer(input$days))
+        summary = nginx_traffic_summary(
+          raw,
+          days = as.integer(input$days),
+          audience = input$audience
+        )
       )
     },
     ignoreInit = FALSE
@@ -176,6 +197,39 @@ server <- function(input, output, session) {
     d <- traffic_data()
     req(is.null(d$error))
     format(d$summary$total_hits, big.mark = ".")
+  })
+
+  output$kpi_organic <- renderText({
+    d <- traffic_data()
+    req(is.null(d$error))
+    format(d$summary$organic_hits, big.mark = ".")
+  })
+
+  output$kpi_bots <- renderText({
+    d <- traffic_data()
+    req(is.null(d$error))
+    format(d$summary$bot_hits, big.mark = ".")
+  })
+
+  output$kpi_cloud <- renderText({
+    d <- traffic_data()
+    req(is.null(d$error))
+    format(d$summary$cloud_hits, big.mark = ".")
+  })
+
+  output$kpi_uncertain <- renderText({
+    d <- traffic_data()
+    req(is.null(d$error))
+    format(d$summary$uncertain_hits, big.mark = ".")
+  })
+
+  output$kpi_filter <- renderText({
+    switch(
+      input$audience,
+      all = "All",
+      organic = "Organic",
+      non_organic = "Bots"
+    )
   })
 
   output$kpi_ips <- renderText({
@@ -215,20 +269,29 @@ server <- function(input, output, session) {
       theme_minimal(base_size = 11)
   })
 
-  output$plot_device <- renderPlot({
+  output$plot_kind <- renderPlot({
     d <- traffic_data()
     req(is.null(d$error))
-    bd <- d$summary$by_device
+    bd <- d$summary$by_day_kind
     if (!nrow(bd)) {
       return(mastr_empty_plot("No data"))
     }
-    ggplot(bd, aes(reorder(device, hits), hits, fill = device)) +
-      geom_col(show.legend = FALSE, width = 0.7) +
-      coord_flip() +
-      scale_fill_brewer(palette = "Set2") +
+    kind_colors <- c(
+      Organic = "#16a34a",
+      Mixed = "#22c55e",
+      Uncertain = "#94a3b8",
+      Cloud = "#dc2626",
+      Bot = "#f59e0b",
+      Scanner = "#ef4444"
+    )
+    ggplot(bd, aes(day, hits, fill = visitor_kind)) +
+      geom_col(position = "stack", width = 0.85) +
+      scale_fill_manual(values = kind_colors) +
+      scale_x_date(labels = label_date_short()) +
       scale_y_continuous(labels = label_number(big.mark = ".")) +
-      labs(x = NULL, y = "Page views") +
-      theme_minimal(base_size = 11)
+      labs(x = NULL, y = "Page views", fill = "Kind") +
+      theme_minimal(base_size = 11) +
+      theme(legend.position = "bottom", legend.title = element_blank())
   })
 
   output$tbl_dashboards <- renderReactable({
@@ -255,7 +318,10 @@ server <- function(input, output, session) {
       columns = list(
         ip = colDef(name = "IP"),
         hits = colDef(name = "Views", format = colFormat(separators = TRUE)),
+        country = colDef(name = "Country"),
+        city = colDef(name = "City"),
         last_seen = colDef(name = "Last seen", format = colFormat(datetime = TRUE)),
+        visitor_kind = colDef(name = "Kind"),
         device = colDef(name = "Device")
       )
     )
@@ -271,8 +337,11 @@ server <- function(input, output, session) {
       columns = list(
         time = colDef(name = "Time", format = colFormat(datetime = TRUE)),
         ip = colDef(name = "IP"),
+        country = colDef(name = "Country"),
+        city = colDef(name = "City"),
         dashboard = colDef(name = "Dashboard"),
         path = colDef(name = "Path"),
+        visitor_kind = colDef(name = "Kind"),
         device = colDef(name = "Device"),
         status = colDef(name = "HTTP")
       )

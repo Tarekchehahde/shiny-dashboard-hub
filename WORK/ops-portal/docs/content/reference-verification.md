@@ -2,9 +2,16 @@
 
 > **Not published here:** the Word bibliography, interactive HTML table, lookup cache, or any citation text. This page documents the **methodology and implementation** only — for reproducibility and portfolio purposes.
 
-**Document date:** June 2026  
-**Build script (local, private):** `WORK/docs/build_scholar_html.py`  
-**Full internal process notes:** `WORK/docs/References_PhD_Scholar_Verification_Process.md` (not served publicly)
+**Document date:** July 2026 (updated for Round 3 optimum path)  
+
+| Role | Path / URL |
+|------|------------|
+| **Interactive session deck (present this)** | [reference-verification-session.html](../reference-verification-session.html) |
+| **Optimum build script (local)** | `WORK/docs/build_scholar_author_year_html.py` |
+| **Final private HTML table (local)** | `WORK/docs/References_PhD_AuthorYear_Verification.html` |
+| Round 1 history notes (local) | `WORK/docs/References_PhD_Scholar_Verification_Process.md` |
+
+**Canonical design:** Round 3 — **author + year Scholar links**, **online fallbacks** for non-Scholar items, **date validation**, **auto status + human review**. Round 1 (DOI-primary) is historical only.
 
 ---
 
@@ -12,10 +19,12 @@
 
 Convert a Word bibliography (`.docx`, APA-style references) into an **interactive HTML verification table** where:
 
-1. Each reference has a **clickable Google Scholar link** to inspect the publication.
-2. Each row includes an **automated accuracy score** estimating link reliability.
-3. The reviewer can **manually mark** each row: correct, partial, or wrong.
-4. The workflow is **documented and reproducible**.
+1. Each reference has a **clickable open path** (Google Scholar *or* online / publisher / DOI / search).
+2. Links are driven by **author + year** (not DOI as the primary UX).
+3. Items unlikely to exist on Scholar get an **Online link** instead.
+4. **Years are validated** against CrossRef when metadata is strong enough.
+5. Rows show **Auto status** (Likely OK / Needs checkup) and a **Your review** column.
+6. The workflow is **documented and reproducible**.
 
 Typical scale: **hundreds of references** (e.g. 500+ in the project that produced this tool).
 

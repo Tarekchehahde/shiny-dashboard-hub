@@ -1,0 +1,12 @@
+{
+  "dataset": "migr_asyrescra",
+  "title": "Resettled persons by age, sex, citizenship and country of previous residence - annual data",
+  "updated": "2026-06-02T23:00:00+0200",
+  "source": "Eurostat",
+  "browser": "https://ec.europa.eu/eurostat/databrowser/view/migr_asyrescra/default/table?lang=en",
+  "note": "Aggregated TOTAL slices only; full cube is ~214 million dense cells.",
+  "n_geo": 160,
+  "n_citizen": 32960,
+  "n_origin": 32640,
+  "n_age_sex": 5111
+}

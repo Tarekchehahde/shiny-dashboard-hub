@@ -14,7 +14,19 @@ Each app runs as its own Shiny process behind nginx at `/{id}/`. Open any dashbo
 
 **Segments:** Home (&lt;10 kW), C&amp;I (&lt;1 MW), Large Scale, Grand Total — bucketed on Bruttoleistung at query time.
 
-**Charts:** Four stacked small-multiple line charts (one per segment) + reactable YTD table mirroring the Candida layout.
+**Charts:** One segment chart (pills: Home / C&amp;I / Large Scale / Grand Total) + reactable YTD table mirroring the Candida layout.
+
+**Outlook:** [4-Monats-Prognose](/most_visited_forecast/) — ensemble forecast of the next four months per segment. Does not change this dashboard.
+
+---
+
+### Most Visited — Prognose (`/most_visited_forecast/`)
+
+**Purpose:** Four-month statistical outlook of monthly solar Zubau (MW) for Home, C&amp;I, Large Scale, and Grand Total.
+
+**Method:** Inverse-MAPE ensemble of ETS, SARIMA, STL+ETS, NNAR, random forest (lags), calendar-month log-linear trend, and damped seasonal YoY. Grand Total is the sum of the three segments.
+
+**Data:** Same MaStR solar extract and size buckets as Most Visited.
 
 ---
 

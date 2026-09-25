@@ -1,0 +1,16 @@
+[Unit]
+Description=MaStR dashboard most_visited_forecast (4-month outlook)
+After=network.target
+
+[Service]
+Type=simple
+User=rstudio
+WorkingDirectory=/opt/mastr-shiny/WORK/shiny/apps/most_visited_forecast
+Environment=HOME=/home/rstudio
+Environment=MASTR_HUB_MODE=paths
+ExecStart=/usr/lib/R/bin/R -e "options(shiny.url.pathPrefix='/most_visited_forecast'); shiny::runApp('.', host='0.0.0.0', port=3856, launch.browser=FALSE)"
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

@@ -1,6 +1,6 @@
 # Monitoring & operations
 
-Live views for demos and day-to-day ops. Most monitoring is **public read-only**; admin tools need a password.
+Live views for demos and day-to-day ops. Grafana dashboards stay public read-only. **Netdata** and **Grafana `/metrics`** require login.
 
 ---
 
@@ -26,7 +26,7 @@ Anonymous **Viewer** is enabled for public demos; admin login required to edit.
 
 ## Netdata (`/netdata/`)
 
-Per-second process and system charts — complementary to Grafana's longer-window trends. Good for “watch the server breathe” during a live demo.
+Per-second process and system charts — complementary to Grafana's longer-window trends. **Login required** (HTTP basic auth). The Mac desktop shortcut still uses an SSH tunnel to `localhost:19999` and does not go through this gate.
 
 ---
 
@@ -42,9 +42,9 @@ Not linked from the public hub. Credentials are stored in server env (`/etc/mast
 
 ---
 
-## Mission Control (`/portal/`)
+## Mission Control (`/`)
 
-Static HTML gateway linking hub, Grafana showcase, Netdata, RStudio, traffic app, and this documentation.
+Static HTML gateway (also at old bookmark `/portal/`, which redirects here) linking the dashboard hub, Grafana showcase, Netdata, traffic app, and this documentation.
 
 ---
 
@@ -52,8 +52,9 @@ Static HTML gateway linking hub, Grafana showcase, Netdata, RStudio, traffic app
 
 Grafana blackbox probes run every **15 seconds** against:
 
-- Hub `/`
-- Portal `/portal/`
+- Mission Control `/`
+- Dashboard Hub `/dashboards/`
+- Portal docs `/portal/docs/` (legacy `/portal/` 301s to `/`)
 - Key Shiny apps (most_visited, eu_electricity, kommunal, solar_wirtschaft, deutschland_solar, grafana itself)
 
 All probe targets appear on the **MaStR Live Showcase** dashboard.

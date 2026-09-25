@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Muster HU-Pr�fplakette">
+  <!-- Educational diagram: month at top, year in center, color = year -->
+  <defs>
+    <filter id="s" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+  <circle cx="120" cy="120" r="100" fill="#2563eb" filter="url(#s)"/>
+  <circle cx="120" cy="120" r="66" fill="#f4f4f4"/>
+  <circle cx="120" cy="120" r="40" fill="#2563eb"/>
+  <!-- black month bars at 12 o'clock -->
+  <path d="M98 22 A100 100 0 0 1 142 22 L134 42 A78 78 0 0 0 106 42 Z" fill="#111"/>
+  <!-- months: 9 on top for September example -->
+  <g fill="#111" font-family="Arial,sans-serif" font-size="13" font-weight="700" text-anchor="middle">
+    <text x="120" y="48">9</text>
+    <text x="155" y="58">10</text>
+    <text x="178" y="88">11</text>
+    <text x="186" y="124">12</text>
+    <text x="178" y="160">1</text>
+    <text x="155" y="188">2</text>
+    <text x="120" y="200">3</text>
+    <text x="85" y="188">4</text>
+    <text x="62" y="160">5</text>
+    <text x="54" y="124">6</text>
+    <text x="62" y="88">7</text>
+    <text x="85" y="58">8</text>
+  </g>
+  <text x="120" y="128" text-anchor="middle" font-family="Arial,sans-serif" font-size="34" font-weight="800" fill="#fff">26</text>
+  <text x="120" y="228" text-anchor="middle" font-size="11" fill="#555" font-family="Arial,sans-serif">Beispiel: September 2026 (blau)</text>
+</svg>

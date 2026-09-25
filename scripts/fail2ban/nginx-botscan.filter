@@ -1,0 +1,6 @@
+# Ban IPs that hammer the server with failed or probe requests.
+# Install: scripts/apply-nginx-security.sh
+
+[Definition]
+failregex = ^<HOST> -.*"(GET|HEAD|POST|OPTIONS) [^"]*" (400|403|404|444|405|408|429) .*$
+ignoreregex =

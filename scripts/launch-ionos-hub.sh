@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Double-click / Desktop launcher: open MaStR hub in browser + SSH tunnel for RStudio.
 #
-# Public hub (no tunnel):  http://82.165.167.86/
+# Public home (Mission Control):  https://82.165.167.86/
+# Dashboard hub:                   https://82.165.167.86/dashboards/
 # RStudio via tunnel:      http://localhost:8787  (user: rstudio)
 
 set -euo pipefail
@@ -9,7 +10,7 @@ set -euo pipefail
 PROJECT="/Users/tarek-lokal/Documents/mastr-shiny"
 LOG="$PROJECT/logs/ionos-hub-launch.log"
 SSH_HOST="ionos-mastr"
-HUB_URL="http://82.165.167.86/"
+HUB_URL="https://82.165.167.86/"
 RSTUDIO_URL="http://localhost:8787"
 TUNNEL_PORTS=(8787 3838 3839 19999)
 

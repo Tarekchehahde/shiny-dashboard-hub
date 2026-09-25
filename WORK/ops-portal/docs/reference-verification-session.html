@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Reference Verification Session — Method Walkthrough</title>
+<style>
+  :root {
+    --bg: #0b1017;
+    --surface: #141c28;
+    --surface2: #1c2736;
+    --border: #2a3a4f;
+    --text: #e8eef7;
+    --muted: #8fa3bb;
+    --accent: #3db8ff;
+    --accent2: #5eead4;
+    --warn: #fbbf24;
+    --bad: #f87171;
+    --good: #4ade80;
+    --step: #a78bfa;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    font-family: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    background:
+      radial-gradient(1200px 600px at 10% -10%, rgba(61,184,255,.12), transparent 50%),
+      radial-gradient(900px 500px at 90% 0%, rgba(94,234,212,.08), transparent 45%),
+      var(--bg);
+    color: var(--text);
+    line-height: 1.55;
+  }
+  a { color: var(--accent); }
+  .app { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
+  .sidebar {
+    border-right: 1px solid var(--border);
+    background: rgba(20,28,40,.92);
+    padding: 1.25rem 1rem 2rem;
+    position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  }
+  .brand { font-size: .72rem; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); margin-bottom: .35rem; }
+  .sidebar h1 { font-size: 1.05rem; margin: 0 0 .75rem; line-height: 1.3; }
+  .back { display: inline-block; font-size: .82rem; color: var(--muted); text-decoration: none; margin-bottom: 1rem; }
+  .back:hover { color: var(--accent); }
+  .nav-btn {
+    display: block; width: 100%; text-align: left;
+    background: transparent; border: 1px solid transparent;
+    color: var(--muted); padding: .55rem .65rem; border-radius: 8px;
+    cursor: pointer; font: inherit; margin-bottom: .25rem;
+  }
+  .nav-btn small { display: block; font-size: .68rem; opacity: .85; }
+  .nav-btn.active, .nav-btn:hover {
+    background: var(--surface2); border-color: var(--border); color: var(--text);
+  }
+  .nav-btn.active { box-shadow: inset 3px 0 0 var(--accent); }
+  .stage { padding: 1.5rem 2rem 3rem; max-width: 1100px; }
+  .topbar {
+    display: flex; flex-wrap: wrap; gap: .75rem; align-items: center;
+    justify-content: space-between; margin-bottom: 1.25rem;
+  }
+  .progress-wrap { flex: 1; min-width: 180px; }
+  .progress-label { font-size: .75rem; color: var(--muted); margin-bottom: .3rem; }
+  .progress-bar {
+    height: 6px; background: var(--surface2); border-radius: 999px; overflow: hidden;
+  }
+  .progress-bar > span {
+    display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transition: width .25s ease;
+  }
+  .controls { display: flex; gap: .5rem; flex-wrap: wrap; }
+  .btn {
+    border: 1px solid var(--border); background: var(--surface);
+    color: var(--text); padding: .45rem .8rem; border-radius: 8px;
+    cursor: pointer; font: inherit; font-size: .85rem;
+  }
+  .btn:hover { border-color: var(--accent); }
+  .btn.primary { background: var(--accent); color: #051018; border-color: transparent; font-weight: 650; }
+  .slide {
+    display: none;
+    animation: fadeIn .28s ease;
+    background: rgba(20,28,40,.65);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem 1.6rem 1.75rem;
+  }
+  .slide.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .slide .kicker { color: var(--accent2); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; margin-bottom: .4rem; }
+  .slide h2 { margin: 0 0 .75rem; font-size: 1.55rem; line-height: 1.25; }
+  .slide p { color: var(--muted); margin: 0 0 .9rem; max-width: 62rem; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: .85rem; }
+  .card {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1rem 1.05rem;
+  }
+  .card h3 { margin: 0 0 .45rem; font-size: 1rem; }
+  .card p, .card li { font-size: .9rem; color: var(--muted); }
+  .card ul { margin: .35rem 0 0; padding-left: 1.1rem; }
+  .stat {
+    text-align: center; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1rem .5rem;
+  }
+  .stat .n { font-size: 1.8rem; font-weight: 700; color: var(--accent); }
+  .stat .l { font-size: .72rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+  .pill {
+    display: inline-block; font-size: .72rem; font-weight: 700; padding: .15rem .5rem;
+    border-radius: 999px; margin-right: .35rem; margin-bottom: .25rem;
+  }
+  .pill.good { background: rgba(74,222,128,.15); color: var(--good); }
+  .pill.bad { background: rgba(248,113,113,.15); color: var(--bad); }
+  .pill.warn { background: rgba(251,191,36,.15); color: var(--warn); }
+  .pill.neutral { background: rgba(61,184,255,.12); color: var(--accent); }
+  .flow {
+    display: flex; flex-wrap: wrap; gap: .55rem; align-items: center; margin: 1rem 0;
+  }
+  .flow .node {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: .55rem .75rem; font-size: .85rem; font-weight: 600;
+  }
+  .flow .node.final { border-color: var(--accent2); box-shadow: 0 0 0 1px rgba(94,234,212,.25); }
+  .flow .arrow { color: var(--muted); font-size: .9rem; }
+  .timeline { position: relative; padding-left: 1.2rem; }
+  .timeline::before {
+    content: ""; position: absolute; left: .35rem; top: .2rem; bottom: .2rem;
+    width: 2px; background: var(--border);
+  }
+  .t-item { position: relative; margin-bottom: 1rem; padding-left: .5rem; }
+  .t-item::before {
+    content: ""; position: absolute; left: -1.05rem; top: .45rem;
+    width: 10px; height: 10px; border-radius: 50%; background: var(--accent);
+    box-shadow: 0 0 0 3px rgba(61,184,255,.2);
+  }
+  .t-item.skip::before { background: var(--bad); }
+  .t-item.win::before { background: var(--good); }
+  .t-item h3 { margin: 0 0 .25rem; font-size: .98rem; }
+  .code {
+    background: #0a121c; border: 1px solid var(--border); border-radius: 10px;
+    padding: .85rem 1rem; overflow-x: auto; font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+    font-size: .78rem; color: #c9e2ff; margin: .6rem 0 0;
+  }
+  .tabs { display: flex; gap: .4rem; flex-wrap: wrap; margin-bottom: .75rem; }
+  .tab {
+    border: 1px solid var(--border); background: transparent; color: var(--muted);
+    border-radius: 999px; padding: .3rem .7rem; cursor: pointer; font: inherit; font-size: .8rem;
+  }
+  .tab.active { background: rgba(61,184,255,.15); color: var(--accent); border-color: rgba(61,184,255,.4); }
+  .panel { display: none; }
+  .panel.active { display: block; }
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: .85rem; }
+  .compare .old { border-top: 3px solid var(--bad); }
+  .compare .new { border-top: 3px solid var(--good); }
+  .svg-wrap {
+    background: #0a121c; border: 1px solid var(--border); border-radius: 12px;
+    padding: 1rem; overflow-x: auto; margin: .8rem 0 0;
+  }
+  .svg-wrap svg { display: block; min-width: 720px; width: 100%; height: auto; }
+  .hotspot {
+    cursor: pointer; transition: fill .15s, stroke .15s;
+  }
+  .hotspot:hover { filter: brightness(1.15); }
+  .tooltip {
+    display: none; position: fixed; z-index: 50; max-width: 280px;
+    background: #0f1724; border: 1px solid var(--border); border-radius: 10px;
+    padding: .65rem .8rem; font-size: .8rem; color: var(--text);
+    box-shadow: 0 12px 40px rgba(0,0,0,.45); pointer-events: none;
+  }
+  .tooltip strong { color: var(--accent2); display: block; margin-bottom: .25rem; }
+  .kb { font-size: .78rem; color: var(--muted); }
+  kbd {
+    font-family: inherit; font-size: .72rem; border: 1px solid var(--border);
+    border-bottom-width: 2px; border-radius: 5px; padding: .05rem .35rem;
+    background: var(--surface2); color: var(--text);
+  }
+  .checklist label {
+    display: flex; gap: .55rem; align-items: flex-start;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: .7rem .85rem; margin-bottom: .45rem;
+    cursor: pointer; font-size: .9rem; color: var(--muted);
+  }
+  .checklist label:has(input:checked) { border-color: rgba(74,222,128,.45); color: var(--text); }
+  details.script-card {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 12px; margin-bottom: .55rem; overflow: hidden;
+  }
+  details.script-card summary {
+    cursor: pointer; padding: .8rem 1rem; font-weight: 650; list-style: none;
+  }
+  details.script-card summary::-webkit-details-marker { display: none; }
+  details.script-card[open] summary { border-bottom: 1px solid var(--border); }
+  details.script-card .inner { padding: .85rem 1rem 1rem; }
+  .code-block { margin-bottom: 1rem; }
+  .code-block .why {
+    display: flex; gap: .75rem; align-items: flex-start;
+    margin-bottom: .45rem;
+  }
+  .code-block .why .tag {
+    flex: 0 0 auto; font-size: .68rem; font-weight: 750; letter-spacing: .06em;
+    text-transform: uppercase; color: #051018; background: var(--accent2);
+    border-radius: 6px; padding: .2rem .45rem; margin-top: .15rem;
+  }
+  .code-block .why p { margin: 0; font-size: .88rem; color: var(--muted); }
+  .code-block .why p strong { color: var(--text); }
+  .code .c { color: #6b879e; }
+  .code .k { color: #c792ea; }
+  .code .f { color: #82aaff; }
+  .code .s { color: #c3e88d; }
+  .code .n { color: #f78c6c; }
+  .footer-note { margin-top: 1rem; font-size: .78rem; color: var(--muted); }
+  @media (max-width: 900px) {
+    .app { grid-template-columns: 1fr; }
+    .sidebar { position: relative; height: auto; }
+    .grid-2, .grid-3, .compare { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <a class="back" href="/portal/docs/?doc=reference-verification">← Method notes</a>
+    <div class="brand">Session brief</div>
+    <h1>Bibliography verification — how we built it</h1>
+    <p style="font-size:.82rem;color:var(--muted);margin:0 0 1rem;">Interactive walkthrough of the <strong style="color:var(--text)">final (Round&nbsp;3)</strong> path and rejected approaches.</p>
+    <nav id="nav" aria-label="Slides"></nav>
+    <p class="kb" style="margin-top:1.2rem"><kbd>←</kbd> <kbd>→</kbd> or <kbd>Space</kbd> to navigate</p>
+  </aside>
+
+  <main class="stage">
+    <div class="topbar">
+      <div class="progress-wrap">
+        <div class="progress-label"><span id="slide-label">1 / 10</span> · scripted presentation</div>
+        <div class="progress-bar"><span id="progress-fill"></span></div>
+      </div>
+      <div class="controls">
+        <button class="btn" id="btn-prev" type="button">Previous</button>
+        <button class="btn primary" id="btn-next" type="button">Next</button>
+        <button class="btn" id="btn-present" type="button" title="Toggle focused presentation">Present mode</button>
+      </div>
+    </div>
+
+    <!-- SLIDE 1 -->
+    <section class="slide active" data-title="Agenda" data-sub="What this session covers">
+      <div class="kicker">01 · Agenda</div>
+      <h2>Session goal: explain the solution end-to-end</h2>
+      <p>How we turned a Word PhD bibliography into an interactive verification tool — what failed, what we kept, and the <strong style="color:var(--text)">optimum Round&nbsp;3 design</strong> you can demo and reuse.</p>
+      <div class="grid-3">
+        <div class="card"><h3>Problem</h3><p>Hundreds of APA references need fast, clickable checking — Scholar is incomplete; dates may be wrong.</p></div>
+        <div class="card"><h3>Method</h3><p>Author + year Scholar queries, CrossRef for dates &amp; publisher links, online fallback when Scholar won’t index.</p></div>
+        <div class="card"><h3>Deliverable</h3><p>Self-hosted HTML table with filters, scores, date flags, and a human review column.</p></div>
+      </div>
+      <div class="footer-note">Privacy: this session documents <em>method</em> only — citation text &amp; private lookup cache are not published here.</div>
+    </section>
+
+    <!-- SLIDE 2 -->
+    <section class="slide" data-title="The problem" data-sub="What we were solving">
+      <div class="kicker">02 · Problem</div>
+      <h2>From a Word list to a checkable verification UI</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Requirements</h3>
+          <ul>
+            <li>Extract all references from <code>.docx</code></li>
+            <li>One-click open for each item</li>
+            <li>Score how trustworthy the link is</li>
+            <li>Classify book vs article (and more)</li>
+            <li>Flag missing / wrong years</li>
+            <li>Let the author mark Checked OK</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Constraints</h3>
+          <ul>
+            <li>Google Scholar has <strong>no public batch API</strong></li>
+            <li>Scraping hits rate limits fast</li>
+            <li>Many items are web/reports — not on Scholar</li>
+            <li>Author may have missed some dates</li>
+            <li>Must stay reproducible offline for the HTML</li>
+          </ul>
+        </div>
+      </div>
+      <div class="grid-3" style="margin-top:1rem">
+        <div class="stat"><div class="n">511</div><div class="l">References processed</div></div>
+        <div class="stat"><div class="n">3</div><div class="l">Design rounds</div></div>
+        <div class="stat"><div class="n">1</div><div class="l">Final HTML tool</div></div>
+      </div>
+    </section>
+
+    <!-- SLIDE 3 -->
+    <section class="slide" data-title="Round story" data-sub="How we iterated to the optimum">
+      <div class="kicker">03 · Iteration</div>
+      <h2>Three rounds — only Round 3 is the session “final”</h2>
+      <div class="timeline">
+        <div class="t-item skip">
+          <h3>Round 1 — DOI → Scholar <span class="pill bad">Superseded</span></h3>
+          <p style="margin:0;color:var(--muted);font-size:.9rem">OpenAlex/CrossRef find DOIs → <code>scholar?q=doi:…</code>. Good for journals; weaker for books/web; not what the author wanted as the primary open path.</p>
+        </div>
+        <div class="t-item">
+          <h3>Round 2 — Author + year Scholar <span class="pill warn">Base</span></h3>
+          <p style="margin:0;color:var(--muted);font-size:.9rem">Links built as <code>author surname(s) + as_ylo/as_yhi=year</code>. Type badges (Article/Book/…). Fixed filters. Still assumed Scholar coverage.</p>
+        </div>
+        <div class="t-item win">
+          <h3>Round 3 — Optimum path <span class="pill good">Current</span></h3>
+          <p style="margin:0;color:var(--muted);font-size:.9rem">Author+year Scholar <em>when likely</em>; Online link (URL/DOI/publisher/search) when not; Date check vs CrossRef; Auto status + Your review columns.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 4 -->
+    <section class="slide" data-title="Dead ends" data-sub="What we tried and rejected">
+      <div class="kicker">04 · Rejected paths</div>
+      <h2>Why scraping Scholar was not the answer</h2>
+      <div class="compare">
+        <div class="card old">
+          <h3>Tried · <code>scholarly</code> scraper</h3>
+          <ul>
+            <li>Worked for 1–few queries</li>
+            <li>Batch → <code>MaxTriesExceededException</code></li>
+            <li>~30s/ref → hours for 500+</li>
+            <li>Against ToS / fragile HTML</li>
+          </ul>
+        </div>
+        <div class="card old">
+          <h3>Tried · Semantic Scholar API</h3>
+          <ul>
+            <li>Quick validation idea</li>
+            <li>HTTP 429 without paid quota</li>
+            <li>Not reliable for full library pass</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card" style="margin-top:.85rem">
+        <h3>Kept · Free bibliographic APIs + constructed URLs</h3>
+        <p style="margin:0">Use <strong>CrossRef</strong> (publisher metadata + DOI + year) and optional OpenAlex when budget allows. Never depend on scraping Scholar HTML. Build Scholar links we control; add online fallbacks ourselves.</p>
+      </div>
+    </section>
+
+    <!-- SLIDE 5: interactive diagram -->
+    <section class="slide" data-title="Final pipeline" data-sub="Interactive Round 3 graphic">
+      <div class="kicker">05 · Final pipeline</div>
+      <h2>Optimum architecture (hover the boxes)</h2>
+      <p>Click a node to show the speaking note for your session. This is the model to present as “what we ship.”</p>
+      <div class="svg-wrap">
+        <svg viewBox="0 0 980 420" role="img" aria-label="Round 3 verification pipeline">
+          <defs>
+            <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#8fa3bb"/></marker>
+            <linearGradient id="g1" x1="0" x2="1"><stop offset="0%" stop-color="#1c2736"/><stop offset="100%" stop-color="#243247"/></linearGradient>
+          </defs>
+          <rect class="hotspot" data-tip="docx" x="30" y="160" width="150" height="70" rx="12" fill="url(#g1)" stroke="#3db8ff"/>
+          <text x="105" y="190" text-anchor="middle" fill="#e8eef7" font-size="14" font-family="IBM Plex Sans, sans-serif">Word .docx</text>
+          <text x="105" y="210" text-anchor="middle" fill="#8fa3bb" font-size="11" font-family="IBM Plex Sans, sans-serif">ZIP → XML extract</text>
+
+          <line x1="180" y1="195" x2="230" y2="195" stroke="#8fa3bb" marker-end="url(#arr)"/>
+
+          <rect class="hotspot" data-tip="parse" x="230" y="145" width="160" height="100" rx="12" fill="url(#g1)" stroke="#5eead4"/>
+          <text x="310" y="180" text-anchor="middle" fill="#e8eef7" font-size="14" font-family="IBM Plex Sans, sans-serif">Parse APA</text>
+          <text x="310" y="200" text-anchor="middle" fill="#8fa3bb" font-size="11" font-family="IBM Plex Sans, sans-serif">author · year · title</text>
+          <text x="310" y="218" text-anchor="middle" fill="#8fa3bb" font-size="11" font-family="IBM Plex Sans, sans-serif">type · URL · DOI</text>
+
+          <line x1="390" y1="195" x2="440" y2="195" stroke="#8fa3bb" marker-end="url(#arr)"/>
+
+          <rect class="hotspot" data-tip="crossref" x="440" y="145" width="170" height="100" rx="12" fill="url(#g1)" stroke="#fbbf24"/>
+          <text x="525" y="180" text-anchor="middle" fill="#e8eef7" font-size="14" font-family="IBM Plex Sans, sans-serif">CrossRef lookup</text>
+          <text x="525" y="200" text-anchor="middle" fill="#8fa3bb" font-size="11" font-family="IBM Plex Sans, sans-serif">title match + pub year</text>
+          <text x="525" y="218" text-anchor="middle" fill="#8fa3bb" font-size="11" font-family="IBM Plex Sans, sans-serif">DOI / publisher URL</text>
+
+          <line x1="525" y1="145" x2="525" y2="95" stroke="#8fa3bb" marker-end="url(#arr)"/>
+          <line x1="525" y1="245" x2="525" y2="295" stroke="#8fa3bb" marker-end="url(#arr)"/>
+
+          <rect class="hotspot" data-tip="scholar" x="620" y="40" width="200" height="80" rx="12" fill="url(#g1)" stroke="#4ade80"/>
+          <text x="720" y="75" text-anchor="middle" fill="#e8eef7" font-size="14" font-family="IBM Plex Sans, sans-serif">Scholar author+year</text>
+          <text x="720" y="95" text-anchor="middle" fill="#8fa3bb" font-size="11" font-family="IBM Plex Sans, sans-serif">as_ylo / as_yhi locked</text>
+
+          <rect class="hotspot" data-tip="online" x="620" y="285" width="200" height="80" rx="12" fill="url(#g1)" stroke="#f87171"/>
+          <text x="720" y="320" text-anchor="middle" fill="#e8eef7" font-size="14" font-family="IBM Plex Sans, sans-serif">Online link</text>
+          <text x="720" y="340" text-anchor="middle" fill="#8fa3bb" font-size="11" font-family="IBM Plex Sans, sans-serif">URL · DOI · site search</text>
+
+          <path d="M610 80 H580 V195 H610" fill="none" stroke="#8fa3bb"/>
+          <path d="M610 325 H580 V195 H610" fill="none" stroke="#8fa3bb"/>
+          <line x1="610" y1="195" x2="640" y2="195" stroke="#8fa3bb" marker-end="url(#arr)"/>
+
+          <rect class="hotspot" data-tip="html" x="780" y="155" width="170" height="90" rx="12" fill="url(#g1)" stroke="#a78bfa"/>
+          <text x="865" y="190" text-anchor="middle" fill="#e8eef7" font-size="14" font-family="IBM Plex Sans, sans-serif">Interactive HTML</text>
+          <text x="865" y="210" text-anchor="middle" fill="#8fa3bb" font-size="11" font-family="IBM Plex Sans, sans-serif">filters · scores · review</text>
+          <text x="865" y="228" text-anchor="middle" fill="#8fa3bb" font-size="11" font-family="IBM Plex Sans, sans-serif">date · auto status</text>
+        </svg>
+      </div>
+      <div id="diagram-note" class="card" style="margin-top:.85rem">
+        <h3>Speaking note</h3>
+        <p id="diagram-text" style="margin:0">Click any box in the diagram to load the presenter cue for that stage.</p>
+      </div>
+    </section>
+
+    <!-- SLIDE 6 -->
+    <section class="slide" data-title="Linking logic" data-sub="Scholar vs online">
+      <div class="kicker">06 · Linking logic</div>
+      <h2>Two doors: Scholar when useful, web when not</h2>
+      <div class="tabs" role="tablist">
+        <button class="tab active" data-panel="p-scholar" type="button">Scholar (author+year)</button>
+        <button class="tab" data-panel="p-online" type="button">Online fallback</button>
+        <button class="tab" data-panel="p-date" type="button">Date validation</button>
+        <button class="tab" data-panel="p-status" type="button">Status columns</button>
+      </div>
+      <div class="panel active" id="p-scholar">
+        <div class="card">
+          <h3>Google Scholar URL shape</h3>
+          <div class="code">https://scholar.google.com/scholar?q=Abels+Bieling&amp;hl=en&amp;as_ylo=2024&amp;as_yhi=2024</div>
+          <ul>
+            <li>Primary query = first 1–2 author surnames (or institution name)</li>
+            <li>Year locked with <code>as_ylo</code> / <code>as_yhi</code></li>
+            <li>Used for Articles / Books / Chapters when Scholar is plausible</li>
+            <li>Shown as “Not on Scholar” for Web / Report / weak matches → force Online link</li>
+          </ul>
+        </div>
+      </div>
+      <div class="panel" id="p-online">
+        <div class="card">
+          <h3>Online link priority</h3>
+          <div class="flow">
+            <span class="node">DOI in citation</span><span class="arrow">→</span>
+            <span class="node">Specific URL in citation</span><span class="arrow">→</span>
+            <span class="node">CrossRef publisher / DOI</span><span class="arrow">→</span>
+            <span class="node">site:domain search</span><span class="arrow">→</span>
+            <span class="node final">Google search</span>
+          </div>
+          <p style="margin:0">Generic homepage URLs (e.g. bare news domain) are skipped in favor of a targeted site search.</p>
+        </div>
+      </div>
+      <div class="panel" id="p-date">
+        <div class="card">
+          <h3>Year check (author may have missed dates)</h3>
+          <ul>
+            <li><span class="pill good">Year OK</span> CrossRef year matches citation</li>
+            <li><span class="pill warn">Check year</span> ±1 year off</li>
+            <li><span class="pill bad">Mismatch / missing</span> larger gap or no year</li>
+            <li><span class="pill neutral">Verify manually</span> web/gray lit with weak metadata (avoid false alarms)</li>
+          </ul>
+        </div>
+      </div>
+      <div class="panel" id="p-status">
+        <div class="grid-2">
+          <div class="card">
+            <h3>Auto status</h3>
+            <p><span class="pill good">Likely OK</span> strong metadata + year OK</p>
+            <p><span class="pill warn">Needs checkup</span> weak match, year issue, gray lit, or multi-works same year</p>
+          </div>
+          <div class="card">
+            <h3>Your review (human)</h3>
+            <p>✓ Checked — OK · ⚠ Needs checkup · ✗ Needs fixing</p>
+            <p style="margin:0">Saved in browser <code>localStorage</code>; exportable CSV.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 7 -->
+    <section class="slide" data-title="Stack &amp; scripts" data-sub="What we actually used">
+      <div class="kicker">07 · Tools &amp; scripts</div>
+      <h2>Stack used to build Round 3</h2>
+      <div class="grid-3">
+        <div class="card"><h3>Runtime</h3><ul><li>Python 3.12</li><li><code>requests</code></li><li>stdlib: zipfile, xml, re, difflib, json</li></ul></div>
+        <div class="card"><h3>APIs</h3><ul><li>CrossRef Works API</li><li>OpenAlex (Round 1; rate-limited later)</li><li>Constructed Scholar / Google URLs</li></ul></div>
+        <div class="card"><h3>UI</h3><ul><li>Static HTML + CSS + JS</li><li>No backend at review time</li><li>Filters + CSV export</li></ul></div>
+      </div>
+      <details class="script-card" style="margin-top:1rem" open>
+        <summary>★ Final build script — <code>build_scholar_author_year_html.py</code></summary>
+        <div class="inner">
+          <p style="margin:0 0 .5rem;color:var(--muted);font-size:.9rem">Round 3 generator: parse → classify type → CrossRef → Scholar/online → date &amp; status → HTML.</p>
+          <div class="code">cd WORK/docs
+PYTHONUNBUFFERED=1 python3 build_scholar_author_year_html.py
+# → References_PhD_AuthorYear_Verification.html
+# cache: .author_year_lookup_cache.json</div>
+        </div>
+      </details>
+      <details class="script-card">
+        <summary>Earlier / related — DOI builder &amp; Word export</summary>
+        <div class="inner">
+          <div class="code"># Round 1 (historical, DOI-primary)
+python3 build_scholar_html.py
+# → References_PhD_Scholar_Verification.html
+
+# Word list of resolved links (after Round 1)
+python3 export_references_links_docx.py
+# → References_PhD_Scholar_Links.docx</div>
+        </div>
+      </details>
+      <p class="footer-note">Next two slides walk through the real Python / JS used in Round 3 — open each tab while you present.</p>
+    </section>
+
+    <!-- SLIDE 8: CODE A -->
+    <section class="slide" data-title="Code A" data-sub="Extract · parse · Scholar URL">
+      <div class="kicker">08 · Code deep-dive A</div>
+      <h2>Reading Word, parsing APA, building Scholar links</h2>
+      <p>From <code>build_scholar_author_year_html.py</code> — the optimum generator.</p>
+
+      <div class="tabs" role="tablist">
+        <button class="tab active" data-panel="code-extract" type="button">1 · Extract .docx</button>
+        <button class="tab" data-panel="code-parse" type="button">2 · Parse APA</button>
+        <button class="tab" data-panel="code-scholar" type="button">3 · Scholar URL</button>
+        <button class="tab" data-panel="code-type" type="button">4 · Type classify</button>
+      </div>
+
+      <div class="panel active" id="code-extract">
+        <div class="code-block">
+          <div class="why"><span class="tag">Why</span><p><strong>.docx is a ZIP.</strong> We unzip <code>word/document.xml</code> and concatenate text nodes per paragraph — no Microsoft Word / python-docx needed for input.</p></div>
+          <div class="code"><span class="k">def</span> <span class="f">extract_docx_paragraphs</span>(path):
+    <span class="k">with</span> zipfile.ZipFile(path) <span class="k">as</span> zf:
+        xml = zf.read(<span class="s">"word/document.xml"</span>)
+    root = ET.fromstring(xml)
+    paras = []
+    <span class="k">for</span> p <span class="k">in</span> root.iter(<span class="s">"{...}p"</span>):          <span class="c"># each Word paragraph</span>
+        texts = [t.text <span class="k">for</span> t <span class="k">in</span> p.iter(<span class="s">"{...}t"</span>) <span class="k">if</span> t.text]
+        line = <span class="s">""</span>.join(texts).strip()
+        <span class="k">if</span> line <span class="k">and</span> line.lower() != <span class="s">"references"</span>:
+            paras.append(line)
+    <span class="k">return</span> paras                         <span class="c"># → list of citation strings</span></div>
+        </div>
+      </div>
+
+      <div class="panel" id="code-parse">
+        <div class="code-block">
+          <div class="why"><span class="tag">Why</span><p><strong>Normalize every citation</strong> into structured fields used later for URLs, type, and CrossRef. APA-ish: <em>Authors (Year). Title. Rest…</em></p></div>
+          <div class="code">REF_RE = re.compile(
+    <span class="s">r"^(.+?)\s*\((\d{4}[a-z]?)(?:,\s[^)]+)?\)\.\s*(.+)$"</span>
+)
+<span class="c"># groups: authors | year | rest-of-citation</span>
+
+<span class="k">def</span> <span class="f">parse_reference</span>(ref):
+    m = REF_RE.match(ref)
+    authors, year, rest = m.group(<span class="n">1</span>), m.group(<span class="n">2</span>), m.group(<span class="n">3</span>)
+    title = rest.split(<span class="s">". "</span>)[<span class="n">0</span>].rstrip(<span class="s">"."</span>)
+    surnames = extract_surnames(authors)   <span class="c"># ["Abels", "Bieling"]</span>
+    <span class="k">return</span> {
+        <span class="s">"author_label"</span>: <span class="s">", "</span>.join(surnames[:<span class="n">3</span>]),
+        <span class="s">"year"</span>: re.sub(<span class="s">r"[a-z]$"</span>, <span class="s">""</span>, year),  <span class="c"># 2014a → 2014</span>
+        <span class="s">"title"</span>: title,
+        <span class="s">"source_url"</span>: URL_RE.findall(ref)[-<span class="n">1</span>:] <span class="k">or</span> <span class="k">None</span>,
+        <span class="s">"doi_in_text"</span>: DOI_RE.search(ref),
+    }</div>
+        </div>
+      </div>
+
+      <div class="panel" id="code-scholar">
+        <div class="code-block">
+          <div class="why"><span class="tag">Why</span><p><strong>No scraping.</strong> We construct a Google Scholar search that locks the publication year with <code>as_ylo</code> / <code>as_yhi</code> — author surname(s) only, as requested.</p></div>
+          <div class="code"><span class="k">def</span> <span class="f">scholar_author_year_link</span>(parsed):
+    q = <span class="s">" "</span>.join(parsed[<span class="s">"surnames"</span>][:<span class="n">2</span>])   <span class="c"># e.g. "Abels Bieling"</span>
+    params = {<span class="s">"q"</span>: q, <span class="s">"hl"</span>: <span class="s">"en"</span>}
+    <span class="k">if</span> parsed[<span class="s">"year"</span>]:
+        params[<span class="s">"as_ylo"</span>] = parsed[<span class="s">"year"</span>]
+        params[<span class="s">"as_yhi"</span>] = parsed[<span class="s">"year"</span>]   <span class="c"># lock year range</span>
+    <span class="k">return</span> <span class="s">"https://scholar.google.com/scholar?"</span> + urlencode(params)
+
+<span class="c"># Result example:</span>
+<span class="c"># .../scholar?q=Abels+Bieling&amp;hl=en&amp;as_ylo=2024&amp;as_yhi=2024</span></div>
+        </div>
+      </div>
+
+      <div class="panel" id="code-type">
+        <div class="code-block">
+          <div class="why"><span class="tag">Why</span><p><strong>Book vs article badge</strong> in the HTML. Heuristics on volume patterns, publisher names, “In … (Ed.)”, URL / press markers.</p></div>
+          <div class="code"><span class="k">def</span> <span class="f">classify_type</span>(ref, parsed):
+    <span class="k">if</span> CHAPTER_RE.search(ref):     <span class="k">return</span> <span class="s">"Chapter"</span>
+    <span class="k">if</span> is_webish(ref):              <span class="k">return</span> <span class="s">"Web"</span>
+    <span class="k">if</span> is_reportish(ref):           <span class="k">return</span> <span class="s">"Report"</span>
+    <span class="k">if</span> JOURNAL_VOL_RE.search(ref):  <span class="k">return</span> <span class="s">"Article"</span>  <span class="c"># , 58(4), …</span>
+    <span class="k">if</span> has_book_publisher(ref):     <span class="k">return</span> <span class="s">"Book"</span>
+    <span class="k">return</span> <span class="s">"Other"</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 9: CODE B -->
+    <section class="slide" data-title="Code B" data-sub="CrossRef · dates · online · UI filters">
+      <div class="kicker">09 · Code deep-dive B</div>
+      <h2>Validation, online fallback, and HTML filters</h2>
+
+      <div class="tabs" role="tablist">
+        <button class="tab active" data-panel="code-xref" type="button">5 · CrossRef lookup</button>
+        <button class="tab" data-panel="code-year" type="button">6 · Date check</button>
+        <button class="tab" data-panel="code-online" type="button">7 · Online link</button>
+        <button class="tab" data-panel="code-js" type="button">8 · JS filters</button>
+      </div>
+
+      <div class="panel active" id="code-xref">
+        <div class="code-block">
+          <div class="why"><span class="tag">Why</span><p><strong>Metadata without scraping Scholar.</strong> CrossRef returns candidate works; we score titles with <code>SequenceMatcher</code> and keep the best match + published year + DOI/URL.</p></div>
+          <div class="code"><span class="k">def</span> <span class="f">lookup_crossref</span>(parsed, year_filter=<span class="k">None</span>):
+    params = {
+        <span class="s">"query.title"</span>: parsed[<span class="s">"title"</span>][:<span class="n">120</span>],
+        <span class="s">"query.author"</span>: <span class="s">" "</span>.join(parsed[<span class="s">"surnames"</span>][:<span class="n">2</span>]),
+        <span class="s">"rows"</span>: <span class="n">8</span>,
+    }
+    <span class="k">if</span> year_filter:                         <span class="c"># optional: lock to cited year</span>
+        params[<span class="s">"filter"</span>] = <span class="s">f"from-pub-date:{year_filter},until-pub-date:{year_filter}"</span>
+    r = SESSION.get(<span class="s">"https://api.crossref.org/works"</span>, params=params)
+    items = r.json()[<span class="s">"message"</span>][<span class="s">"items"</span>]
+    <span class="c"># pick max similarity(parsed["title"], item["title"][0])</span>
+    <span class="k">return</span> best  <span class="c"># {title, score, doi, url, pub_year}</span></div>
+        </div>
+      </div>
+
+      <div class="panel" id="code-year">
+        <div class="code-block">
+          <div class="why"><span class="tag">Why</span><p>Author may have <strong>missed or mistyped a date</strong>. Compare citation year to CrossRef’s published year; soften checks for web/gray literature (weak matches cause false alarms).</p></div>
+          <div class="code"><span class="k">def</span> <span class="f">validate_year</span>(cited_year, meta_year):
+    <span class="k">if</span> <span class="k">not</span> cited_year:     <span class="k">return</span> <span class="s">"missing"</span>, <span class="s">"No year in citation"</span>
+    <span class="k">if</span> <span class="k">not</span> meta_year:      <span class="k">return</span> <span class="s">"unverified"</span>, <span class="s">"Year not confirmed online"</span>
+    <span class="k">if</span> cited_year == meta_year:
+        <span class="k">return</span> <span class="s">"ok"</span>, <span class="s">f"Year OK ({cited_year})"</span>
+    diff = abs(int(cited_year) - int(meta_year))
+    <span class="k">if</span> diff == <span class="n">1</span>:
+        <span class="k">return</span> <span class="s">"check"</span>, <span class="s">f"Check year — online={meta_year}"</span>
+    <span class="k">return</span> <span class="s">"mismatch"</span>, <span class="s">f"Year mismatch — online={meta_year}"</span></div>
+        </div>
+      </div>
+
+      <div class="panel" id="code-online">
+        <div class="code-block">
+          <div class="why"><span class="tag">Why</span><p><strong>Not everything is on Google Scholar</strong> (press, gov, corp PDFs). Priority ladder builds a usable open URL; generic home pages become a <code>site:domain</code> search.</p></div>
+          <div class="code"><span class="k">def</span> <span class="f">find_online_link</span>(parsed, meta_cited, meta_any):
+    <span class="k">if</span> parsed[<span class="s">"doi_in_text"</span>]:
+        <span class="k">return</span> <span class="s">f"https://doi.org/{doi}"</span>, <span class="s">"DOI (in citation)"</span>
+    <span class="k">if</span> specific_url(parsed[<span class="s">"source_url"</span>]):
+        <span class="k">return</span> source_url, <span class="s">"URL in citation"</span>
+    <span class="k">if</span> meta_cited <span class="k">and</span> meta_cited[<span class="s">"score"</span>] >= <span class="n">0.65</span>:
+        <span class="k">return</span> meta_cited[<span class="s">"url"</span>] <span class="k">or</span> doi_org(meta_cited)
+    <span class="k">if</span> is_generic_url(source_url):
+        <span class="k">return</span> google(<span class="s">f'site:{domain} "{title}" {year}'</span>)
+    <span class="k">return</span> google_search_link(parsed)     <span class="c"># last resort</span></div>
+        </div>
+      </div>
+
+      <div class="panel" id="code-js">
+        <div class="code-block">
+          <div class="why"><span class="tag">Why</span><p>In-browser filtering for the session demo. Important fix: <strong>&lt; 60</strong> uses <code>below60</code>, not <code>0</code> (which used to match nothing). Text searches citation / author / notes — not dropdown chrome text.</p></div>
+          <div class="code"><span class="k">function</span> <span class="f">matchesAccuracy</span>(acc, filterVal) {
+  <span class="k">if</span> (!filterVal) <span class="k">return</span> <span class="k">true</span>;
+  <span class="k">if</span> (filterVal === <span class="s">"below60"</span>) <span class="k">return</span> acc &lt; <span class="n">60</span>;
+  <span class="k">return</span> acc &gt;= parseInt(filterVal, <span class="n">10</span>);
+}
+<span class="k">function</span> <span class="f">applyFilters</span>() {
+  <span class="c">// type · auto status · date · accuracy · human review</span>
+  rows.forEach(tr =&gt; {
+    <span class="k">const</span> show = textMatch &amp;&amp; typeMatch &amp;&amp; autoMatch
+              &amp;&amp; dateMatch &amp;&amp; accMatch &amp;&amp; reviewMatch;
+    tr.style.display = show ? <span class="s">""</span> : <span class="s">"none"</span>;
+  });
+}</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 10 -->
+    <section class="slide" data-title="HTML features" data-sub="What the reviewer sees">
+      <div class="kicker">10 · Product surface</div>
+      <h2>Columns in the final verification HTML</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Data columns</h3>
+          <ul>
+            <li># · Citation · Type · Author(s) · Year</li>
+            <li>Scholar / Not on Scholar</li>
+            <li>Online link</li>
+            <li>Date check</li>
+            <li>Matched title · Score · Notes</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Interaction</h3>
+          <ul>
+            <li>Filter: text, type, auto status, date, score, review</li>
+            <li>“N shown” counter (fixed &lt;60 score filter)</li>
+            <li>Your review dropdown (persist)</li>
+            <li>Export CSV for reporting</li>
+          </ul>
+        </div>
+      </div>
+      <div class="grid-3" style="margin-top:1rem">
+        <div class="stat"><div class="n">~218</div><div class="l">Not on Scholar*</div></div>
+        <div class="stat"><div class="n">~336</div><div class="l">Needs checkup (auto)*</div></div>
+        <div class="stat"><div class="n">~171</div><div class="l">Likely OK (auto)*</div></div>
+      </div>
+      <p class="footer-note">* Approximate counts from the Round 3 rebuild; use the live HTML dashboard for exact current figures. Private table is not hosted on this public page.</p>
+    </section>
+
+    <!-- SLIDE 11 -->
+    <section class="slide" data-title="Demo script" data-sub="Talk track for the session">
+      <div class="kicker">11 · Presenter script</div>
+      <h2>Suggested 10–12 minute talk track</h2>
+      <div class="checklist" id="talk-track">
+        <label><input type="checkbox"/> <span><strong>0:00</strong> — Problem: large APA list, need verify links &amp; years without trusting Scholar alone.</span></label>
+        <label><input type="checkbox"/> <span><strong>1:00</strong> — Round story: scraper failed → DOI round → author/year → Round 3 optimum.</span></label>
+        <label><input type="checkbox"/> <span><strong>3:00</strong> — Interactive pipeline graphic (slide 5).</span></label>
+        <label><input type="checkbox"/> <span><strong>4:30</strong> — Code A: extract Word XML → parse APA → author+year Scholar URL (slide 8).</span></label>
+        <label><input type="checkbox"/> <span><strong>6:00</strong> — Code B: CrossRef + date check + online fallback ladder + filter fix (slide 9).</span></label>
+        <label><input type="checkbox"/> <span><strong>7:30</strong> — Demo local verification HTML: filter “Needs checkup”, Online link + Date check.</span></label>
+        <label><input type="checkbox"/> <span><strong>9:00</strong> — Mark “Checked — OK”; localStorage + CSV; regenerate with the Python script.</span></label>
+        <label><input type="checkbox"/> <span><strong>Close</strong> — Limits: multi-edition books, gray lit; session URL stays on the server.</span></label>
+      </div>
+    </section>
+
+    <!-- SLIDE 12 -->
+    <section class="slide" data-title="Deploy &amp; reuse" data-sub="On your server">
+      <div class="kicker">12 · Hosting</div>
+      <h2>Where this session lives — and how to reuse it</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Public session URL</h3>
+          <p>Served with Mission Control docs:</p>
+          <div class="code">http://82.165.167.86/portal/docs/reference-verification-session.html</div>
+          <p style="margin:.6rem 0 0">Sibling method notes (markdown): <a href="/portal/docs/?doc=reference-verification">/portal/docs/?doc=reference-verification</a></p>
+        </div>
+        <div class="card">
+          <h3>Local source paths</h3>
+          <div class="code">WORK/ops-portal/docs/reference-verification-session.html
+WORK/docs/build_scholar_author_year_html.py
+WORK/docs/References_PhD_AuthorYear_Verification.html  # private
+WORK/docs/References_PhD_Scholar_Verification_Process.md  # Round 1 history</div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:.85rem">
+        <h3>Open-source package (for other PhDs)</h3>
+        <p style="margin:0 0 .5rem">The Round&nbsp;3 tool is published as a standalone project:</p>
+        <div class="code">https://github.com/Tarekchehahde/scholar-ref-verifier
+
+pip install "git+https://github.com/Tarekchehahde/scholar-ref-verifier.git"
+scholar-ref-verifier references.docx -o verification.html --open</div>
+      </div>
+      <div class="card" style="margin-top:.85rem">
+        <h3>Redeploy docs to the VPS</h3>
+        <div class="code">scp -r WORK/ops-portal/* ionos-mastr:/var/www/mastr-portal/</div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="tooltip" id="tip"></div>
+
+<script>
+const slides = [...document.querySelectorAll(".slide")];
+const nav = document.getElementById("nav");
+const tip = document.getElementById("tip");
+let i = 0;
+
+const tips = {
+  docx: ["Word .docx", "Parsed as ZIP; word/document.xml paragraphs become the bibliography rows. No MS Word install needed."],
+  parse: ["Parse APA", "Regex extracts authors, year, title, URLs, optional DOI. Heuristics classify Article / Book / Chapter / Report / Web / Other."],
+  crossref: ["CrossRef", "REST search by title+author (and year when available). Returns title match score, published year, DOI, and publisher URL for online links."],
+  scholar: ["Scholar author+year", "Constructed links only — no scraping. Year locked. Shown when the work is likely indexed; otherwise UI says Not on Scholar."],
+  online: ["Online link", "Priority: DOI → citation URL → CrossRef URL/DOI → site:domain search → generic web search. Critical for press, gov, and corp sources."],
+  html: ["Interactive HTML", "Static file: filters, accuracy score, date badge, auto status, human review column, CSV export. Review state in localStorage."]
+};
+
+slides.forEach((s, idx) => {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "nav-btn" + (idx === 0 ? " active" : "");
+  b.innerHTML = `${String(idx + 1).padStart(2, "0")} · ${s.dataset.title}<small>${s.dataset.sub || ""}</small>`;
+  b.addEventListener("click", () => go(idx));
+  nav.appendChild(b);
+});
+
+function go(n) {
+  i = Math.max(0, Math.min(slides.length - 1, n));
+  slides.forEach((s, idx) => s.classList.toggle("active", idx === i));
+  [...nav.children].forEach((b, idx) => b.classList.toggle("active", idx === i));
+  document.getElementById("slide-label").textContent = `${i + 1} / ${slides.length}`;
+  document.getElementById("progress-fill").style.width = `${((i + 1) / slides.length) * 100}%`;
+  history.replaceState({}, "", `#slide-${i + 1}`);
+}
+
+document.getElementById("btn-prev").onclick = () => go(i - 1);
+document.getElementById("btn-next").onclick = () => go(i + 1);
+document.getElementById("btn-present").onclick = () => {
+  document.body.classList.toggle("present");
+  const side = document.querySelector(".sidebar");
+  if (document.body.classList.contains("present")) {
+    side.style.display = "none";
+    document.querySelector(".app").style.gridTemplateColumns = "1fr";
+  } else {
+    side.style.display = "";
+    document.querySelector(".app").style.gridTemplateColumns = "";
+  }
+};
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") { e.preventDefault(); go(i + 1); }
+  if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); go(i - 1); }
+  if (e.key === "Home") go(0);
+  if (e.key === "End") go(slides.length - 1);
+});
+
+document.querySelectorAll(".tab").forEach((tab) => {
+  tab.addEventListener("click", () => {
+    const pane = tab.closest(".slide");
+    pane.querySelectorAll(".tab").forEach((t) => t.classList.remove("active"));
+    pane.querySelectorAll(".panel").forEach((p) => p.classList.remove("active"));
+    tab.classList.add("active");
+    document.getElementById(tab.dataset.panel).classList.add("active");
+  });
+});
+
+document.querySelectorAll(".hotspot").forEach((el) => {
+  el.addEventListener("click", () => {
+    const key = el.dataset.tip;
+    const t = tips[key];
+    if (!t) return;
+    document.getElementById("diagram-text").innerHTML = `<strong style="color:var(--accent2)">${t[0]}</strong><br>${t[1]}`;
+  });
+  el.addEventListener("mousemove", (ev) => {
+    const key = el.dataset.tip;
+    const t = tips[key];
+    if (!t) return;
+    tip.style.display = "block";
+    tip.innerHTML = `<strong>${t[0]}</strong>${t[1]}`;
+    tip.style.left = Math.min(window.innerWidth - 300, ev.clientX + 14) + "px";
+    tip.style.top = Math.min(window.innerHeight - 120, ev.clientY + 14) + "px";
+  });
+  el.addEventListener("mouseleave", () => { tip.style.display = "none"; });
+});
+
+const hash = location.hash.match(/slide-(\d+)/);
+if (hash) go(parseInt(hash[1], 10) - 1);
+else go(0);
+
+const track = document.getElementById("talk-track");
+track?.addEventListener("change", () => {
+  localStorage.setItem("ref_session_talktrack", JSON.stringify(
+    [...track.querySelectorAll("input")].map((x) => x.checked)
+  ));
+});
+try {
+  const saved = JSON.parse(localStorage.getItem("ref_session_talktrack") || "[]");
+  track?.querySelectorAll("input").forEach((inp, idx) => { if (saved[idx]) inp.checked = true; });
+} catch (_) {}
+</script>
+</body>
+</html>

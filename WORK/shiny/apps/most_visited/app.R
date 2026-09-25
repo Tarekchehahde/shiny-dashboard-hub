@@ -9,10 +9,10 @@
 #       <10 kW = Home, <1 MW = C&I, Rest Large Scale."
 #
 # Parity goals (match what Candida generates):
-#   1. Four vertically stacked small multiples (Home / C&I / Large Scale /
-#      Grand Total) of monthly new-capacity (DC/Brutto MW), one colored line
+#   1. Monthly new-capacity (DC/Brutto MW) as one chart at a time, with pills
+#      to switch Home / C&I / Large Scale / Grand Total; one colored spline
 #      per year yr_from..current.
-#   2. Year-to-date columns highlighted with a light orange band.
+#   2. Year-to-date columns highlighted with a translucent green band.
 #   3. Side table "IBN Differenz der Vorjahre - Total | Brutto/DC-Leistung MW"
 #      — YTD months × last 5-6 years, two rows per month (Wert + Abw. zu
 #      Vorjahr), layout mirrors the Candida screenshot 1:1.
@@ -35,15 +35,232 @@ source("../../R/tableau_helpers.R")
 YEAR_NOW  <- as.integer(format(Sys.Date(), "%Y"))
 MONTH_NOW <- as.integer(format(Sys.Date(), "%m"))
 
-# Color palette aligned with the Candida screenshot:
-# light blue (oldest) -> dark grey -> orange (current year).
+# Dark Matrix greens: dim forest (oldest) -> neon (current year).
 SEGMENT_YEAR_COLORS <- function(years) {
   n <- length(years)
-  pal <- c("#a8c9e2","#7b9db7","#5e7a8e","#3f4a57","#f97316")
-  if (n <= length(pal)) tail(pal, n) else c(rep(pal[1], n - length(pal) + 1), pal[-1])
+  pal <- c("#163d28", "#1a5c38", "#1f7a48", "#26a65a", "#4ade80", "#00ff41")
+  if (n <= length(pal)) {
+    tail(pal, n)
+  } else {
+    grDevices::colorRampPalette(pal)(n)
+  }
 }
 
+# Shared tokens for bslib / plotly / reactable.
+MATRIX <- list(
+  bg     = "#050a07",
+  panel  = "#07140e",
+  card   = "#0a1610",
+  header = "#0c1f14",
+  border = "#1a4d32",
+  text   = "#c8ffd4",
+  muted  = "#6ee7b7",
+  neon   = "#00ff41",
+  dim    = "#14532d",
+  grid   = "#123322",
+  pos    = "#39ff14",
+  neg    = "#ff6b6b"
+)
+
+matrix_theme <- function() {
+  bslib::bs_theme(
+    version = 5,
+    bg = MATRIX$bg,
+    fg = MATRIX$text,
+    primary = MATRIX$neon,
+    secondary = MATRIX$dim,
+    success = MATRIX$pos,
+    info = "#22c55e",
+    warning = "#86efac",
+    danger = MATRIX$neg,
+    base_font = bslib::font_google("Inter", local = FALSE),
+    heading_font = bslib::font_google("Inter", local = FALSE),
+    "font-size-base" = "0.95rem"
+  )
+}
+
+matrix_css <- tags$style(HTML(sprintf("
+  html { color-scheme: dark; }
+  body, .bslib-page-fluid, .bslib-page-fill {
+    background:
+      radial-gradient(ellipse at top, #0d2818 0%%, %s 58%%) !important;
+    color: %s;
+  }
+  h2.mb-0 {
+    color: %s;
+    text-shadow: 0 0 18px rgba(0, 255, 65, 0.22);
+  }
+  .text-muted, .text-muted.mb-0, small.text-muted { color: %s !important; }
+  a, a:link, #hub_back { color: %s !important; }
+  a:hover, #hub_back:hover { color: #39ff14 !important; }
+  hr { border-color: %s; opacity: 1; }
+  code {
+    color: %s;
+    background: %s;
+    border: 1px solid %s;
+  }
+  .card {
+    background: %s !important;
+    border: 1px solid %s !important;
+    box-shadow: 0 0 28px rgba(0, 255, 65, 0.07);
+    color: %s;
+  }
+  .card-header {
+    background: %s !important;
+    border-bottom: 1px solid %s !important;
+    color: %s !important;
+  }
+  .bslib-sidebar-layout > .sidebar {
+    background: #050d09 !important;
+    border-right: 1px solid %s !important;
+    color: %s;
+  }
+  .bslib-sidebar-layout > .main { background: transparent !important; }
+  .alert-info {
+    background: %s !important;
+    border-color: %s !important;
+    color: %s !important;
+  }
+  .form-check-input {
+    background-color: %s;
+    border-color: %s;
+  }
+  .form-check-input:checked {
+    background-color: %s;
+    border-color: %s;
+  }
+  .form-check-label, .control-label, .shiny-input-container label { color: %s; }
+  .irs--shiny .irs-bar {
+    background: %s;
+    border-top-color: %s;
+    border-bottom-color: %s;
+  }
+  .irs--shiny .irs-line {
+    background: %s;
+    border-color: %s;
+  }
+  .irs--shiny .irs-handle {
+    background: %s;
+    border: 1px solid %s;
+    box-shadow: 0 0 8px rgba(0, 255, 65, 0.4);
+  }
+  .irs--shiny .irs-single, .irs--shiny .irs-from, .irs--shiny .irs-to {
+    background: %s;
+    color: #04110a;
+  }
+  .irs--shiny .irs-min, .irs--shiny .irs-max {
+    background: %s;
+    color: %s;
+  }
+  .irs--shiny .irs-grid-pol { background: %s; }
+  .irs--shiny .irs-grid-text { color: %s; }
+  .mastr-footer {
+    color: %s !important;
+    border-top-color: %s !important;
+  }
+  .mastr-footer a { color: %s !important; }
+  .mastr-creator-qr, .mastr-creator-qr-tab {
+    background: %s !important;
+    border-color: %s !important;
+    color: %s !important;
+    box-shadow: 0 4px 18px rgba(0, 255, 65, 0.12) !important;
+  }
+  .mastr-creator-qr-text { color: %s !important; }
+  .mastr-creator-qr-text strong { color: %s !important; }
+  .mastr-creator-qr-tab:hover { background: %s !important; color: %s !important; }
+  .mastr-creator-qr-tab:focus-visible { outline-color: %s !important; }
+  .js-plotly-plot .plotly .bg { fill: transparent !important; }
+  .reactable, .rt-table, .ReactTable {
+    background: #0a1610 !important;
+    color: #c8ffd4 !important;
+  }
+  .bslib-sidebar-title, .sidebar-title { color: #00ff41 !important; }
+  .irs-bar { background: #00ff41 !important; border-color: #00ff41 !important; }
+  .irs-line { background: #14532d !important; border-color: #1a4d32 !important; }
+  .irs-handle { border-color: #00ff41 !important; background: #07140e !important; }
+  .irs-single, .irs-from, .irs-to { background: #00ff41 !important; color: #04110a !important; }
+  .irs-min, .irs-max { background: #14532d !important; color: #6ee7b7 !important; }
+  .irs-grid-text { color: #6ee7b7 !important; }
+  .irs-grid-pol { background: #1a4d32 !important; }
+  .collapse-toggle, .bslib-sidebar-toggle { color: #00ff41 !important; }
+  .segment-pills .shiny-input-container { margin-bottom: 0.35rem; }
+  .segment-pills .shiny-options-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 0.25rem;
+  }
+  .segment-pills .form-check {
+    padding-left: 0;
+    margin: 0;
+  }
+  .segment-pills .form-check-input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .segment-pills .form-check-label {
+    display: inline-block;
+    margin: 0;
+    cursor: pointer;
+    border-radius: 999px;
+    border: 1px solid #1a4d32;
+    background: #07140e;
+    color: #6ee7b7;
+    padding: 0.28rem 0.9rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+  .segment-pills .form-check-label:hover {
+    border-color: #00ff41;
+    color: #c8ffd4;
+  }
+  .segment-pills .form-check-input:checked + .form-check-label,
+  .segment-pills .form-check-input:checked ~ .form-check-label,
+  .segment-pills .form-check:has(.form-check-input:checked) .form-check-label {
+    background: #00ff41;
+    border-color: #00ff41;
+    color: #04110a;
+    box-shadow: 0 0 12px rgba(0, 255, 65, 0.28);
+  }
+  .segment-pills .form-check-input:focus-visible + .form-check-label {
+    outline: 2px solid #00ff41;
+    outline-offset: 2px;
+  }
+",
+  MATRIX$bg, MATRIX$text, MATRIX$neon, MATRIX$muted, MATRIX$neon, MATRIX$border,
+  MATRIX$neon, MATRIX$header, MATRIX$border,
+  MATRIX$card, MATRIX$border, MATRIX$text,
+  MATRIX$header, MATRIX$border, MATRIX$neon,
+  MATRIX$border, MATRIX$text,
+  MATRIX$header, MATRIX$border, MATRIX$muted,
+  MATRIX$card, MATRIX$border, MATRIX$neon, MATRIX$neon, MATRIX$text,
+  MATRIX$neon, MATRIX$neon, MATRIX$neon,
+  MATRIX$dim, MATRIX$border,
+  MATRIX$panel, MATRIX$neon,
+  MATRIX$neon,
+  MATRIX$dim, MATRIX$muted,
+  MATRIX$border, MATRIX$muted,
+  MATRIX$muted, MATRIX$border, MATRIX$neon,
+  MATRIX$header, MATRIX$border, MATRIX$text,
+  MATRIX$muted, MATRIX$neon,
+  MATRIX$dim, MATRIX$neon, MATRIX$neon
+)))
+
 SEGMENTS <- c("Home", "C&I", "Large Scale", "Grand Total")
+SEGMENT_CHOICES <- c(
+  "Home" = "Home",
+  "C&I" = "C&I",
+  "Large Scale" = "Large Scale",
+  "Grand Total" = "Grand Total"
+)
+SEGMENT_HINTS <- c(
+  Home = "Anlagen < 10 kW",
+  `C&I` = "10 kW bis < 1 MW",
+  `Large Scale` = "\u2265 1 MW",
+  `Grand Total` = "Alle Segmente zusammen"
+)
 
 ui <- mastr_page(
   title = "Most Visited \u2014 Zubauleistung pro Segment (R Shiny-Nachbau)",
@@ -51,6 +268,59 @@ ui <- mastr_page(
     "Aktuelle Zubauleistung f\u00fcr %s in DE pro Segment. Monate im Vergleich zu den Vorjahren \u00fcber alle Segmente. Segmente enthalten Anlagen wie folgt: <10 kW = Home, <1 MW = C&I, Rest Large Scale.",
     MONTHS_DE[MONTH_NOW]),
   fluid = TRUE,
+  theme = matrix_theme(),
+  tags$head(tags$meta(name = "theme-color", content = "#00ff41")),
+  matrix_css,
+  tags$script(HTML("
+    (function () {
+      function graphDiv(root) {
+        if (!root) return null;
+        if (root.classList && root.classList.contains('js-plotly-plot')) return root;
+        return root.querySelector ? root.querySelector('.js-plotly-plot') : null;
+      }
+      function bind(gd) {
+        if (!gd || typeof gd.on !== 'function') return;
+        if (typeof gd.removeAllListeners === 'function') {
+          gd.removeAllListeners('plotly_hover');
+          gd.removeAllListeners('plotly_unhover');
+        }
+        gd.on('plotly_hover', function (evt) {
+          if (!evt || !evt.points || !evt.points.length || !gd.data) return;
+          var cn = evt.points[0].curveNumber;
+          var n = gd.data.length;
+          var off = [];
+          for (var i = 0; i < n; i++) if (i !== cn) off.push(i);
+          if (off.length) Plotly.restyle(gd, {opacity: 0.14}, off);
+          Plotly.restyle(gd, {opacity: 1}, [cn]);
+        });
+        gd.on('plotly_unhover', function () {
+          if (!gd.data) return;
+          var all = [];
+          for (var i = 0; i < gd.data.length; i++) all.push(i);
+          Plotly.restyle(gd, {opacity: 1}, all);
+        });
+      }
+      function scan() {
+        bind(graphDiv(document.getElementById('plot_segment')));
+      }
+      if (window.jQuery) {
+        $(document).on('plotly_afterplot', function (e) {
+          var t = e.target;
+          if (!t) return;
+          if (t.id === 'plot_segment' || (t.closest && t.closest('#plot_segment'))) {
+            bind(graphDiv(t) || t);
+          }
+        });
+        $(document).on('shiny:value shiny:visualchange shiny:idle', scan);
+      }
+      document.addEventListener('change', function (e) {
+        if (e.target && e.target.name && String(e.target.name).indexOf('chart_segment') !== -1) {
+          setTimeout(scan, 200);
+          setTimeout(scan, 600);
+        }
+      }, true);
+    })();
+  ")),
 
   tableau_parity_banner("Aktuelle Zubauleistung pro Segment (Tableau-Referenz)"),
 
@@ -70,27 +340,37 @@ ui <- mastr_page(
                    selected = "brutto"),
       checkboxInput("only_active", "Nur aktive Einheiten", value = FALSE),
       tags$hr(),
+      tags$p(
+        tags$a(
+          href = if (identical(Sys.getenv("MASTR_HUB_MODE", "paths"), "ports"))
+            "http://localhost:3856/" else "/most_visited_forecast/",
+          style = "display:inline-block;font-weight:700;border-radius:999px;padding:0.28rem 0.85rem;background:#00ff41;color:#04110a !important;text-decoration:none;",
+          "4-Monats-Prognose \u2192"
+        )
+      ),
       tags$small(class = "text-muted",
         "Daten live aus dem neuesten GitHub-Release (", code("runGitHub"),
         "). Quelle BNetzA MaStR.")
     ),
 
-    # 2-column layout: left = 4 stacked small multiples (each its own plotly),
-    # right = the Candida-style YTD diff table.
+    # Left = one segment chart (pills switch Home / C&I / Large Scale / Total).
+    # Right = the Candida-style YTD diff table.
     layout_column_wrap(
       width = 1/2, heights_equal = "row",
 
       card(full_screen = TRUE, height = "720px",
            card_header("MaStR \u2014 monatlicher Zubau pro Segment (MW)"),
            div(class = "p-2",
-               div(class = "mb-1 small text-muted fw-semibold", "Home (< 10 kW)"),
-               plotlyOutput("plot_home",   height = "130px"),
-               div(class = "mb-1 small text-muted fw-semibold mt-2", "C&I (10 kW \u2013 < 1 MW)"),
-               plotlyOutput("plot_ci",     height = "130px"),
-               div(class = "mb-1 small text-muted fw-semibold mt-2", "Large Scale (\u2265 1 MW)"),
-               plotlyOutput("plot_large",  height = "130px"),
-               div(class = "mb-1 small text-muted fw-semibold mt-2", "Grand Total"),
-               plotlyOutput("plot_total",  height = "140px"))),
+               div(class = "segment-pills",
+                   radioButtons(
+                     "chart_segment",
+                     label = NULL,
+                     choices = SEGMENT_CHOICES,
+                     selected = "Home",
+                     inline = TRUE
+                   )),
+               uiOutput("segment_hint"),
+               plotlyOutput("plot_segment", height = "560px"))),
 
       card(full_screen = TRUE, height = "720px",
            card_header(sprintf(
@@ -148,18 +428,28 @@ server <- function(input, output, session) {
     bind_rows(d, total)
   })
 
-  # ----- one small-multiple per segment --------------------------------------
-  make_segment_plot <- function(segment_name, show_legend = FALSE) {
+  # ----- one segment at a time (pills) ---------------------------------------
+  output$segment_hint <- renderUI({
+    hint <- SEGMENT_HINTS[[input$chart_segment]]
+    if (is.null(hint)) return(NULL)
+    div(class = "mb-2 small text-muted", hint)
+  })
+
+  make_segment_plot <- function(segment_name) {
     d <- data_with_total()
     if (!nrow(d) || !(segment_name %in% d$segment))
-      return(plotly_empty(type = "scatter", mode = "lines"))
+      return(
+        plotly_empty(type = "scatter", mode = "lines") |>
+          layout(paper_bgcolor = "rgba(0,0,0,0)", plot_bgcolor = "rgba(0,0,0,0)",
+                 font = list(color = MATRIX$text))
+      )
     dd <- d |> filter(segment == segment_name) |>
       mutate(year = as.integer(year), month = as.integer(month)) |>
       arrange(year, month)
     years <- sort(unique(dd$year))
     cols  <- setNames(SEGMENT_YEAR_COLORS(years), as.character(years))
 
-    p <- plot_ly(height = if (segment_name == "Grand Total") 140 else 130)
+    p <- plot_ly(height = 560)
     for (y in years) {
       dy <- dd |> filter(year == y)
       is_current <- (y == YEAR_NOW)
@@ -168,40 +458,93 @@ server <- function(input, output, session) {
                      x = ~month, y = ~mw,
                      name = as.character(y),
                      legendgroup = as.character(y),
-                     showlegend = show_legend,
-                     type = "scatter", mode = "lines+markers",
+                     showlegend = TRUE,
+                     type = "scatter",
+                     mode = "lines+markers",
+                     cliponaxis = FALSE,
+                     opacity = 1,
                      line = list(color = cols[[as.character(y)]],
-                                 width = if (is_current) 3 else 1.5),
-                     marker = list(color = cols[[as.character(y)]],
-                                   size = if (is_current) 6 else 4),
-                     hovertemplate = paste0(as.character(y),
-                                            " \u00b7 %{x}: %{y:,.0f} MW<extra></extra>"))
+                                 width = if (is_current) 3 else 2,
+                                 shape = "spline",
+                                 smoothing = 1.05),
+                     marker = list(
+                       color = cols[[as.character(y)]],
+                       size = if (is_current) 10 else 8,
+                       opacity = 1,
+                       line = list(color = MATRIX$bg, width = 1.5)
+                     ),
+                     hoverinfo = "text",
+                     text = paste0(y, " \u00b7 ", MONTHS_DE[dy$month], ": ",
+                                   round(dy$mw), " MW"))
     }
     p |> layout(
+      paper_bgcolor = "rgba(0,0,0,0)",
+      plot_bgcolor = "rgba(7,20,14,0.55)",
+      font = list(color = MATRIX$text),
+      hovermode = "closest",
+      hoverdistance = 80,
+      spikedistance = -1,
+      hoverlabel = list(bgcolor = MATRIX$header, font = list(color = MATRIX$neon),
+                        bordercolor = MATRIX$border),
       shapes = list(list(
         type = "rect", xref = "x", yref = "paper",
         x0 = 0.5, x1 = input$ytd_m + 0.5, y0 = 0, y1 = 1,
-        fillcolor = "#fde68a", opacity = 0.25, line = list(width = 0))),
+        fillcolor = MATRIX$neon, opacity = 0.10, line = list(width = 0))),
       xaxis = list(title = "",
                    tickmode = "array", tickvals = 1:12,
                    ticktext = substr(MONTHS_DE, 1, 3),
-                   tickangle = 0, tickfont = list(size = 10)),
-      yaxis = list(title = list(text = "MW", standoff = 4),
-                   automargin = TRUE, tickfont = list(size = 10),
-                   zeroline = TRUE, zerolinecolor = "#e5e7eb"),
-      margin = list(t = 8, r = 8, b = 22, l = 46),
-      showlegend = show_legend,
-      legend = list(orientation = "h", y = 1.18, x = 0.5,
+                   tickangle = 0,
+                   tickfont = list(size = 11, color = MATRIX$muted),
+                   gridcolor = MATRIX$grid, linecolor = MATRIX$border,
+                   zeroline = FALSE),
+      yaxis = list(title = list(text = "MW", standoff = 4, font = list(color = MATRIX$muted)),
+                   automargin = TRUE,
+                   tickfont = list(size = 11, color = MATRIX$muted),
+                   gridcolor = MATRIX$grid, linecolor = MATRIX$border,
+                   zeroline = TRUE, zerolinecolor = MATRIX$border),
+      margin = list(t = 36, r = 12, b = 36, l = 52),
+      showlegend = TRUE,
+      legend = list(orientation = "h", y = 1.08, x = 0.5,
                     xanchor = "center", yanchor = "bottom",
-                    font = list(size = 11))
+                    font = list(size = 12, color = MATRIX$text),
+                    bgcolor = "rgba(0,0,0,0)")
     ) |>
-      config(displaylogo = FALSE, displayModeBar = FALSE)
+      config(displaylogo = FALSE, displayModeBar = FALSE) |>
+      htmlwidgets::onRender("
+        function(el, x) {
+          var gd = el;
+          if (el.querySelector) {
+            var inner = el.querySelector('.js-plotly-plot');
+            if (inner) gd = inner;
+          }
+          if (!gd || typeof gd.on !== 'function') return;
+          if (typeof gd.removeAllListeners === 'function') {
+            gd.removeAllListeners('plotly_hover');
+            gd.removeAllListeners('plotly_unhover');
+          }
+          gd.on('plotly_hover', function(evt) {
+            if (!evt || !evt.points || !evt.points.length || !gd.data) return;
+            var cn = evt.points[0].curveNumber;
+            var n = gd.data.length;
+            var off = [];
+            for (var i = 0; i < n; i++) if (i !== cn) off.push(i);
+            if (off.length) Plotly.restyle(gd, {opacity: 0.14}, off);
+            Plotly.restyle(gd, {opacity: 1}, [cn]);
+          });
+          gd.on('plotly_unhover', function() {
+            if (!gd.data) return;
+            var all = [];
+            for (var i = 0; i < gd.data.length; i++) all.push(i);
+            Plotly.restyle(gd, {opacity: 1}, all);
+          });
+        }
+      ")
   }
 
-  output$plot_home  <- renderPlotly(make_segment_plot("Home",        show_legend = TRUE))
-  output$plot_ci    <- renderPlotly(make_segment_plot("C&I",         show_legend = FALSE))
-  output$plot_large <- renderPlotly(make_segment_plot("Large Scale", show_legend = FALSE))
-  output$plot_total <- renderPlotly(make_segment_plot("Grand Total", show_legend = FALSE))
+  output$plot_segment <- renderPlotly({
+    req(input$chart_segment)
+    make_segment_plot(input$chart_segment)
+  })
 
   # ----- Candida-style YTD diff table ----------------------------------------
   # Layout: 1 row per month, sub-rows ("Wert" + "Abw. zu Vorjahr") via a
@@ -258,11 +601,13 @@ server <- function(input, output, session) {
     cdefs <- c(
       list(
         MonthName = colDef(name = "Monat", minWidth = 78, sticky = "left",
+                           style = list(background = MATRIX$card, color = MATRIX$text),
                            cell = function(value, index, name) {
                              if (d$Kennzahl[index] == "Wert") as.character(value) else ""
                            }),
         Kennzahl  = colDef(name = "", minWidth = 82, sticky = "left",
-                           style = function(value) list(color = "#6b7280",
+                           style = function(value) list(color = MATRIX$muted,
+                                                        background = MATRIX$card,
                                                         fontStyle = "italic",
                                                         whiteSpace = "nowrap",
                                                         fontSize = "0.78rem"),
@@ -272,16 +617,17 @@ server <- function(input, output, session) {
       ),
       setNames(lapply(yr_cols, function(y) colDef(
         name = y, align = "right", minWidth = year_w,
-        headerStyle = list(fontWeight = 600,
+        headerStyle = list(fontWeight = 600, color = MATRIX$neon,
                            background = if (y == as.character(YEAR_NOW))
-                             "#fde68a" else "#f9fafb"),
+                             MATRIX$dim else MATRIX$header),
         style = function(value, index) {
           base <- if (y == as.character(YEAR_NOW))
-            list(background = "#fef3c7") else list()
+            list(background = "#0f2a18", color = MATRIX$text) else
+              list(background = MATRIX$card, color = MATRIX$text)
           if (d$Kennzahl[index] == "Wert")
             return(modifyList(base, list(fontWeight = 500, whiteSpace = "nowrap")))
           if (is.na(value) || !is.numeric(value)) return(base)
-          col <- if (value >= 0) "#15803d" else "#b91c1c"
+          col <- if (value >= 0) MATRIX$pos else MATRIX$neg
           modifyList(base, list(color = col, fontStyle = "italic",
                                 whiteSpace = "nowrap"))
         },
@@ -309,10 +655,14 @@ server <- function(input, output, session) {
       defaultPageSize = 24, minRows = 1,
       pagination = FALSE,
       rowStyle = function(index) {
-        if (d$Kennzahl[index] == "Wert") list(borderTop = "1px solid #e5e7eb") else NULL
+        if (d$Kennzahl[index] == "Wert") list(borderTop = paste("1px solid", MATRIX$border)) else NULL
       },
       theme = reactableTheme(
-        headerStyle = list(fontWeight = 600, background = "#f9fafb"),
+        color = MATRIX$text,
+        backgroundColor = MATRIX$card,
+        borderColor = MATRIX$border,
+        highlightColor = MATRIX$grid,
+        headerStyle = list(fontWeight = 600, background = MATRIX$header, color = MATRIX$neon),
         cellPadding = "5px 6px"
       )
     )

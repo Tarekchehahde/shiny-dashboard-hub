@@ -1,0 +1,17 @@
+[Unit]
+Description=Eurostat resettled persons dashboard (migr_asyrescra)
+After=network.target
+
+[Service]
+Type=simple
+User=rstudio
+WorkingDirectory=/opt/mastr-shiny/WORK/shiny/apps/eurostat_resettled
+Environment=HOME=/home/rstudio
+Environment=MASTR_HUB_MODE=paths
+Environment=MASTR_EUROSTAT_DIR=/var/lib/mastr-shiny/eurostat/migr_asyrescra
+ExecStart=/usr/lib/R/bin/R -e "options(shiny.url.pathPrefix='/eurostat_resettled'); shiny::runApp('.', host='0.0.0.0', port=3857, launch.browser=FALSE)"
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

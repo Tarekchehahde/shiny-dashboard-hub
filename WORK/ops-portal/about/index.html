@@ -3,63 +3,403 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <meta name="description" content="Tarek Chehade — data engineer, Shiny developer, energy analytics. How I work, what I build, and what I care about."/>
-  <title>Tarek Chehade — About</title>
+  <meta name="description" content="Tarek Chehade — Data Engineer at SMA Solar. Public CV: experience, education, languages, and live energy dashboards."/>
+  <title>Tarek Chehade — CV &amp; About</title>
   <link rel="stylesheet" href="about.css"/>
 </head>
 <body>
   <nav class="topnav">
     <a class="brand" href="/about/">Tarek Chehade</a>
     <div class="nav-links">
-      <a href="#work">Work</a>
-      <a href="#method">How I work</a>
+      <a href="#stack">Skills</a>
+      <a href="#experience">Experience</a>
+      <a href="#education">Learning</a>
+      <a href="#languages">Languages</a>
       <a href="#projects">Projects</a>
-      <a href="#life">Life</a>
       <a href="#contact">Contact</a>
-      <a class="nav-muted" href="/portal/">Mission Control</a>
+      <a class="nav-muted" href="/">Mission Control</a>
+      <a class="nav-muted" href="/barrierefrei/">Barrierefrei</a>
+      <a class="nav-muted" href="/about/de/" title="Deutsch">DE</a>
     </div>
   </nav>
 
   <header class="hero">
-    <p class="eyebrow">Data · Energy · Interactive systems</p>
+    <p class="eyebrow">Data Engineer · Energy · Interactive systems</p>
     <h1>Tarek Chehade</h1>
     <p class="lead">
-      I turn messy public data into clear, interactive stories — mostly around
-      <strong>German energy</strong>, open registers, and the kind of questions
-      policymakers and teams actually ask in a meeting.
+      Data Engineer at <strong>SMA Solar Technology AG</strong> — turning messy
+      industrial and public data into clear, interactive systems. Based in
+      <strong>Erfurt</strong>, with professional focus on renewable energy,
+      analytics engineering, and browser-based dashboards.
     </p>
+    <div class="meta-row">
+      <span><strong>Born</strong> 08.11.1990 · Beirut</span>
+      <span><strong>Nationality</strong> Lebanese</span>
+      <span><strong>Location</strong> Erfurt, Germany</span>
+    </div>
     <div class="hero-actions">
-      <a class="btn btn-primary" href="#projects">See my work</a>
+      <a class="btn btn-primary" href="#experience">Curriculum vitae</a>
       <a class="btn btn-ghost" href="https://github.com/Tarekchehahde" target="_blank" rel="noopener">GitHub</a>
       <a class="btn btn-ghost" href="https://www.linkedin.com/in/tarek-shehadi/" target="_blank" rel="noopener">LinkedIn</a>
+      <a class="btn btn-ghost" href="mailto:tarekchehade.de@gmail.com">Email</a>
     </div>
   </header>
 
   <main class="wrap">
 
     <section class="panel" id="about">
-      <h2>About me</h2>
+      <h2>Profile</h2>
       <p>
-        I'm a data-focused builder working at the intersection of
-        <strong>renewable energy</strong>, <strong>analytics engineering</strong>, and
-        <strong>browser-based dashboards</strong>. My day-to-day mixes R and Python,
-        SQL over large registers, and shipping things people can click — not slide decks
-        that go stale overnight.
+        I work at the intersection of <strong>renewable energy</strong>,
+        <strong>analytics engineering</strong>, and <strong>interactive dashboards</strong>.
+        Day to day I use Python, R/Shiny, SQL, and modern data platforms — shipping
+        tools people can click, not slide decks that go stale overnight.
       </p>
       <p>
-        I live and work in <strong>Germany</strong>, with roots and projects that also
-        connect me to <strong>Lebanon</strong> — civic data, elections, and cross-cultural
-        perspectives show up in my portfolio alongside MaStR and EU energy work.
+        Before Germany I built experience across engineering, R&amp;D education programmes,
+        university teaching, and educational technology in Lebanon and Saudi Arabia.
+        I entered Germany on <strong>31 August 2022</strong> (EU Blue Card) and have worked
+        as a Data Engineer since then — first at Entrenco GmbH (Regensburg), now at SMA Solar (Kassel).
       </p>
       <p>
-        I'm deepening my research track (policy &amp; infrastructure questions) while
-        operating a public <strong>dashboard hub</strong> on my own VPS — the same stack
-        I use to demo delivery to teams and conference audiences (e.g. erwicon connect, Erfurt).
+        I also run a public <strong>dashboard hub</strong> on this VPS — the same stack I use to
+        ship energy analytics, live demos, and stakeholder-ready apps.
       </p>
     </section>
 
+    <section class="panel panel-skills" id="stack" data-skills>
+      <h2>Skill constellation</h2>
+      <p class="section-note" style="margin-top:-0.35rem">Pick a galaxy · hover the stage · click a star for signal strength</p>
+
+      <div class="skill-filters" role="group" aria-label="Skill categories">
+        <button type="button" class="filter-chip is-active" data-skill-filter="all" aria-pressed="true">Full map</button>
+        <button type="button" class="filter-chip" data-skill-filter="data" aria-pressed="false">Data</button>
+        <button type="button" class="filter-chip" data-skill-filter="viz" aria-pressed="false">Viz / Shiny</button>
+        <button type="button" class="filter-chip" data-skill-filter="platform" aria-pressed="false">Platform</button>
+        <button type="button" class="filter-chip" data-skill-filter="energy" aria-pressed="false">Energy</button>
+      </div>
+
+      <div class="skill-stage-wrap">
+        <div class="skill-stage" aria-hidden="false">
+          <div class="skill-orbit"></div>
+          <div class="skill-orbit o2"></div>
+          <div class="skill-orbit o3"></div>
+          <div class="skill-core">Stack<br/>core</div>
+
+          <button type="button" class="skill-node" style="--x:18%;--y:28%;--delay:0s" data-skill-cat="data" data-skill-name="Python" data-skill-level="92" data-skill-blurb="Primary language for ETL, automation, and energy data products at SMA and on this VPS.">Python</button>
+          <button type="button" class="skill-node" style="--x:78%;--y:22%;--delay:0.4s" data-skill-cat="viz" data-skill-name="R / Shiny" data-skill-level="90" data-skill-blurb="Interactive hub of public dashboards — MaStR, live prices, civic maps — multi-app Shiny behind nginx.">R / Shiny</button>
+          <button type="button" class="skill-node" style="--x:86%;--y:55%;--delay:0.8s" data-skill-cat="data" data-skill-name="SQL · DuckDB" data-skill-level="88" data-skill-blurb="Analytical SQL over Parquet/DuckDB for large energy registers and fast local exploration.">SQL · DuckDB</button>
+          <button type="button" class="skill-node" style="--x:70%;--y:78%;--delay:1.1s" data-skill-cat="viz" data-skill-name="plotly" data-skill-level="84" data-skill-blurb="Browser charts that feel exploratory — filters, tooltips, linked views.">plotly</button>
+          <button type="button" class="skill-node" style="--x:32%;--y:80%;--delay:0.2s" data-skill-cat="platform" data-skill-name="nginx · systemd" data-skill-level="86" data-skill-blurb="One app, one URL, one process — production hub ops without a container zoo.">nginx · systemd</button>
+          <button type="button" class="skill-node" style="--x:12%;--y:58%;--delay:1.4s" data-skill-cat="platform" data-skill-name="Grafana · Prometheus" data-skill-level="78" data-skill-blurb="Live health of the dashboard fleet — probes, panels, less guessing at 2 a.m.">Grafana</button>
+          <button type="button" class="skill-node" style="--x:48%;--y:16%;--delay:0.6s" data-skill-cat="energy" data-skill-name="MaStR / BNetzA" data-skill-level="87" data-skill-blurb="Nightly pipelines from Germany’s plant register into views municipalities and teams can actually use.">MaStR</button>
+          <button type="button" class="skill-node" style="--x:58%;--y:68%;--delay:1.7s" data-skill-cat="viz" data-skill-name="Tableau" data-skill-level="80" data-skill-blurb="Public viz craft (e.g. Lebanese elections) and Tableau→Shiny parity work.">Tableau</button>
+          <button type="button" class="skill-node" style="--x:24%;--y:42%;--delay:0.9s" data-skill-cat="platform" data-skill-name="GitHub Actions" data-skill-level="82" data-skill-blurb="Reproducible release paths — pinned data, automated checks, less manual drama.">Actions</button>
+          <button type="button" class="skill-node" style="--x:82%;--y:40%;--delay:1.3s" data-skill-cat="energy" data-skill-name="Live energy APIs" data-skill-level="83" data-skill-blurb="Day-ahead prices, solar irradiance, auto-refreshing maps — real feeds, not screenshots.">Live APIs</button>
+          <button type="button" class="skill-node" style="--x:40%;--y:72%;--delay:0.3s" data-skill-cat="data" data-skill-name="Parquet" data-skill-level="85" data-skill-blurb="Columnar releases for analytics that stay fast as the register grows.">Parquet</button>
+        </div>
+
+        <aside class="skill-readout" data-skill-readout>
+          <h3 data-skill-title>Explore the map</h3>
+          <p data-skill-body>Click any star to see where it shows up in my work. Filter a galaxy to dim the rest.</p>
+          <div class="skill-meter-track"><div class="skill-meter-fill" data-skill-meter></div></div>
+          <div class="skill-meter-label">Signal strength</div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="panel panel-journey" id="experience" data-journey>
+      <h2>Career journey</h2>
+      <p class="section-note" style="margin-top:-0.35rem">Scroll the path · click a stop to expand · filter by region</p>
+
+      <div class="journey-toolbar" role="group" aria-label="Filter by region">
+        <button type="button" class="filter-chip is-active" data-filter="all" aria-pressed="true">All stops</button>
+        <button type="button" class="filter-chip" data-filter="de" aria-pressed="false">Germany</button>
+        <button type="button" class="filter-chip" data-filter="lb" aria-pressed="false">Lebanon</button>
+        <button type="button" class="filter-chip" data-filter="sa" aria-pressed="false">Saudi Arabia</button>
+        <p class="journey-hint"
+           data-hint-all="Full path from engineering abroad to energy data in Germany."
+           data-hint-de="Germany chapter — Entrenco → SMA Solar (current)."
+           data-hint-lb="Lebanon chapter — teaching, R&amp;D education, SABIS."
+           data-hint-sa="Saudi Arabia chapter — project engineering at the terminals.">
+          Full path from engineering abroad to energy data in Germany.
+        </p>
+      </div>
+
+      <div class="journey-track">
+        <div class="journey-spine" aria-hidden="true"><div class="journey-fill"></div></div>
+
+        <article class="journey-node" data-region="de">
+          <span class="journey-dot" aria-hidden="true"></span>
+          <div class="journey-card">
+            <button type="button" class="journey-head" aria-expanded="false">
+              <div class="journey-year-row">
+                <span class="journey-year">01.2024 – present</span>
+                <span class="journey-now">Now</span>
+                <span class="journey-place">Germany</span>
+              </div>
+              <h3>Data Engineer</h3>
+              <p class="journey-org">SMA Solar Technology AG · Kassel</p>
+              <span class="journey-chevron" aria-hidden="true"></span>
+            </button>
+            <div class="journey-body">
+              <div class="journey-body-inner">
+                <p>Python scripts, data platforms, and analytics for renewable-energy operations. Based in Erfurt with part-time commute to Kassel.</p>
+                <div class="journey-tags">
+                  <span>Python</span><span>Data platforms</span><span>Renewables</span><span>Ops analytics</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="journey-node" data-region="de">
+          <span class="journey-dot" aria-hidden="true"></span>
+          <div class="journey-card">
+            <button type="button" class="journey-head" aria-expanded="false">
+              <div class="journey-year-row">
+                <span class="journey-year">11.2022 – 12.2023</span>
+                <span class="journey-place">Germany</span>
+              </div>
+              <h3>Data Engineer &amp; Automation</h3>
+              <p class="journey-org">Entrenco GmbH · Regensburg</p>
+              <span class="journey-chevron" aria-hidden="true"></span>
+            </button>
+            <div class="journey-body">
+              <div class="journey-body-inner">
+                <p>First German role after EU Blue Card entry (31.08.2022). Automation, dashboards, and data engineering in Regensburg.</p>
+                <div class="journey-tags">
+                  <span>Automation</span><span>Dashboards</span><span>ETL</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="journey-node" data-region="lb">
+          <span class="journey-dot" aria-hidden="true"></span>
+          <div class="journey-card">
+            <button type="button" class="journey-head" aria-expanded="false">
+              <div class="journey-year-row">
+                <span class="journey-year">06.2018 – 08.2022</span>
+                <span class="journey-place">Lebanon</span>
+              </div>
+              <h3>Research Analyst</h3>
+              <p class="journey-org">SABIS Educational Services · Adma</p>
+              <span class="journey-chevron" aria-hidden="true"></span>
+            </button>
+            <div class="journey-body">
+              <div class="journey-body-inner">
+                <p>Educational technologies: e-learning systems, robotics programming, app development, and 3D-printing courses. Parallel Google Data Analytics certificate (2021).</p>
+                <div class="journey-tags">
+                  <span>EdTech</span><span>Robotics</span><span>Apps</span><span>3D printing</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="journey-node" data-region="lb">
+          <span class="journey-dot" aria-hidden="true"></span>
+          <div class="journey-card">
+            <button type="button" class="journey-head" aria-expanded="false">
+              <div class="journey-year-row">
+                <span class="journey-year">10.2017 – 05.2018</span>
+                <span class="journey-place">Lebanon</span>
+              </div>
+              <h3>Mechatronics Lecturer</h3>
+              <p class="journey-org">AUST · Beirut</p>
+              <span class="journey-chevron" aria-hidden="true"></span>
+            </button>
+            <div class="journey-body">
+              <div class="journey-body-inner">
+                <p>University teaching in mechatronics, robotics, and virtual instrumentation — overlapping with the Airbus education programme.</p>
+                <div class="journey-tags">
+                  <span>Teaching</span><span>Robotics</span><span>Mechatronics</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="journey-node" data-region="lb">
+          <span class="journey-dot" aria-hidden="true"></span>
+          <div class="journey-card">
+            <button type="button" class="journey-head" aria-expanded="false">
+              <div class="journey-year-row">
+                <span class="journey-year">02.2016 – 02.2018</span>
+                <span class="journey-place">Middle East</span>
+              </div>
+              <h3>R&amp;D Coordinator</h3>
+              <p class="journey-org">Airbus Little Engineer Program</p>
+              <span class="journey-chevron" aria-hidden="true"></span>
+            </button>
+            <div class="journey-body">
+              <div class="journey-body-inner">
+                <p>Coordinated education programmes and curricula across the Middle East for the Airbus foundation STEM track.</p>
+                <div class="journey-tags">
+                  <span>STEM education</span><span>Curriculum</span><span>R&amp;D</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="journey-node" data-region="sa">
+          <span class="journey-dot" aria-hidden="true"></span>
+          <div class="journey-card">
+            <button type="button" class="journey-head" aria-expanded="false">
+              <div class="journey-year-row">
+                <span class="journey-year">04.2014 – 02.2016</span>
+                <span class="journey-place">Saudi Arabia</span>
+              </div>
+              <h3>Project Engineer</h3>
+              <p class="journey-org">National Containers Terminals</p>
+              <span class="journey-chevron" aria-hidden="true"></span>
+            </button>
+            <div class="journey-body">
+              <div class="journey-body-inner">
+                <p>Technical systems and maintenance engineering — first professional chapter after the Mechatronics Master.</p>
+                <div class="journey-tags">
+                  <span>Engineering</span><span>Maintenance</span><span>Systems</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel panel-learn" id="education" data-learning>
+      <h2>Learning path</h2>
+      <p class="section-note" style="margin-top:-0.35rem">Swipe / click a chapter — arrow keys work too</p>
+
+      <div class="learn-rail" role="tablist" aria-label="Learning chapters">
+        <button type="button" class="learn-step" role="tab" data-learn-step="bsc" aria-selected="false">
+          <span class="learn-era">2008 – 2012</span>
+          <strong>B.Sc. Mechatronics</strong>
+        </button>
+        <button type="button" class="learn-step" role="tab" data-learn-step="msc" aria-selected="false">
+          <span class="learn-era">2012 – 2014</span>
+          <strong>M.Sc. Mechatronics</strong>
+        </button>
+        <button type="button" class="learn-step" role="tab" data-learn-step="google" aria-selected="false">
+          <span class="learn-era">2021</span>
+          <strong>Google Data Analytics</strong>
+        </button>
+        <button type="button" class="learn-step is-active" role="tab" data-learn-step="german" aria-selected="true">
+          <span class="learn-era">2023 – 2024</span>
+          <strong>German track</strong>
+        </button>
+      </div>
+
+      <div class="learn-progress" aria-hidden="true"><div class="learn-progress-bar"></div></div>
+      <div class="learn-stage-head">
+        <span class="section-note">Chapter detail</span>
+        <span class="learn-counter" data-learn-counter>4 / 4</span>
+      </div>
+
+      <div class="learn-panel" data-learn-panel="bsc" hidden>
+        <h3>B.Sc. Mechatronics Engineering</h3>
+        <p class="learn-org">Rafic Hariri University · Lebanon</p>
+        <p>Foundation in mechanics, electronics, and control — the systems thinking that still shapes how I approach data pipelines and automation today.</p>
+        <div class="learn-badges"><span>Engineering</span><span>Control systems</span><span>STEM base</span></div>
+      </div>
+      <div class="learn-panel" data-learn-panel="msc" hidden>
+        <h3>M.Sc. Mechatronics Engineering</h3>
+        <p class="learn-org">Rafic Hariri University · Lebanon</p>
+        <p>Advanced mechatronics — deeper into integrated systems and problem-solving under real constraints.</p>
+        <div class="learn-badges"><span>Master’s</span><span>Systems</span><span>Integration</span></div>
+      </div>
+      <div class="learn-panel" data-learn-panel="google" hidden>
+        <h3>Google Data Analytics Professional Certificate</h3>
+        <p class="learn-org">Scholarship programme · Jun–Dec 2021</p>
+        <p>Structured pivot into analytics while working at SABIS — cleaning, analyzing, and communicating with data.</p>
+        <div class="learn-badges"><span>Analytics</span><span>SQL thinking</span><span>Scholarship</span></div>
+      </div>
+      <div class="learn-panel is-active" data-learn-panel="german">
+        <h3>German language track</h3>
+        <p class="learn-org">Goethe-Institut · München</p>
+        <p>Daily working language in Germany. Goethe-Zertifikat B1 issued 18.03.2024 (modules across 2023–2024). Communicative B2 in day-to-day professional use; also Arabic (native), English (C2), French (B1).</p>
+        <div class="learn-badges"><span>Goethe B1</span><span>DE B2</span><span>EN C2</span><span>AR native</span></div>
+      </div>
+    </section>
+
+    <section class="panel panel-langs" id="languages" data-langs
+      data-world-pop="8100000000"
+      data-label-humans="humans I can talk to"
+      data-label-world="of world population"
+      data-label-hint="Tap languages to rebuild the reach. Numbers are approximate total speakers (incl. L2). Overlap exists — the sum is an optimistic upper bound.">
+      <h2>Language reach</h2>
+      <p class="section-note" style="margin-top:-0.35rem">Who can I talk to? Toggle languages — the counter reacts live</p>
+
+      <div class="lang-hero">
+        <div class="lang-reach-card">
+          <p class="lang-reach-kicker">Potential conversation pool</p>
+          <p class="lang-reach-number"><span data-lang-total>0</span></p>
+          <p class="lang-reach-sub" data-lang-humans-label>humans I can talk to</p>
+          <div class="lang-world-bar" aria-hidden="true">
+            <div class="lang-world-fill" data-lang-world-fill></div>
+          </div>
+          <p class="lang-world-pct"><span data-lang-world-pct>0</span>% <span data-lang-world-label>of world population</span></p>
+        </div>
+        <div class="lang-pulse" aria-hidden="true">
+          <span class="lang-ring r1"></span>
+          <span class="lang-ring r2"></span>
+          <span class="lang-ring r3"></span>
+          <span class="lang-pulse-core" data-lang-core>AR · EN · DE · FR</span>
+        </div>
+      </div>
+
+      <div class="lang-grid-live" role="group" aria-label="Languages">
+        <button type="button" class="lang-live is-on" data-lang="ar" data-speakers="420000000" data-level="Native" aria-pressed="true">
+          <span class="lang-flag">AR</span>
+          <span class="lang-name">Arabic</span>
+          <span class="lang-level">Native</span>
+          <span class="lang-count" data-lang-count></span>
+          <span class="lang-bar"><i style="--w:52%"></i></span>
+        </button>
+        <button type="button" class="lang-live is-on" data-lang="en" data-speakers="1450000000" data-level="C2" aria-pressed="true">
+          <span class="lang-flag">EN</span>
+          <span class="lang-name">English</span>
+          <span class="lang-level">C2 · fluent</span>
+          <span class="lang-count" data-lang-count></span>
+          <span class="lang-bar"><i style="--w:100%"></i></span>
+        </button>
+        <button type="button" class="lang-live is-on" data-lang="de" data-speakers="135000000" data-level="B2" aria-pressed="true">
+          <span class="lang-flag">DE</span>
+          <span class="lang-name">German</span>
+          <span class="lang-level">B2 · Goethe B1</span>
+          <span class="lang-count" data-lang-count></span>
+          <span class="lang-bar"><i style="--w:17%"></i></span>
+        </button>
+        <button type="button" class="lang-live is-on" data-lang="fr" data-speakers="310000000" data-level="B1" aria-pressed="true">
+          <span class="lang-flag">FR</span>
+          <span class="lang-name">French</span>
+          <span class="lang-level">B1</span>
+          <span class="lang-count" data-lang-count></span>
+          <span class="lang-bar"><i style="--w:38%"></i></span>
+        </button>
+      </div>
+
+      <p class="lang-footnote" data-lang-footnote>
+        Tap languages to rebuild the reach. Numbers are approximate total speakers (incl. L2). Overlap exists — the sum is an optimistic upper bound.
+      </p>
+    </section>
+
+    <section class="panel" id="volunteering">
+      <h2>Volunteering</h2>
+      <ul class="vol-list">
+        <li><strong>Malteser</strong> — active supporter and fundraiser</li>
+        <li><strong>Regensburg Lebenshilfe e.V.</strong></li>
+        <li><strong>ECO-Truck</strong> — UN development programme + Lebanon Solar Energy Society (2013)</li>
+        <li><strong>Lebanon Green Building Council</strong> — green-tech awareness (2017)</li>
+        <li><strong>Beirut explosion relief</strong> — housing support for affected families (2020)</li>
+      </ul>
+    </section>
+
     <section class="panel" id="work">
-      <h2>What I do</h2>
+      <h2>What I build</h2>
       <div class="pill-grid">
         <article class="pill-card">
           <h3>Energy &amp; MaStR analytics</h3>
@@ -74,53 +414,15 @@
           <p>Multi-app Shiny hub behind nginx, systemd, Grafana monitoring, documentation site, reproducible GitHub Actions pipelines.</p>
         </article>
         <article class="pill-card">
-          <h3>Research &amp; methods</h3>
-          <p>Thesis-oriented work on batteries, storage technology mix, and raw-material context; rigorous bibliography and data verification workflows.</p>
-        </article>
-        <article class="pill-card">
-          <h3>Civic &amp; geospatial viz</h3>
-          <p>Election and social data stories — interactive maps and treemaps built for public understanding, not just insiders.</p>
-        </article>
-        <article class="pill-card">
-          <h3>Stakeholder demos</h3>
-          <p>Executive-ready pitch flows: from business question → scoped app → deployed URL on a shared hub in days, not quarters.</p>
+          <h3>Methods &amp; verification</h3>
+          <p>Reproducible ETL, documented schemas, and data-verification workflows so every dashboard number can be traced to a source row.</p>
         </article>
       </div>
     </section>
 
-    <section class="panel" id="method">
-      <h2>How I work</h2>
-      <ol class="timeline">
-        <li>
-          <strong>Start from the question, not the tool.</strong>
-          Who needs the answer, how often does data change, and what decision does the chart support?
-        </li>
-        <li>
-          <strong>Reproducible data first.</strong>
-          Versioned ETL, pinned release tags, documented schemas — so a number in a dashboard can be traced back to a source row.
-        </li>
-        <li>
-          <strong>Build in the open where possible.</strong>
-          Code on GitHub (<a href="https://github.com/Tarekchehahde/shiny-dashboard-hub">shiny-dashboard-hub</a>), public demos on a real server, docs next to the apps.
-        </li>
-        <li>
-          <strong>One app, one URL, one process.</strong>
-          Each dashboard is an isolated Shiny service — deploy, restart, and monitor independently without breaking the rest of the hub.
-        </li>
-        <li>
-          <strong>Iterate with humans in the loop.</strong>
-          Filters, mobile layout, language toggles, and “does this match what you expect?” reviews before calling it done.
-        </li>
-        <li>
-          <strong>Automate the boring ops.</strong>
-          Prometheus probes, Grafana live panels, nginx logs — so I spend time on analysis, not guessing if something is down.
-        </li>
-      </ol>
-    </section>
-
     <section class="panel" id="projects">
       <h2>Selected work (live)</h2>
-      <p class="section-note">Public demos on my dashboard server — click through; no install required.</p>
+      <p class="section-note">Public demos on this server — click through; no install required.</p>
       <div class="project-grid">
         <a class="project-card" href="/care_workers_thuringia/">
           <span class="tag">Research</span>
@@ -152,7 +454,7 @@
           <h3>Lebanese Elections</h3>
           <p>2022 parliamentary casas — density, candidates, treemap (Tableau → Shiny).</p>
         </a>
-        <a class="project-card" href="/">
+        <a class="project-card" href="/dashboards/">
           <span class="tag">Hub</span>
           <h3>Full dashboard catalog</h3>
           <p>All public apps, including Gapminder-style demos and conference pitch boards.</p>
@@ -160,57 +462,21 @@
       </div>
       <p class="section-note">
         Infrastructure &amp; docs:
-        <a href="/portal/">Mission Control</a> ·
+        <a href="/">Mission Control</a> ·
         <a href="/portal/docs/">Documentation</a> ·
         <a href="/grafana/d/mastr-live-showcase/mastr-live-showcase?refresh=5s">Live server metrics</a>
       </p>
     </section>
 
-    <section class="panel" id="stack">
-      <h2>Tools I reach for</h2>
-      <div class="stack-row">
-        <span>R</span><span>Shiny</span><span>bslib</span><span>plotly</span><span>DuckDB</span>
-        <span>Python</span><span>GitHub Actions</span><span>nginx</span><span>Prometheus</span>
-        <span>Grafana</span><span>Docker-free VPS ops</span><span>RStudio Server</span>
-        <span>tidymodels</span><span>SQL</span><span>Parquet</span>
-      </div>
-    </section>
-
-    <section class="panel" id="life">
-      <h2>Life &amp; hobbies</h2>
-      <div class="life-grid">
-        <article>
-          <h3>Curiosity</h3>
-          <p>I like following how grids, markets, and climate data move in real time — and building small tools so friends can see it too.</p>
-        </article>
-        <article>
-          <h3>Making things legible</h3>
-          <p>Good charts, clear docs, and honest footnotes about data limits. I'd rather show uncertainty than fake precision.</p>
-        </article>
-        <article>
-          <h3>Languages &amp; places</h3>
-          <p>Working in German and English daily; projects tied to both Europe and the Middle East keep me grounded in different public debates.</p>
-        </article>
-        <article>
-          <h3>Learning in public</h3>
-          <p>New stacks (ML, monitoring, licensing nuance for Posit/RStudio), open-source repos, and conference demos — learn by shipping.</p>
-        </article>
-        <article>
-          <h3>Away from the screen</h3>
-          <p>Time with family and friends, cooking, and unplugged walks — the best antidote to staring at time-series charts.</p>
-        </article>
-        <article>
-          <h3>What’s next</h3>
-          <p>This page is my single home on the web: portfolio, CV, and front door to everything I run on this server.</p>
-        </article>
-      </div>
-    </section>
-
     <section class="panel contact-panel" id="contact">
       <h2>Contact</h2>
-      <p>Open to collaborations on data products, energy analytics, Shiny delivery, and research-oriented tooling.</p>
+      <p>
+        Open to collaborations on data products, energy analytics, Shiny delivery, and research tooling.
+        Prefer <strong>email</strong> — phone signal at work is sometimes unreliable.
+      </p>
       <div class="hero-actions">
-        <a class="btn btn-primary" href="https://www.linkedin.com/in/tarek-shehadi/" target="_blank" rel="noopener">LinkedIn</a>
+        <a class="btn btn-primary" href="mailto:tarekchehade.de@gmail.com">tarekchehade.de@gmail.com</a>
+        <a class="btn btn-ghost" href="https://www.linkedin.com/in/tarek-shehadi/" target="_blank" rel="noopener">LinkedIn</a>
         <a class="btn btn-ghost" href="https://github.com/Tarekchehahde" target="_blank" rel="noopener">GitHub</a>
         <a class="btn btn-ghost" href="https://public.tableau.com/app/profile/tarek.chehade/viz/lebanese-elections/Dashboard1" target="_blank" rel="noopener">Tableau Public</a>
       </div>
@@ -219,8 +485,9 @@
   </main>
 
   <footer class="site-footer">
-    <p>Tarek Chehade · <a href="/about/">About</a> · <a href="/">Dashboards</a> · <a href="/portal/">Portal</a></p>
-    <p class="fine">Hosted on a private VPS · This page is intended as my primary public CV.</p>
+    <p>Tarek Chehade · <a href="/about/">CV / About</a> · <a href="/about/de/">Deutsch</a> · <a href="/dashboards/">Dashboards</a> · <a href="/">Mission Control</a></p>
+    <p class="fine">Hosted on a private VPS · Public curriculum vitae (home address omitted for privacy).</p>
   </footer>
+  <script src="about.js" defer></script>
 </body>
 </html>

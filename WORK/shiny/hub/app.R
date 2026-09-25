@@ -2,8 +2,12 @@
 # hub/app.R — landing page for all dashboards on this server.
 #
 # Deployed behind nginx:
-#   /              -> this hub (port 3838)
-#   /most_visited/ -> flagship Most Visited (port 3839)
+#   /              -> Mission Control (static)
+#   /dashboards/   -> this hub (port 3838)
+#   /most_visited_forecast/ -> 4-month outlook (port 3856)
+#   /eurostat_resettled/    -> Eurostat migr_asyrescra (port 3857)
+#   /eurostat_de_gas/       -> Germany natural-gas diversification (port 3858)
+#   /transformative-ai/     -> static briefing (nginx alias)
 #   /dummy_demo/   -> demo / test dashboard (port 3840)
 #   /health_wealth_nations/ -> Gapminder-style bubble chart (port 3841)
 #   /lebanese_elections/    -> Lebanese elections Tableau replica (port 3842)
@@ -99,6 +103,39 @@ DASHBOARDS <- list(
     badge_class = "bg-warning text-dark",
     desc = "Monatlicher Solar-Zubau (MW) nach Segment + YTD-Vergleichstabelle.",
     highlight = FALSE
+  ),
+  list(
+    id = "most_visited_forecast",
+    title = "Most Visited — Prognose",
+    badge = "MaStR",
+    badge_class = "bg-warning text-dark",
+    desc = "4-Monats-Prognose des Solar-Zubaus je Segment (Home, C&I, Large Scale, Total) aus den MaStR-Jahresmustern.",
+    highlight = FALSE
+  ),
+  list(
+    id = "eurostat_resettled",
+    title = "Eurostat — Resettled persons",
+    badge = "Eurostat",
+    badge_class = "bg-primary",
+    desc = "Resettled persons (migr_asyrescra): receiving country, citizenship, previous residence, age \u00d7 sex. Auto-refreshes when Eurostat updates the cube.",
+    highlight = FALSE
+  ),
+  list(
+    id = "eurostat_de_gas",
+    title = "Germany — Natural gas diversification",
+    badge = "Eurostat",
+    badge_class = "bg-primary",
+    desc = "German gas imports by partner (annual origin + monthly transit), LNG share, import dependency, storage, supply, and prices. Auto-refreshes when Eurostat updates any cube.",
+    highlight = FALSE
+  ),
+  list(
+    id = "transformative_ai",
+    title = "Transformative AI — Europe",
+    badge = "Briefing",
+    badge_class = "bg-dark",
+    desc = "One-screen public explainer of the September 2026 independent Transformative AI Strategy for Europe — five urgent moves, three pillars.",
+    highlight = FALSE,
+    href = "/transformative-ai/"
   ),
   list(
     id = "deutschland_solar_radiation",
@@ -221,6 +258,9 @@ hub_dashboards <- function() {
       my_manager_demo = 3843L,
       deutschland_solar_radiation = 3844L,
       most_visited = 3839L,
+      most_visited_forecast = 3856L,
+      eurostat_resettled = 3857L,
+      eurostat_de_gas = 3858L,
       health_wealth_nations = 3841L,
       lebanese_elections = 3842L,
       dummy_demo = 3840L
@@ -422,7 +462,7 @@ hub_hero <- function() {
     p(
       class = "hub-hero-sub",
       "Live data dashboards \u2014 select one below. ",
-      tags$a(href = "/portal/", class = "text-decoration-none", "Mission Control"),
+      tags$a(href = "/", class = "text-decoration-none", "Mission Control"),
       " \u00b7 ",
       tags$a(href = "/about/", class = "text-decoration-none", "About"),
       ", Grafana, docs."

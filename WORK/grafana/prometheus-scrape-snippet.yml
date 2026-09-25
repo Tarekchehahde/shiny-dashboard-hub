@@ -9,8 +9,10 @@
     static_configs:
       - targets:
           - http://127.0.0.1/
+          - http://127.0.0.1/dashboards/
           - http://127.0.0.1/portal/
           - http://127.0.0.1/most_visited/
+          - http://127.0.0.1/most_visited_forecast/
           - http://127.0.0.1/eu_electricity_live/
           - http://127.0.0.1/thueringen_kommunal/
           - http://127.0.0.1/thueringen_solar_wirtschaft/

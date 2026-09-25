@@ -1,0 +1,178 @@
+/* Barrier-free trial pages. Independent of Mission Control styles. */
+
+:root {
+  --bg: #ffffff;
+  --fg: #111111;
+  --link: #003399;
+  --link-visited: #5a007a;
+  --rule: #111111;
+  --focus: #111111;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 125%;
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: "Segoe UI", Tahoma, "Noto Naskh Arabic", "Geeza Pro", Arial, sans-serif;
+  line-height: 1.8;
+  -webkit-text-size-adjust: 100%;
+}
+
+html:not([dir="rtl"]) body {
+  font-family: "Segoe UI", system-ui, Tahoma, Arial, sans-serif;
+}
+
+.page {
+  width: min(40rem, calc(100% - 2rem));
+  margin-inline: auto;
+  padding-block: 1.25rem 3rem;
+}
+
+.skip {
+  position: absolute;
+  inset-block-start: 0.5rem;
+  inset-inline-start: 0.5rem;
+  padding: 0.6rem 0.9rem;
+  background: var(--fg);
+  color: var(--bg);
+  text-decoration: underline;
+  z-index: 2;
+  transform: translateY(-200%);
+}
+
+.skip:visited {
+  color: var(--bg);
+}
+
+.skip:focus {
+  transform: none;
+  color: var(--bg);
+}
+
+a {
+  color: var(--link);
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
+a:visited {
+  color: var(--link-visited);
+}
+
+a:hover {
+  text-decoration-thickness: 0.14em;
+}
+
+a:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+
+header {
+  border-bottom: 2px solid var(--rule);
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.site-name {
+  margin: 0 0 0.35rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.site-name a {
+  color: var(--fg);
+  text-decoration: none;
+}
+
+.site-name a:hover,
+.site-name a:focus-visible {
+  text-decoration: underline;
+}
+
+.note {
+  margin: 0 0 1rem;
+  font-size: 1rem;
+}
+
+nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+nav li {
+  margin: 0;
+}
+
+nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding-block: 0.25rem;
+}
+
+h1 {
+  margin: 0 0 1rem;
+  font-size: 1.85rem;
+  line-height: 1.35;
+  font-weight: 700;
+}
+
+h2 {
+  margin: 2rem 0 0.7rem;
+  font-size: 1.35rem;
+  line-height: 1.4;
+}
+
+p {
+  margin: 0 0 1rem;
+  max-width: 40rem;
+}
+
+ul.content-list,
+ol.content-list {
+  margin: 0 0 1rem;
+  padding-inline-start: 1.4rem;
+}
+
+ul.content-list li,
+ol.content-list li {
+  margin-bottom: 0.55rem;
+}
+
+footer {
+  margin-top: 2.5rem;
+  padding-top: 1rem;
+  border-top: 2px solid var(--rule);
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --bg: #ffffff;
+    --fg: #000000;
+    --link: #0000ee;
+    --link-visited: #551a8b;
+  }
+
+  a:focus-visible {
+    outline-width: 4px;
+  }
+}

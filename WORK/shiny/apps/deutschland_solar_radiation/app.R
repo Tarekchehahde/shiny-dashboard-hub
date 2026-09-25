@@ -375,39 +375,21 @@ server <- function(input, output, session) {
     load_active(force = FALSE)
   })
 
-  # Populate dropdown once when data arrives; do not reset on every refresh tick.
-  observeEvent(plz_data(), {
-    d <- plz_data()
-    if (!is.null(d) && identical(input$map_mode, "plz")) {
-      preserve <- if (nzchar(input$plz_pick %||% "") && input$plz_pick %in% d$id) {
-        input$plz_pick
-      } else {
-        NULL
-      }
-      sync_choices(d, "plz", preserve = preserve)
+  # Keep the select in sync with loaded data (do not use ignoreInit here).
+  observe({
+    d <- active_data()
+    mode <- input$map_mode
+    if (is.null(d) || nrow(d) < 1L) {
+      return()
     }
-  }, ignoreInit = TRUE)
-
-  observeEvent(city_data(), {
-    d <- city_data()
-    if (!is.null(d) && identical(input$map_mode, "cities")) {
-      preserve <- if (nzchar(input$plz_pick %||% "") && input$plz_pick %in% d$id) {
-        input$plz_pick
-      } else {
-        NULL
-      }
-      sync_choices(d, "cities", preserve = preserve)
-    }
-  }, ignoreInit = TRUE)
+    isolate(sync_choices(d, mode))
+  })
 
   observeEvent(input$refresh, load_active(force = TRUE), ignoreInit = TRUE)
 
   observeEvent(input$map_mode, {
-    d <- active_data()
-    if (is.null(d)) {
+    if (is.null(active_data())) {
       load_active()
-    } else {
-      sync_choices(d, input$map_mode)
     }
   }, ignoreInit = TRUE)
 
@@ -445,7 +427,11 @@ server <- function(input, output, session) {
     base <- if (is.null(t)) {
       "Loading…"
     } else {
-      paste("Last fetch:", format(t, "%H:%M %d %b %Y"), "· auto-refresh ~15 min")
+      paste(
+        "Last fetch:",
+        format(t, "%H:%M %d %b %Y", tz = "Europe/Berlin"),
+        "· auto-refresh ~15 min"
+      )
     }
     if (!is.null(err) && nzchar(err)) paste(base, "·", err) else base
   })
@@ -511,7 +497,13 @@ server <- function(input, output, session) {
     }
 
     leaflet(d, options = leafletOptions(minZoom = 5, maxZoom = 12)) |>
-      addProviderTiles(providers$CartoDB.Positron) |>
+      addTiles(
+        urlTemplate = "https://tile.openstreetmap.de/{z}/{x}/{y}.png",
+        attribution = paste0(
+          '&copy; <a href="https://www.openstreetmap.org/copyright">',
+          "OpenStreetMap</a>"
+        )
+      ) |>
       setView(lng = 10.5, lat = 51.0, zoom = 6) |>
       addCircleMarkers(
         lng = ~lon, lat = ~lat,

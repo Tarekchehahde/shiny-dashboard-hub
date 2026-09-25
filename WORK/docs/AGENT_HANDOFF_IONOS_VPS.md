@@ -18,10 +18,10 @@
 | System | User | Password |
 |--------|------|----------|
 | **VPS SSH (root)** | `root` | IONOS panel → Server → Zugangsdaten |
-| **RStudio Server** | `rstudio` | see `SERVER.credentials.local.md` |
+| **Shiny / R user** | `rstudio` | Linux user for `mastr-*` apps (no RStudio Server) |
 | **Site traffic dashboard** | `admin` | see `SERVER.credentials.local.md` |
 | **Grafana admin** | `admin` | see `SERVER.credentials.local.md` |
-| **Mission Control** | — | Public — http://82.165.167.86/portal/ |
+| **Mission Control** | — | Public — https://82.165.167.86/ (`/portal/` 301s here) |
 
 **Change site-traffic password:**
 
@@ -97,10 +97,10 @@ Passwords: WORK/docs/SERVER.credentials.local.md (local only, gitignored)
 | IP | `82.165.167.86` |
 | OS | Ubuntu 24.04 LTS |
 | Spec | 6 vCPU, 8 GB RAM, 240 GB NVMe |
-| Public entry | HTTP **80** (HTTPS not configured) |
+| Public entry | HTTPS **443** (HTTP **80** redirects to HTTPS; ACME stays on 80) |
 | R version | 4.6.0 |
 | bslib | **0.11.0** (no vector `width` in `layout_column_wrap`) |
-| RStudio Server | 2026.x on `:8787` (SSH tunnel recommended) |
+| RStudio Server | **not installed** — IDE is local on the Mac |
 | Netdata | `:19999` localhost only (Desktop **VPS Netdata** app) |
 | Grafana | **13.x** on `:3000` localhost; public **http://82.165.167.86/grafana/** |
 | Swap | **2 GB** `/swapfile` (added 2026-06-22) |
@@ -181,18 +181,18 @@ Counts dashboard **entry** page views (not JS/CSS). Shows IPs, devices, daily ch
 
 ---
 
-## Mission Control portal (`/portal/`)
+## Mission Control (`/`)
 
-**URL:** http://82.165.167.86/portal/
+**URL:** https://82.165.167.86/  
+**Legacy bookmark:** https://82.165.167.86/portal/ → 301 to `/`
 
 Single HTML gateway (static, nginx) linking to:
 
 | Link | URL | Auth |
 |------|-----|------|
-| Dashboard Hub | `/` | Public |
+| Dashboard Hub | `/dashboards/` | Public |
 | Grafana | `/grafana/` | **Public view** (anonymous); admin login for configuration |
 | Netdata | `/netdata/` | **Public** (via nginx proxy; was localhost-only) |
-| RStudio | `:8787` | **Login required** — do not disable on public internet |
 | Site traffic | `/site_traffic/` | Password |
 
 Source: `WORK/ops-portal/` → `/var/www/mastr-portal/` on VPS.
@@ -201,15 +201,9 @@ Source: `WORK/ops-portal/` → `/var/www/mastr-portal/` on VPS.
 
 ---
 
-## Machine learning on this VPS
+## Machine learning
 
-| Tool | Status | Best for |
-|------|--------|----------|
-| **RStudio Server** | Installed (`:8787`) | R ML: **tidymodels**, caret, xgboost, torch, Shiny prototypes |
-| **JupyterLab** | Not installed | Python ML: scikit-learn, pandas — install if needed |
-| Orange / KNIME | N/A on server | Desktop GUI tools — use locally, not this VPS |
-
-RStudio is the primary ML IDE here; same R 4.6 stack as production Shiny apps.
+Not published on the VPS (no `/portal/docs/?doc=ml`, no RStudio Server). IDE work is local on the Mac. Shiny apps still run as Linux user `rstudio`.
 
 ---
 
@@ -257,7 +251,7 @@ Previously Netdata listened on `127.0.0.1:19999` only; nginx now proxies `/netda
 3. **Kommunal** fix: wind SQL uses `WindAnLandOderAufSee <> 889`; `mastr_empty_plot()` for loading states.
 4. Hub reorder; erwicon title badges removed; **502 fix** — hub must use `layout_column_wrap(width = 1/2)` not named vector (bslib 0.11).
 5. Mobile responsive CSS; **site_traffic** app; collapsible LinkedIn QR dock.
-6. **Grafana** + Prometheus + **Mission Control** portal (`/portal/`); Netdata public at `/netdata/`.
+6. **Grafana** + Prometheus + **Mission Control** (`/`); Netdata public at `/netdata/`.
 
 **Not done yet:**
 
@@ -349,7 +343,7 @@ Logs: `mastr-shiny/logs/ionos-hub-launch.log`
 ## Security notes
 
 - **Passwords:** `WORK/docs/SERVER.credentials.local.md` only — file is gitignored; never push to GitHub
-- Prefer SSH key + tunnel for RStudio; don't expose `:8787` publicly if avoidable
+- Prefer SSH key for VPS admin; do not expose admin IDEs on the public IP
 - Rotate VPS root password if ever pasted in chat
 - Site traffic shows real IPs — treat as admin-only
 

@@ -9,7 +9,7 @@ Public **multi-dashboard Shiny server** on an IONOS VPS (`http://82.165.167.86/`
 | **Production hub** | [`WORK/shiny/hub/`](WORK/shiny/hub/) — nginx routes to many Shiny apps |
 | **MaStR ETL** | [`WORK/etl/`](WORK/etl/) + GitHub Actions → nightly `data-YYYY-MM-DD` releases |
 | **VPS ops** | [`WORK/docs/SERVER.md`](WORK/docs/SERVER.md) — runbook (passwords: local `SERVER.credentials.local.md` only) |
-| **Portal & web docs** | [`WORK/ops-portal/`](WORK/ops-portal/) → `/portal/` and `/portal/docs/` on the server |
+| **Portal & web docs** | [`WORK/ops-portal/`](WORK/ops-portal/) → `/` (Mission Control) and `/portal/docs/` on the server |
 | **Thesis track** | [`THESIS/thesis_energy_mastr_shiny/`](THESIS/thesis_energy_mastr_shiny/) — separate battery/thesis apps |
 
 **GitHub:** [Tarekchehahde/shiny-dashboard-hub](https://github.com/Tarekchehahde/shiny-dashboard-hub) · branch **`main`**
@@ -20,10 +20,10 @@ Public **multi-dashboard Shiny server** on an IONOS VPS (`http://82.165.167.86/`
 
 | URL | Purpose |
 |-----|---------|
-| http://82.165.167.86/ | Dashboard hub |
-| http://82.165.167.86/portal/ | Mission Control |
-| http://82.165.167.86/portal/docs/ | Public documentation |
-| http://82.165.167.86/grafana/ | Live metrics (Grafana) |
+| https://82.165.167.86/ | Mission Control |
+| https://82.165.167.86/dashboards/ | Dashboard hub |
+| https://82.165.167.86/portal/docs/ | Public documentation |
+| https://82.165.167.86/grafana/ | Live metrics (Grafana) |
 
 Full runbook: [`WORK/docs/SERVER.md`](WORK/docs/SERVER.md)
 

@@ -1,0 +1,11 @@
+# Restart Prognose ~1 hour after each typical MaStR data-* landing.
+# ETL schedule is once: 06:00 UTC (mastr-nightly-etl). GitHub often delays it.
+#   08:30 UTC — 1 h after on-time publish  (~07:15 UTC)
+#   12:30 UTC — 1 h after delayed publish (~10:20–11:40 UTC)
+# VPS timezone is UTC. Most Visited is not bounced here.
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+MAILTO=""
+CRON_TZ=UTC
+
+30 8,12 * * * root /usr/local/sbin/mastr-sync-data-apps.sh >/dev/null 2>&1

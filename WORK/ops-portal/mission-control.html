@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Mission Control — classic board</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --card: #121a2f;
+      --accent: #38bdf8;
+      --accent2: #a78bfa;
+      --accent3: #34d399;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --border: rgba(148,163,184,.15);
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      height: 100dvh;
+      overflow: hidden;
+      font-family: "Inter", system-ui, -apple-system, sans-serif;
+      background: radial-gradient(ellipse 120% 80% at 50% -20%, #1e3a5f 0%, var(--bg) 55%);
+      color: var(--text);
+    }
+
+    .sky {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      overflow: hidden;
+    }
+    .aurora {
+      position: absolute; border-radius: 50%;
+      filter: blur(70px); opacity: .55; will-change: transform;
+    }
+    .aurora-1 { width: 52vw; height: 52vw; top: -18vw; left: -10vw;
+      background: radial-gradient(circle, rgba(56,189,248,.8), transparent 65%);
+      animation: drift1 13s ease-in-out infinite; }
+    .aurora-2 { width: 44vw; height: 44vw; top: 6vw; right: -14vw;
+      background: radial-gradient(circle, rgba(167,139,250,.7), transparent 65%);
+      animation: drift2 17s ease-in-out infinite; }
+    .aurora-3 { width: 36vw; height: 36vw; bottom: -16vw; left: 30vw;
+      background: radial-gradient(circle, rgba(52,211,153,.55), transparent 65%);
+      animation: drift3 21s ease-in-out infinite; }
+    @keyframes drift1 { 0%,100% { transform: translate(0,0) scale(1); }
+      50% { transform: translate(14vw, 9vw) scale(1.3); } }
+    @keyframes drift2 { 0%,100% { transform: translate(0,0) scale(1); }
+      50% { transform: translate(-16vw, 12vw) scale(.8); } }
+    @keyframes drift3 { 0%,100% { transform: translate(0,0); }
+      33% { transform: translate(-12vw, -7vw) scale(1.15); }
+      66% { transform: translate(12vw, 5vw) scale(.9); } }
+
+    .star {
+      position: absolute; border-radius: 50%;
+      background: rgba(226,232,240,.8);
+      animation: twinkle ease-in-out infinite;
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: .1; transform: scale(.8); }
+      50%      { opacity: 1; transform: scale(1.7); }
+    }
+
+    .wrap {
+      position: relative; z-index: 1;
+      height: 100dvh;
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 0.7rem 1.1rem 0.45rem;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .legacy-bar {
+      flex: 0 0 auto;
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 0.4rem;
+    }
+    .legacy-bar a { color: var(--accent); text-decoration: none; }
+    .legacy-bar a:hover { text-decoration: underline; }
+
+    header {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.55rem;
+      opacity: 0;
+      animation: fadeDown .6s cubic-bezier(.22,1,.36,1) .08s forwards;
+    }
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    h1 {
+      font-size: clamp(1.2rem, 2.4vw, 1.7rem);
+      font-weight: 700; letter-spacing: -.02em; margin: 0;
+      background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3), var(--accent));
+      background-size: 300% auto;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 3.5s linear infinite;
+    }
+    @keyframes shimmer {
+      0%   { background-position: 0% center; }
+      100% { background-position: 300% center; }
+    }
+    .tagline {
+      color: var(--muted);
+      font-size: 0.82rem;
+      margin: 0;
+      line-height: 1.35;
+      max-width: 34rem;
+    }
+    .tagline a { color: var(--accent); text-decoration: none; }
+    .tagline a:hover { text-decoration: underline; }
+
+    .board {
+      flex: 1 1 auto;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.42rem;
+      overflow: hidden;
+    }
+
+    section {
+      margin: 0;
+      flex: 1 1 auto;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    section h3 {
+      font-size: .68rem;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: var(--muted);
+      margin: 0 0 0.28rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      flex: 0 0 auto;
+    }
+    section h3 a {
+      color: #93c5fd;
+      text-decoration: none;
+      text-transform: none;
+      letter-spacing: 0;
+      font-size: 0.72rem;
+      font-weight: 500;
+    }
+    section h3 a:hover { text-decoration: underline; }
+    section h3 img { height: 16px; width: auto; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.42rem;
+      flex: 1 1 auto;
+      min-height: 0;
+    }
+    .grid-2 { grid-template-columns: repeat(2, 1fr); }
+    .grid-3 { grid-template-columns: repeat(3, 1fr); }
+
+    a.card {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      text-decoration: none;
+      color: inherit;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.48rem 0.65rem;
+      position: relative;
+      overflow: hidden;
+      min-height: 0;
+      height: 100%;
+      transition: transform .2s cubic-bezier(.22,1,.36,1),
+                  border-color .2s, box-shadow .2s;
+    }
+    a.card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(56,189,248,.8);
+      box-shadow: 0 10px 28px rgba(0,0,0,.45), 0 0 22px rgba(56,189,248,.16);
+    }
+    a.card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3), var(--accent));
+      background-size: 300% auto;
+      animation: shimmer 3s linear infinite;
+      transform: scaleX(0); transform-origin: left;
+      transition: transform .25s cubic-bezier(.22,1,.36,1);
+    }
+    a.card:hover::before { transform: scaleX(1); }
+
+    .card-icon {
+      font-size: 1.15rem;
+      line-height: 1;
+      flex: 0 0 auto;
+    }
+    .card-body { min-width: 0; flex: 1 1 auto; }
+    .card h2 {
+      font-size: 0.84rem;
+      margin: 0;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .card p { display: none; }
+
+    .badge {
+      display: inline-block; margin-top: .12rem;
+      font-size: .58rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: .06em; padding: .1rem .4rem; border-radius: 999px;
+    }
+    .badge-public { background: rgba(34,197,94,.2); color: #86efac; }
+    .badge-private { background: rgba(248,113,113,.15); color: #fca5a5; }
+    .badge-live {
+      background: rgba(56,189,248,.15); color: #7dd3fc;
+    }
+    .badge-igm {
+      background: rgba(227, 6, 19, 0.18);
+      color: #fca5a5;
+    }
+    .badge-research { background: rgba(167,139,250,.18); color: #ddd6fe; }
+
+    section.section-igmetall {
+      padding: 0.35rem 0.45rem 0.4rem;
+      border-radius: 12px;
+      border: 1px solid rgba(227, 6, 19, 0.28);
+      background: linear-gradient(145deg, rgba(227, 6, 19, 0.08), rgba(18, 26, 47, 0.55));
+    }
+    section.section-igmetall h3 { color: #fecaca; }
+    section.section-igmetall a.card:hover {
+      border-color: rgba(227, 6, 19, 0.65);
+      box-shadow: 0 10px 28px rgba(0,0,0,.45), 0 0 22px rgba(227, 6, 19, 0.12);
+    }
+
+    footer {
+      flex: 0 0 auto;
+      text-align: center;
+      margin-top: 0.35rem;
+      font-size: .7rem;
+      color: var(--muted);
+    }
+
+    @media (max-width: 900px) {
+      .grid, .grid-2, .grid-3 { grid-template-columns: repeat(2, 1fr); }
+      .card h2 { white-space: normal; }
+    }
+    @media (max-width: 560px), (max-height: 620px) {
+      body { overflow: auto; height: auto; }
+      .wrap { height: auto; min-height: 100dvh; overflow: visible; }
+      .board { overflow: visible; }
+      section { flex: 0 0 auto; }
+      .grid { flex: 0 0 auto; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .aurora, .star, h1, a.card::before, header { animation: none !important; }
+      header { opacity: 1 !important; transform: none !important; }
+      a.card { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="sky" aria-hidden="true">
+    <div class="aurora aurora-1"></div>
+    <div class="aurora aurora-2"></div>
+    <div class="aurora aurora-3"></div>
+  </div>
+
+  <div class="wrap">
+    <p class="legacy-bar">Classic ops board · <a href="/">Back to Tarek Chehade</a></p>
+    <header>
+      <h1>Mission Control</h1>
+      <p class="tagline">Dashboards, demos, and monitoring · <a href="/about/">About &amp; CV</a></p>
+    </header>
+
+    <div class="board">
+      <section>
+        <h3>Showcase</h3>
+        <div class="grid">
+          <a class="card" href="/dashboards/">
+            <div class="card-icon">📊</div>
+            <div class="card-body">
+              <h2>Dashboard Hub</h2>
+              <span class="badge badge-public">Public</span>
+            </div>
+          </a>
+          <a class="card" href="/grafana/d/mastr-live-showcase/mastr-live-showcase?refresh=5s&kiosk">
+            <div class="card-icon">🛰️</div>
+            <div class="card-body">
+              <h2>MaStR Live Showcase</h2>
+              <span class="badge badge-live">Live</span>
+            </div>
+          </a>
+          <a class="card" href="/grafana/">
+            <div class="card-icon">📈</div>
+            <div class="card-body">
+              <h2>Grafana</h2>
+              <span class="badge badge-public">Public view</span>
+            </div>
+          </a>
+          <a class="card" href="/netdata/">
+            <div class="card-icon">⚡</div>
+            <div class="card-body">
+              <h2>Netdata</h2>
+              <span class="badge badge-public">Public</span>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <section>
+        <h3>People &amp; research</h3>
+        <div class="grid grid-3">
+          <a class="card" href="/about/">
+            <div class="card-icon">👤</div>
+            <div class="card-body">
+              <h2>Tarek Chehade — About &amp; CV</h2>
+              <span class="badge badge-public">Portfolio</span>
+            </div>
+          </a>
+          <a class="card" href="/care_workers_thuringia/">
+            <div class="card-icon">🏥</div>
+            <div class="card-body">
+              <h2>Care Workers in Thüringen</h2>
+              <span class="badge badge-research">Research</span>
+            </div>
+          </a>
+          <a class="card" href="/demo/ccs-ops-pulse/">
+            <div class="card-icon">🍽</div>
+            <div class="card-body">
+              <h2>CCS Ops Pulse</h2>
+              <span class="badge badge-public">Pitch demo</span>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <section id="nour">
+        <h3>For Nour</h3>
+        <div class="grid grid-2">
+          <a class="card" href="/nour-jobs/">
+            <div class="card-icon">💼</div>
+            <div class="card-body">
+              <h2>Nour · Job Tracker</h2>
+              <span class="badge badge-private">Password</span>
+            </div>
+          </a>
+          <a class="card" href="/goldthau-readings/">
+            <div class="card-icon">📖</div>
+            <div class="card-body">
+              <h2>Goldthau readings</h2>
+              <span class="badge badge-private">Password</span>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <section class="section-igmetall" id="igmetall">
+        <h3>
+          <img src="/demo/igmetall-mitte-factory/assets/igmetall-logo.svg" alt=""/>
+          IG Metall demonstrations
+          <a href="/portal/igmetall/">Demo hub →</a>
+        </h3>
+        <div class="grid grid-3">
+          <a class="card" href="/demo/igmetall-mitte-factory/">
+            <div class="card-icon">🏭</div>
+            <div class="card-body">
+              <h2>Werksgelände</h2>
+              <span class="badge badge-igm">Proof-of-Concept</span>
+            </div>
+          </a>
+          <a class="card" href="/demo/igmetall-mitte-demographics/">
+            <div class="card-icon">📊</div>
+            <div class="card-body">
+              <h2>Demografie</h2>
+              <span class="badge badge-igm">Proof-of-Concept</span>
+            </div>
+          </a>
+          <a class="card" href="/demo/igmetall-mitte-dfi/">
+            <div class="card-icon">📋</div>
+            <div class="card-body">
+              <h2>DFI 2026</h2>
+              <span class="badge badge-igm">Proof-of-Concept</span>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <section>
+        <h3>Ops</h3>
+        <div class="grid grid-2">
+          <a class="card" href="/portal/docs/">
+            <div class="card-icon">📚</div>
+            <div class="card-body">
+              <h2>Project documentation</h2>
+              <span class="badge badge-public">Public</span>
+            </div>
+          </a>
+          <a class="card" href="/site_traffic/">
+            <div class="card-icon">🔍</div>
+            <div class="card-body">
+              <h2>Site traffic</h2>
+              <span class="badge badge-private">Password</span>
+            </div>
+          </a>
+        </div>
+      </section>
+    </div>
+
+    <footer>MaStR Shiny VPS · 82.165.167.86</footer>
+  </div>
+
+  <script>
+    (function () {
+      var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduced) return;
+      var sky = document.querySelector('.sky');
+      for (var i = 0; i < 28; i++) {
+        var s = document.createElement('span');
+        s.className = 'star';
+        var size = 1 + Math.random() * 2.2;
+        s.style.width = size + 'px';
+        s.style.height = size + 'px';
+        s.style.left = Math.random() * 100 + '%';
+        s.style.top = Math.random() * 100 + '%';
+        s.style.animationDuration = (1.6 + Math.random() * 3) + 's';
+        s.style.animationDelay = (Math.random() * 3) + 's';
+        sky.appendChild(s);
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -1,6 +1,6 @@
 # MaStR IONOS VPS — server documentation
 
-**Production hub:** http://82.165.167.86/  
+**Production home:** https://82.165.167.86/ (Mission Control) · **Dashboard hub:** https://82.165.167.86/dashboards/  
 **GitHub:** [Tarekchehahde/shiny-dashboard-hub](https://github.com/Tarekchehahde/shiny-dashboard-hub) · branch `main`  
 **Local mirror:** `/Users/tarek-lokal/Documents/mastr-shiny/` *(folder name may still say mastr-shiny)*  
 **Server clone:** `/opt/mastr-shiny/` on VPS `82.165.167.86` *(path unchanged; `git remote` → shiny-dashboard-hub)*
@@ -13,15 +13,19 @@
 
 | What | URL | Auth |
 |------|-----|------|
-| Dashboard hub | http://82.165.167.86/ | Public |
-| Mission Control | http://82.165.167.86/portal/ | Public |
+| Dashboard hub | https://82.165.167.86/dashboards/ | Public (Goldthau readings path is password-protected) |
+| Mission Control | https://82.165.167.86/ | Public (`/portal/` redirects here) |
 | **About / CV** | http://82.165.167.86/about/ | Public — primary personal page |
 | `/cv` | redirects → `/about/` | Short link |
+| **Barrierefrei (DE / AR)** | https://82.165.167.86/barrierefrei/ | Public trial — programming & data science for screen-reader users (`/barrierefrei/ar/` Arabic) |
+| **Fahrprüfung (DEKRA study)** | http://82.165.167.86/fahrpruefung/ | App password — see credentials file |
+| **Goldthau readings (Nour)** | http://82.165.167.86/goldthau-readings/ | Login required — see credentials file |
+| **Nour job tracker** | https://82.165.167.86/nour-jobs/ | Login required — see credentials file |
 | Web documentation | http://82.165.167.86/portal/docs/ | Public |
-| Grafana (live metrics) | http://82.165.167.86/grafana/ | Public view; admin to edit |
+| Grafana (live metrics) | http://82.165.167.86/grafana/ | Public view; admin to edit. `/grafana/metrics` is login-gated |
 | MaStR Live Showcase | http://82.165.167.86/grafana/d/mastr-live-showcase/mastr-live-showcase?refresh=5s | Public |
-| Netdata | http://82.165.167.86/netdata/ | Public |
-| RStudio Server | http://82.165.167.86:8787/ | Login — see credentials file |
+| Netdata | http://82.165.167.86/netdata/ | Login required — see credentials file (Grafana admin). Mac shortcut still uses SSH tunnel |
+| RStudio Server | *removed* — use RStudio Desktop / Positron on the Mac | — |
 | Site traffic | http://82.165.167.86/site_traffic/ | Login — see credentials file |
 
 ---
@@ -34,10 +38,10 @@
 | IP | `82.165.167.86` |
 | OS | Ubuntu 24.04 LTS |
 | Spec | 6 vCPU, 8 GB RAM, 240 GB NVMe |
-| Public entry | HTTP **80** (HTTPS not configured yet) |
+| Public entry | HTTPS **443** (HTTP **80** redirects to HTTPS; ACME stays on 80) |
 | R | 4.6.0 |
 | bslib | **0.11.0** — no vector `width` in `layout_column_wrap` |
-| RStudio Server | `:8787` (SSH tunnel recommended) |
+| RStudio Server | **not installed** (IDE is local on the Mac) |
 | Swap | 2 GB `/swapfile` |
 
 ---
@@ -46,10 +50,15 @@
 
 | URL path | App |
 |----------|-----|
-| `/` | Hub — dashboard picker |
+| `/` | Mission Control — public gateway |
+| `/dashboards/` | Hub — dashboard picker |
 | `/my_manager_demo/` | Executive pitch demo |
 | `/dummy_demo/` | Routing test |
 | `/most_visited/` | MaStR solar Zubau (flagship) |
+| `/most_visited_forecast/` | 4-month Zubau outlook |
+| `/eurostat_resettled/` | Eurostat resettled persons (`migr_asyrescra`) |
+| `/eurostat_de_gas/` | Germany natural-gas diversification |
+| `/transformative-ai/` | Transformative AI Strategy for Europe (static one-screen briefing) |
 | `/deutschland_solar_radiation/` | Live solar GHI map Germany |
 | `/health_wealth_nations/` | Gapminder bubble chart |
 | `/eu_electricity_live/` | EU day-ahead electricity prices |
@@ -68,9 +77,11 @@
 |-----|--------|
 | `/thueringen_fachkraefte/` | nginx **404** + service stopped (unlock for erwicon) |
 | `/site_traffic/` | Private — login required |
+| `/fahrpruefung/` | Private — DEKRA Stichworte study app (password gate) |
 | `/grafana/` | Public view; admin login to edit |
-| `/netdata/` | Public monitoring |
-| `/portal/` | Mission Control gateway |
+| `/grafana/metrics` | Private — HTTP basic auth (Grafana admin) |
+| `/netdata/` | Private — HTTP basic auth (Grafana admin); SSH tunnel still works |
+| `/portal/` | **301 → `/`** (legacy Mission Control bookmark) |
 | `/portal/docs/` | Rendered project documentation |
 
 ---
@@ -81,8 +92,12 @@ All Shiny apps run as Linux user **`rstudio`**.
 
 | Public path | Port | systemd service | Notes |
 |-------------|------|-----------------|-------|
-| `/` | 3838 | `mastr-hub` | Hub |
+| `/` | — | nginx static | Mission Control (`/var/www/mastr-portal/index.html`) |
+| `/dashboards/` | 3838 | `mastr-hub` | Hub (pathPrefix `/dashboards`) |
 | `/most_visited/` | 3839 | `mastr-most-visited` | MaStR flagship |
+| `/most_visited_forecast/` | 3856 | `mastr-most-visited-forecast` | 4-month Zubau outlook |
+| `/eurostat_resettled/` | 3857 | `mastr-eurostat-resettled` | Eurostat `migr_asyrescra` |
+| `/eurostat_de_gas/` | 3858 | `mastr-eurostat-de-gas` | Germany gas diversification |
 | `/dummy_demo/` | 3840 | `mastr-dummy-demo` | Test |
 | `/health_wealth_nations/` | 3841 | `mastr-health-wealth` | Gapminder |
 | `/lebanese_elections/` | 3842 | `mastr-lebanese-elections` | Elections |
@@ -100,9 +115,10 @@ All Shiny apps run as Linux user **`rstudio`**.
 | `/site_traffic/` | 3854 | `mastr-site-traffic` | Private |
 | `/grafana/` | 3000 | `grafana-server` | Grafana OSS |
 
-Sub-apps use `options(shiny.url.pathPrefix = '/<id>')`. Hub uses `MASTR_HUB_MODE=paths`.
+Sub-apps use `options(shiny.url.pathPrefix = '/<id>')`. Hub uses `shiny.url.pathPrefix='/dashboards'` and `MASTR_HUB_MODE=paths`.
 
-**nginx:** `/etc/nginx/sites-available/mastr-hub`  
+**nginx:** `/etc/nginx/sites-available/mastr-hub` (+ `/etc/nginx/sites-enabled/mastr-hub` — may be a separate copy)  
+**Fahrprüfung route:** `include snippets/mastr-fahrpruefung.conf;` → `/etc/nginx/snippets/mastr-fahrpruefung.conf` (repo: `scripts/nginx/mastr-fahrpruefung.conf`). Survives hub-file cleanup if the include line is kept; re-run `scripts/apply-nginx-security.sh` to restore.  
 **Grafana proxy:** `location /grafana/` → `http://127.0.0.1:3000` (no trailing slash on `proxy_pass`)
 
 ---
@@ -117,7 +133,7 @@ Sub-apps use `options(shiny.url.pathPrefix = '/<id>')`. Hub uses `MASTR_HUB_MODE
     ├── R/                           # ui_helpers, mastr_data, thueringen_helpers, nginx_analytics
     ├── data/thueringen/             # Kreis CSVs for demos
     └── www/                         # shared assets (LinkedIn QR)
-WORK/ops-portal/                     # Mission Control + /portal/docs/ sources
+WORK/ops-portal/                     # Mission Control (`/`) + `/portal/docs/` sources
 WORK/grafana/                        # Grafana provisioning copies
 ```
 
@@ -130,12 +146,7 @@ ssh ionos-mastr
 # or: ssh root@82.165.167.86
 ```
 
-**RStudio (prefer tunnel):**
-
-```bash
-ssh -L 8787:localhost:8787 ionos-mastr
-# Browser: http://localhost:8787  — user rstudio (password in SERVER.credentials.local.md)
-```
+**R:** production Shiny apps run as Linux user `rstudio`. There is no RStudio Server on this VPS — use RStudio Desktop / Positron on the Mac.
 
 **Mac desktop shortcuts:** MaStR Hub, IONOS VPS Terminal, VPS Netdata — see `scripts/setup-ionos-ssh-key.sh` and `scripts/install-ionos-desktop-launcher.sh`.
 
@@ -250,17 +261,36 @@ Public docs cover dashboards, monitoring, infrastructure, ML guide, reference-ve
 
 ## MaStR data freshness
 
-Nightly ETL → GitHub release `data-YYYY-MM-DD`. `mastr-most-visited` caches release tag at process start:
+Nightly ETL (`mastr-nightly-etl`) is scheduled **once** at **06:00 UTC**. It publishes `data-YYYY-MM-DD`. GitHub often starts that cron late; publishes typically land around **07:15 UTC** (on time) or **10:20–11:40 UTC** (delayed). Shiny pins the tag for the life of the R process.
+
+**Prognose auto-sync:** `/usr/local/sbin/mastr-sync-data-apps.sh` (repo: `scripts/mastr-sync-data-apps.sh`) runs twice a day via `/etc/cron.d/mastr-data-sync`, **1 hour after** those windows:
+
+- **08:30 UTC** — after an on-time publish
+- **12:30 UTC** — after a delayed publish
+
+If the newest `data-*` tag or `published_at` changed, it restarts **only** `mastr-most-visited-forecast`. Unchanged releases are a no-op. Most Visited is not bounced on this timer.
+
+State file: `/var/lib/mastr-shiny/last-data-release`. Logs: `journalctl -t mastr-data-sync` (and syslog).
+
+## Eurostat resettled persons
+
+Dashboard: https://82.165.167.86/eurostat_resettled/ — cube `migr_asyrescra`. ETL: `scripts/eurostat-sync-resettled.py` (VPS `/usr/local/sbin/eurostat-sync-resettled.py`). Cron `/etc/cron.d/mastr-eurostat-resettled` at 09:30/10:30/21:30/22:30 UTC (after Eurostat’s 11:00 and 23:00 CET catalogue refresh). No-op when the cube `updated` stamp is unchanged. Data: `/var/lib/mastr-shiny/eurostat/migr_asyrescra/`.
+
+## Eurostat Germany natural gas
+
+Dashboard: https://82.165.167.86/eurostat_de_gas/ — cubes `nrg_ti_gas`, `nrg_ti_gasm`, `nrg_ind_id`, `nrg_stk_gasm`, `nrg_cb_gasm`, `nrg_pc_202`, `nrg_pc_203` (Germany slices). ETL: `scripts/eurostat-sync-de-gas.py` (VPS `/usr/local/sbin/eurostat-sync-de-gas.py`). Cron `/etc/cron.d/mastr-eurostat-de-gas` at 09:35/10:35/21:35/22:35 UTC. No-op when every cube `updated` stamp is unchanged. Data: `/var/lib/mastr-shiny/eurostat/nrg_gas_de/`. Annual import partners are **country of origin**; monthly partners are **last transit country**.
+
+Manual:
 
 ```bash
-systemctl restart mastr-most-visited
+systemctl restart mastr-most-visited mastr-most-visited-forecast
 ```
 
 ---
 
 ## Machine learning
 
-RStudio Server (`:8787`) is the ML environment — tidymodels, caret, xgboost, torch. JupyterLab not installed. See http://82.165.167.86/portal/docs/?doc=ml
+No public ML page on the VPS. Interactive IDE work is local (RStudio Desktop / Positron on the Mac).
 
 ---
 

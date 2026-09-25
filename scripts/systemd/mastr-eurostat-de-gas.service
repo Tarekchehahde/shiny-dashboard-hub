@@ -1,0 +1,17 @@
+[Unit]
+Description=Eurostat Germany natural-gas diversification (nrg_ti_gas and related)
+After=network.target
+
+[Service]
+Type=simple
+User=rstudio
+WorkingDirectory=/opt/mastr-shiny/WORK/shiny/apps/eurostat_de_gas
+Environment=HOME=/home/rstudio
+Environment=MASTR_HUB_MODE=paths
+Environment=MASTR_EUROSTAT_DIR=/var/lib/mastr-shiny/eurostat/nrg_gas_de
+ExecStart=/usr/lib/R/bin/R -e "options(shiny.url.pathPrefix='/eurostat_de_gas'); shiny::runApp('.', host='0.0.0.0', port=3858, launch.browser=FALSE)"
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

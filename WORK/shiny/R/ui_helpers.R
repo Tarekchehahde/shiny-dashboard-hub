@@ -25,18 +25,32 @@ MASTR_PALETTE <- list(
   storage = "#111827"
 )
 
+.mastr_ui_env <- new.env(parent = emptyenv())
+.mastr_ui_env$themes <- new.env(parent = emptyenv())
+
+#' Shared bslib theme for hub apps.
+#'
+#' Uses `font_google(..., local = FALSE)` so Inter is loaded via Google Fonts CSS
+#' instead of copying `.woff2` files into `tempfile()` dirs on every Shiny
+#' session. With `local = TRUE` (bslib default), probes/traffic were filling
+#' `/tmp/Rtmp*` (e.g. ~11k font dirs/day on thueringen_kommunal).
 mastr_theme <- function(primary = MASTR_PALETTE$primary) {
-  bslib::bs_theme(
+  key <- as.character(primary)
+  cached <- .mastr_ui_env$themes[[key]]
+  if (!is.null(cached)) {
+    return(cached)
+  }
+  th <- bslib::bs_theme(
     version = 5,
     bootswatch = "flatly",
     primary = primary,
-    base_font = bslib::font_google("Inter"),
-    heading_font = bslib::font_google("Inter"),
+    base_font = bslib::font_google("Inter", local = FALSE),
+    heading_font = bslib::font_google("Inter", local = FALSE),
     "font-size-base" = "0.95rem"
   )
+  .mastr_ui_env$themes[[key]] <- th
+  th
 }
-
-.mastr_ui_env <- new.env(parent = emptyenv())
 
 .mastr_www_dir <- function() {
   candidates <- character()
@@ -330,12 +344,15 @@ mastr_responsive_css <- function() {
 #' @param footer Footer preset passed to [mastr_footer()]. Use `"mastr"` only for
 #'   MaStR-backed dashboards (`most_visited` and related apps). Other hub apps
 #'   should set an app-specific preset so the BNetzA line does not appear.
+#' @param theme Optional [bslib::bs_theme()] object. When `NULL` (default),
+#'   uses [mastr_theme()] with `primary`.
 #' @param hub_back If TRUE, show a back-to-hub link in the page header (requires
 #'   [mastr_hub_back_server()] in the server function).
 #' @param creator_qr If TRUE, show a fixed LinkedIn QR badge (bottom-right).
 #' @param creator_qr_lang `"de"` or `"en"` for QR caption text.
 mastr_page <- function(title, subtitle = NULL, ...,
                        primary = MASTR_PALETTE$primary,
+                       theme = NULL,
                        fluid = FALSE,
                        footer = "mastr",
                        hub_back = TRUE,
@@ -345,7 +362,7 @@ mastr_page <- function(title, subtitle = NULL, ...,
   page_fn <- if (isTRUE(fluid)) bslib::page_fluid else bslib::page_fillable
   page_fn(
     title = title,
-    theme = mastr_theme(primary),
+    theme = if (is.null(theme)) mastr_theme(primary) else theme,
     if (isTRUE(hub_back)) mastr_hub_nav_head(),
     if (isTRUE(creator_qr)) mastr_creator_qr_head(),
     mastr_responsive_css(),
@@ -478,6 +495,20 @@ mastr_footer <- function(footer = "mastr") {
       tags$a(
         href = "https://github.com/Tarekchehahde/Navigating-Expectations-Care-Workers-Thuringia",
         target = "_blank", rel = "noopener", "Project repo"
+      )
+    ),
+    eurostat = tagList(
+      "Data: Eurostat dataset migr_asyrescra (resettled persons by age, sex, citizenship and country of previous residence). ",
+      tags$a(
+        href = "https://ec.europa.eu/eurostat/databrowser/view/migr_asyrescra/default/table",
+        target = "_blank", rel = "noopener", "Eurostat"
+      )
+    ),
+    eurostat_gas = tagList(
+      "Data: Eurostat energy statistics for Germany \u2014 nrg_ti_gas, nrg_ti_gasm, nrg_ind_id, nrg_stk_gasm, nrg_cb_gasm, nrg_pc_202, nrg_pc_203. ",
+      tags$a(
+        href = "https://ec.europa.eu/eurostat/web/energy/database",
+        target = "_blank", rel = "noopener", "Eurostat energy"
       )
     ),
     hub = "Dashboard hub — select an app above.",
