@@ -1,12 +1,17 @@
 name: mastr-nightly-etl
 
 # Download the MaStR XML dump, parse to Parquet, build DuckDB, publish a
-# dated GitHub Release. Runs unattended every night at 06:00 UTC (~08:00 CEST,
-# comfortably after BNetzA's 05:00 CET refresh window).
+# dated GitHub Release. Runs unattended every night at 03:23 UTC (05:23 CEST;
+# BNetzA's export file is usually ready ~01:30 UTC), with a 09:41 UTC backup
+# run that the `check` job skips when today's release already exists.
 
 on:
   schedule:
-    - cron: "0 6 * * *"
+    # 03:23 UTC = 05:23 Berlin (CEST); BNetzA file ready ~03:30 Berlin.
+    # Off the top of the hour to dodge GitHub's scheduled-run backlog.
+    - cron: "23 3 * * *"
+    # Backup run (11:41 Berlin CEST); skipped by `check` if today's release exists.
+    - cron: "41 9 * * *"
   workflow_dispatch:
     inputs:
       tag_override:
@@ -23,7 +28,33 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  check:
+    # Scheduled runs only: skip the ETL when today's data-YYYY-MM-DD release
+    # already exists (e.g. the 09:41 UTC backup after a good 03:23 UTC run).
+    # Manual workflow_dispatch runs always proceed.
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      skip: ${{ steps.c.outputs.skip }}
+    steps:
+      - id: c
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          TAG="data-$(date -u +%F)"
+          if [ "${{ github.event_name }}" = "schedule" ] && \
+             gh release view "$TAG" -R "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release $TAG already exists - skipping scheduled ETL"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
   etl:
+    needs: check
+    if: needs.check.outputs.skip != 'true'
     runs-on: ubuntu-latest
     # 6 h ceiling: BNetzA's CDN throttles per-connection downloads heavily, so
     # even with 16-way parallel aria2c the full pipeline (download + parse +
@@ -96,25 +127,50 @@ jobs:
         # 16 simultaneous range requests against the same URL. Typical speedup
         # for the Gesamtdatenexport: 5-10x. Summary line every 15 s shows real
         # speed/ETA in the GH Actions log.
+        # Resilience (2026-09-28 failure: last segment died on a stale reused
+        # keep-alive socket, 5 tries burnt in ~24 s): no keep-alive, 30 tries,
+        # 3 resuming attempts 60 s apart, then the single-stream Python
+        # downloader (mastr_etl.download) as a last resort.
+        timeout-minutes: 180
         run: |
           set -euo pipefail
           mkdir -p data/work
-          aria2c \
-            --max-connection-per-server=16 \
-            --split=16 \
-            --min-split-size=10M \
-            --max-tries=5 \
-            --retry-wait=10 \
-            --connect-timeout=30 \
-            --timeout=60 \
-            --console-log-level=info \
-            --summary-interval=15 \
-            --allow-overwrite=true \
-            --auto-file-renaming=false \
-            --check-certificate=true \
-            --dir=data/work \
-            --out=mastr-latest.zip \
-            "${{ steps.zipurl.outputs.url }}"
+          URL="${{ steps.zipurl.outputs.url }}"
+          ok=0
+          for attempt in 1 2 3; do
+            echo "aria2c attempt $attempt/3"
+            if aria2c \
+                --max-connection-per-server=16 \
+                --split=16 \
+                --min-split-size=10M \
+                --max-tries=30 \
+                --retry-wait=20 \
+                --enable-http-keep-alive=false \
+                --lowest-speed-limit=50K \
+                --continue=true \
+                --connect-timeout=30 \
+                --timeout=60 \
+                --console-log-level=info \
+                --summary-interval=15 \
+                --allow-overwrite=true \
+                --auto-file-renaming=false \
+                --check-certificate=true \
+                --dir=data/work \
+                --out=mastr-latest.zip \
+                "$URL"; then
+              ok=1
+              break
+            fi
+            if [ "$attempt" -lt 3 ]; then
+              echo "aria2c attempt $attempt failed; resuming in 60 s"
+              sleep 60
+            fi
+          done
+          if [ "$ok" -ne 1 ]; then
+            echo "aria2c failed 3x; falling back to single-stream Python downloader"
+            rm -f data/work/mastr-latest.zip data/work/mastr-latest.zip.aria2
+            python -u -m mastr_etl.download --out data/work --url "$URL" --filename mastr-latest.zip
+          fi
           ls -lh data/work/
           # SHA-256 sidecar so downstream steps + downstream R clients can verify
           (cd data/work && sha256sum mastr-latest.zip > mastr-latest.zip.sha256)

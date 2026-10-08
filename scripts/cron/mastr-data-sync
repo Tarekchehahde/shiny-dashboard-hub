@@ -1,11 +1,14 @@
-# Restart Prognose ~1 hour after each typical MaStR data-* landing.
-# ETL schedule is once: 06:00 UTC (mastr-nightly-etl). GitHub often delays it.
-#   08:30 UTC — 1 h after on-time publish  (~07:15 UTC)
-#   12:30 UTC — 1 h after delayed publish (~10:20–11:40 UTC)
-# VPS timezone is UTC. Most Visited is not bounced here.
+# Restart the MaStR apps after each new GitHub data-* release.
+# ETL (mastr-nightly-etl) is scheduled 03:23 UTC with a 09:41 UTC backup run,
+# but GitHub often delays scheduled runs by hours, so poll every 30 min from
+# 04:00 to 17:30 UTC (06:00-19:30 Berlin CEST). When the newest data-* release
+# is unchanged the script is a cheap no-op (one GitHub API call).
+# Restarts both Most Visited and the 4-month Prognose (MASTR_SYNC_SERVICES is
+# read by /usr/local/sbin/mastr-sync-data-apps.sh). VPS timezone is UTC.
 SHELL=/bin/bash
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 MAILTO=""
 CRON_TZ=UTC
+MASTR_SYNC_SERVICES="mastr-most-visited-forecast mastr-most-visited"
 
-30 8,12 * * * root /usr/local/sbin/mastr-sync-data-apps.sh >/dev/null 2>&1
+*/30 4-17 * * * root /usr/local/sbin/mastr-sync-data-apps.sh >/dev/null 2>&1
